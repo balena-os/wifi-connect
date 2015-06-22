@@ -1,4 +1,4 @@
-connman = require 'connman-simplified'
+connman = require('connman-simplified')()
 app = require('express')()
 bodyParser = require('body-parser')
 
