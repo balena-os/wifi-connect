@@ -1,5 +1,6 @@
 connman = require('connman-simplified')()
-app = require('express')()
+express = require('express')
+app = express()
 bodyParser = require('body-parser')
 
 ssid = process.env.SSID or 'ResinAP'
