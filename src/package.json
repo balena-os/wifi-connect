@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-  	"start": "coffee app.coffee",
+    "start": "coffee app.coffee",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.13.1",
+    "coffee-script": "^1.9.3",
+    "connman-simplified": "0.0.2",
+    "express": "^4.13.0"
+  }
 }

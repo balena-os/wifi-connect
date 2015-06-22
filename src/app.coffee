@@ -9,15 +9,18 @@ connman.init (err) ->
 	connman.initWiFi (err, wifi, properties) ->
 		throw err if err
 		console.log("WiFi initialized")
-		wifi.openHotspot 'raspberrypi', (err) ->
-			throw err if err
-			console.log("Hotspot enabled")
+		if !properties.connected
+			wifi.joinFavorite (err) ->
+				if err
+					wifi.openHotspot 'raspberrypi', (err) ->
+						throw err if err
+						console.log("Hotspot enabled")
 
-			app.use(bodyParser())
-			app.use(express.static(__dirname + '/public'))
-			app.get '/ssids', (req, res) ->
-				res.send(['net1', 'net2'])
-			app.post '/connect', (req, res) ->
-				if req.body.ssid and req.body.passphrase
-					console.log("Selected " + req.body.ssid)
+						app.use(bodyParser())
+						app.use(express.static(__dirname + '/public'))
+						app.get '/ssids', (req, res) ->
+							res.send(['net1', 'net2'])
+						app.post '/connect', (req, res) ->
+							if req.body.ssid and req.body.passphrase
+								console.log("Selected " + req.body.ssid)
 
