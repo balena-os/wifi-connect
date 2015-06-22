@@ -1,12 +1,13 @@
 {
   "name": "resin-wifi-connect",
   "version": "1.0.0",
-  "description": "",
+  "repository": "https://github.com/pcarranzav/resin-wifi-connect",
+  "description": "A tool to allow wifi configuration to be set via a captive portal",
   "scripts": {
     "start": "coffee app.coffee",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Pablo Carranza Vélez <pablo@resin.io>",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.13.1",
