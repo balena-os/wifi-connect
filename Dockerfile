@@ -6,7 +6,9 @@ RUN apt-get update && apt-get install -y \
 	wireless-tools\
 	sudo \
 	net-tools \
-	iptables
+	iptables \
+	libdbus-1-dev \
+	libexpat-dev
 
 COPY . /app
 
