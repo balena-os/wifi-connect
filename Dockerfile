@@ -1,6 +1,12 @@
 FROM resin/rpi-node
 
-RUN apt-get update && apt-get install -y dropbear usbutils wireless-tools sudo
+RUN apt-get update && apt-get install -y \
+	dropbear \
+	usbutils\
+	wireless-tools\
+	sudo \
+	net-tools \
+	iptables
 
 COPY . /app
 

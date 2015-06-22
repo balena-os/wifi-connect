@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<title>Resin WiFi chooser</title>
+
+		<link rel="stylesheet/css" href="/css/bootstrap.css">
+
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/index.js"></script>
+	</head>
+
+	<body>
+		Hi! Please choose your wifi from the list.
+
+		<form action='/connect' method='post'>
+			<select id='ssid-select' name='ssid'></select>
+
+			<input type='password' name='passphrase'></input>
+		</form>
+	</body>
+</html>
