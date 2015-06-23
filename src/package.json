@@ -13,7 +13,7 @@
     "async": "^1.2.1",
     "body-parser": "^1.13.1",
     "coffee-script": "^1.9.3",
-    "connman-simplified": "0.0.2",
+    "connman-simplified": "git+https://github.com/pcarranzav/connman-simplified.git",
     "express": "^4.13.0"
   }
 }

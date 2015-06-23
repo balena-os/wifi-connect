@@ -41,6 +41,7 @@ connman.init (err) ->
 					startServer(wifi) if err
 
 		if !properties.connected
+			console.log("Trying to join wifi")
 			wifi.joinFavorite (err) ->
 				if err
 					startServer(wifi)
