@@ -10,7 +10,8 @@ export PASSWD=${PASSWD:=root}
 #Set the root password
 echo "root:$PASSWD" | chpasswd
 
-cd src && npm start &
+cd /app/src && npm install
+cd /app/src && npm start &
 
 #Spawn dropbear
 dropbear -E -F
