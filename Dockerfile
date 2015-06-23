@@ -1,4 +1,4 @@
-FROM resin/rpi-node:0.11
+FROM resin/armv7hf-node:0.12.2
 
 RUN apt-get update && apt-get install -y \
 	dropbear \
