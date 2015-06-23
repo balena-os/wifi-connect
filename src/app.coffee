@@ -16,16 +16,16 @@ startServer = (wifi) ->
 	wifi.getNetworks (err, list) ->
 		ssidList = list
 		wifi.openHotspot ssid, passphrase, (err) ->
-			throw err if err
+			throw err if err?
 			console.log("Hotspot enabled")
 			server = app.listen(port)
 
 console.log("Starting node connman app")
 connman.init (err) ->
-	throw err if err
+	throw err if err?
 	console.log("Connman initialized")
 	connman.initWiFi (err, wifi, properties) ->
-		throw err if err
+		throw err if err?
 		console.log("WiFi initialized")
 
 		app.use(bodyParser())

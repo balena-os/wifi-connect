@@ -17,5 +17,6 @@ RUN chmod a+x /app/start
 RUN cd /app/src && npm install
 
 EXPOSE 8080
+VOLUME /var/lib/connman:/var/lib/connman
 
 CMD cd /app && ./start
