@@ -37,8 +37,11 @@ connman.init (err) ->
 				console.log("Selected " + req.body.ssid)
 				res.send('OK')
 				server.close()
-				wifi.join req.body.ssid, req.body.passphrase, (err) ->
-					startServer(wifi) if err
+				wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
+					console.log(err) if err
+					return startServer(wifi) if err
+					console.log("Joined!")
+
 
 		if !properties.connected
 			console.log("Trying to join wifi")
