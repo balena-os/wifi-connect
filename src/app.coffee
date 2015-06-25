@@ -19,7 +19,7 @@ iptablesRules = [
 		interface: 'tether'
 		dport: '80'
 		jump: 'DNAT'
-		'to-destination': '0.0.0.0:8080'
+		target_options: 'to-destination': '0.0.0.0:8080'
 	,
 		table: 'nat'
 		chain: 'PREROUTING'
@@ -27,7 +27,7 @@ iptablesRules = [
 		interface: 'tether'
 		dport: '443'
 		jump: 'DNAT'
-		'to-destination': '0.0.0.0:8080'
+		target_options: 'to-destination': '0.0.0.0:8080'
 	,
 		table: 'nat'
 		chain: 'POSTROUTING'
