@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
 	iptables \
 	libdbus-1-dev \
 	libexpat-dev \
-	nano
+	nano \
+	connman
 
 COPY . /app
 
