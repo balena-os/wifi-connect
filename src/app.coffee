@@ -30,6 +30,15 @@ iptablesRules = [
 		target_options: 'to-destination': '0.0.0.0:8080'
 ]
 
+masquerading = {
+	table: 'nat'
+	chain: 'POSTROUTING'
+	jump: 'MASQUERADE'
+}
+
+iptables.delete masquerading, (err) ->
+	console.log("Obnoxious rule deleted")
+
 
 startServer = (wifi) ->
 	wifi.getNetworks (err, list) ->
