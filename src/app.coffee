@@ -28,10 +28,6 @@ iptablesRules = [
 		dport: '443'
 		jump: 'DNAT'
 		target_options: 'to-destination': '0.0.0.0:8080'
-	,
-		table: 'nat'
-		chain: 'POSTROUTING'
-		jump: 'MASQUERADE'
 ]
 
 
