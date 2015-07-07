@@ -19,28 +19,13 @@ iptablesRules = ->
 	myIP = os.networkInterfaces().tether[0].address
 	return [
 			table: 'nat'
-			chain: 'PREROUTING'
-			protocol: 'tcp'
-			interface: 'tether'
-			dport: '80'
-			jump: 'DNAT'
-			target_options: 'to-destination': "#{myIP}:8080"
+			rule: "PREROUTING -p tcp -i tether --dport 80 -j DNAT --to-destination #{myIP}:8080"
 		,
 			table: 'nat'
-			chain: 'PREROUTING'
-			protocol: 'tcp'
-			interface: 'tether'
-			dport: '443'
-			jump: 'DNAT'
-			target_options: 'to-destination': "#{myIP}:8080"
+			rule: "PREROUTING -p tcp -i tether --dport 443 -j DNAT --to-destination #{myIP}:8080"
 		,
 			table: 'nat'
-			chain: 'PREROUTING'
-			protocol: 'udp'
-			interface: 'tether'
-			dport: '53'
-			jump: 'DNAT'
-			target_options: 'to-destination': "#{myIP}:53"
+			rule: "PREROUTING -p tcp -i tether --dport 53 -j DNAT --to-destination #{myIP}:53"
 	]
 
 
