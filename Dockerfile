@@ -19,7 +19,7 @@ COPY . /app
 
 RUN chmod a+x /app/start
 
-#RUN cd /app/src && npm install
+RUN cd /app/src && npm install
 
 VOLUME /var/lib/connman
 
