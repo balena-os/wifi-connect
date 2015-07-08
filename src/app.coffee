@@ -25,7 +25,7 @@ iptablesRules = ->
 			rule: "PREROUTING -p tcp -i tether --dport 443 -j DNAT --to-destination #{myIP}:8080"
 		,
 			table: 'nat'
-			rule: "PREROUTING -p tcp -i tether --dport 53 -j DNAT --to-destination #{myIP}:53"
+			rule: "PREROUTING -p udp -i tether --dport 53 -j DNAT --to-destination #{myIP}:53"
 	]
 
 
