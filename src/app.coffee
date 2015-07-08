@@ -19,13 +19,16 @@ iptablesRules = ->
 	myIP = os.networkInterfaces().tether[0].address
 	return [
 			table: 'nat'
-			rule: "PREROUTING -p tcp -i tether --dport 80 -j DNAT --to-destination #{myIP}:8080"
+			rule: "PREROUTING -i tether -j TETHER"
 		,
 			table: 'nat'
-			rule: "PREROUTING -p tcp -i tether --dport 443 -j DNAT --to-destination #{myIP}:8080"
+			rule: "TETHER -p tcp --dport 80 -j DNAT --to-destination #{myIP}:8080"
 		,
 			table: 'nat'
-			rule: "PREROUTING -p udp -i tether --dport 53 -j DNAT --to-destination #{myIP}:53"
+			rule: "TETHER -p tcp --dport 443 -j DNAT --to-destination #{myIP}:8080"
+		,
+			table: 'nat'
+			rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
 	]
 
 
@@ -36,7 +39,7 @@ startServer = (wifi) ->
 		wifi.openHotspot ssid, passphrase, (err) ->
 			throw err if err?
 			console.log("Hotspot enabled")
-			dnsServer = spawn('named', ['-u', 'bind'])
+			dnsServer = spawn('named', ['-f'])
 			iptables.appendMany iptablesRules(), (err) ->
 				throw err if err?
 				console.log("Captive portal enabled")
@@ -60,24 +63,29 @@ connman.init (err) ->
 				console.log("Selected " + req.body.ssid)
 				res.send('OK')
 				server.close ->
-					iptables.deleteMany iptablesRules(), (err) ->
-						throw err if err?
-						dnsServer.kill()
-						console.log("Server closed and captive portal disabled")
-						wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
-							console.log(err) if err
-							return startServer(wifi) if err
-							console.log("Joined! Exiting.")
-							process.exit()
+					iptables.delete iptablesRules()[0], ->
+						iptables.flush 'nat', 'TETHER', ->
+							dnsServer.kill()
+							console.log("Server closed and captive portal disabled")
+							wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
+								console.log(err) if err
+								return startServer(wifi) if err
+								console.log("Joined! Exiting.")
+								process.exit()
 
-		if !properties.connected
-			console.log("Trying to join wifi")
-			wifi.joinFavorite (err) ->
-				if err
-					startServer(wifi)
-		else
-			console.log("Already connected")
-					
+		# Create TETHER iptables chain (will silently fail if it already exists)
+		iptables.createChain 'nat', 'TETHER', ->
+			# Ensure no rules exist from an unclean shutdown
+			iptables.delete iptablesRules()[0], ->
+				iptables.flush 'nat', 'TETHER', ->
+					if !properties.connected
+						console.log("Trying to join wifi")
+						wifi.joinFavorite (err) ->
+							if err
+								startServer(wifi)
+					else
+						console.log("Already connected")
+						
 
 							
 

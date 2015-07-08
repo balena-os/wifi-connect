@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 	bridge-utils \
 	bind9
 
-COPY ./assets/namedb /etc/namedb
+COPY ./assets/bind /etc/bind
 COPY . /app
 
 RUN chmod a+x /app/start

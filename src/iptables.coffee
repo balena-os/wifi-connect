@@ -10,6 +10,12 @@ iptables.append = (rule, cb) ->
 iptables.delete = (rule, cb) ->
 	exec("iptables -t #{rule.table} -D #{rule.rule}", cb)
 
+iptables.createChain = (table, chain, cb) ->
+	exec("iptables -t #{table} -N #{chain}", cb)
+
+iptables.flush = (table, chain, cb) ->
+	exec("iptables -t #{table} -F #{chain}", cb)
+
 iptables.appendMany = (rules, cb) ->
 	async.eachSeries rules, iptables.append, cb
 
