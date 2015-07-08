@@ -76,7 +76,7 @@ connman.init (err) ->
 		# Create TETHER iptables chain (will silently fail if it already exists)
 		iptables.createChain 'nat', 'TETHER', ->
 			# Ensure no rules exist from an unclean shutdown
-			iptables.delete iptablesRules()[0], ->
+			iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
 				iptables.flush 'nat', 'TETHER', ->
 					if !properties.connected
 						console.log("Trying to join wifi")
