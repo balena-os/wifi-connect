@@ -15,11 +15,14 @@ RUN apt-get update && apt-get install -y \
 	bind9
 
 COPY ./assets/bind /etc/bind
+
+RUN mkdir -p /app/src
+COPY ./src/package.json /app/src/
+RUN cd /app/src && npm install
+
 COPY . /app
 
 RUN chmod a+x /app/start
-
-RUN cd /app/src && npm install
 
 VOLUME /var/lib/connman
 
