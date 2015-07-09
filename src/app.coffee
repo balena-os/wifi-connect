@@ -5,6 +5,7 @@ bodyParser = require('body-parser')
 iptables = require('./iptables')
 spawn = require('child_process').spawn
 os = require('os')
+async = require('async')
 
 ssid = process.env.SSID or 'ResinAP'
 passphrase = process.env.PASSPHRASE or '12345678'
@@ -15,21 +16,28 @@ server = null
 ssidList = null
 dnsServer = null
 
-iptablesRules = ->
-	myIP = os.networkInterfaces().tether[0].address
-	return [
-			table: 'nat'
-			rule: "PREROUTING -i tether -j TETHER"
-		,
-			table: 'nat'
-			rule: "TETHER -p tcp --dport 80 -j DNAT --to-destination #{myIP}:8080"
-		,
-			table: 'nat'
-			rule: "TETHER -p tcp --dport 443 -j DNAT --to-destination #{myIP}:8080"
-		,
-			table: 'nat'
-			rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
-	]
+getIptablesRules = (callback) ->
+	async.retry {times: 10, interval: 100}, (cb) ->
+		try
+			myIP = os.networkInterfaces().tether[0].address
+			cb(null, myIP)
+		catch err
+			cb(err)
+	, (err, myIP) ->
+		throw err if err?
+		callback null, [
+				table: 'nat'
+				rule: "PREROUTING -i tether -j TETHER"
+			,
+				table: 'nat'
+				rule: "TETHER -p tcp --dport 80 -j DNAT --to-destination #{myIP}:8080"
+			,
+				table: 'nat'
+				rule: "TETHER -p tcp --dport 443 -j DNAT --to-destination #{myIP}:8080"
+			,
+				table: 'nat'
+				rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
+		]
 
 
 startServer = (wifi) ->
@@ -40,11 +48,12 @@ startServer = (wifi) ->
 			throw err if err?
 			console.log("Hotspot enabled")
 			dnsServer = spawn('named', ['-f'])
-			iptables.appendMany iptablesRules(), (err) ->
-				throw err if err?
-				console.log("Captive portal enabled")
-				server = app.listen port, ->
-					console.log("Server listening")
+			getIptablesRules (err, iptablesRules) ->
+				iptables.appendMany iptablesRules, (err) ->
+					throw err if err?
+					console.log("Captive portal enabled")
+					server = app.listen port, ->
+						console.log("Server listening")
 
 console.log("Starting node connman app")
 connman.init (err) ->
@@ -63,7 +72,7 @@ connman.init (err) ->
 				console.log("Selected " + req.body.ssid)
 				res.send('OK')
 				server.close ->
-					iptables.delete iptablesRules()[0], ->
+					iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
 						iptables.flush 'nat', 'TETHER', ->
 							dnsServer.kill()
 							console.log("Server closed and captive portal disabled")
