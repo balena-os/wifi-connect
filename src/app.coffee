@@ -71,16 +71,16 @@ connman.init (err) ->
 			if req.body.ssid and req.body.passphrase
 				console.log("Selected " + req.body.ssid)
 				res.send('OK')
-				server.close ->
-					iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
-						iptables.flush 'nat', 'TETHER', ->
-							dnsServer.kill()
-							console.log("Server closed and captive portal disabled")
-							wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
-								console.log(err) if err
-								return startServer(wifi) if err
-								console.log("Joined! Exiting.")
-								process.exit()
+				server.close()
+				iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
+					iptables.flush 'nat', 'TETHER', ->
+						dnsServer.kill()
+						console.log("Server closed and captive portal disabled")
+						wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
+							console.log(err) if err
+							return startServer(wifi) if err
+							console.log("Joined! Exiting.")
+							process.exit()
 
 		# Create TETHER iptables chain (will silently fail if it already exists)
 		iptables.createChain 'nat', 'TETHER', ->
