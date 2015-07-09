@@ -17,7 +17,7 @@ ssidList = null
 dnsServer = null
 
 getIptablesRules = (callback) ->
-	async.retry {times: 10, interval: 100}, (cb) ->
+	async.retry {times: 100, interval: 100}, (cb) ->
 		try
 			myIP = os.networkInterfaces().tether[0].address
 			cb(null, myIP)
