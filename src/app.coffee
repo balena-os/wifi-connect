@@ -81,6 +81,8 @@ connman.init (err) ->
 							return startServer(wifi) if err
 							console.log("Joined! Exiting.")
 							process.exit()
+		app.use (req, res) ->
+			res.redirect('/')
 
 		# Create TETHER iptables chain (will silently fail if it already exists)
 		iptables.createChain 'nat', 'TETHER', ->
@@ -94,6 +96,7 @@ connman.init (err) ->
 								startServer(wifi)
 					else
 						console.log("Already connected")
+						process.exit()
 						
 
 							
