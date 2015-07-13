@@ -8,8 +8,7 @@ os = require('os')
 async = require('async')
 
 ssid = process.env.SSID or 'ResinAP'
-passphrase = process.env.PASSPHRASE or '12345678'
-passphrase = null if process.env.UNSECURED_TETHERING?
+passphrase = process.env.PASSPHRASE or null
 
 port = process.env.PORT or 8080
 
