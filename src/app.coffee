@@ -9,6 +9,7 @@ async = require('async')
 
 ssid = process.env.SSID or 'ResinAP'
 passphrase = process.env.PASSPHRASE or '12345678'
+passphrase = null if passphrase == ""
 
 port = process.env.PORT or 8080
 
