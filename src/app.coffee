@@ -58,10 +58,14 @@ startServer = (wifi) ->
 console.log("Starting node connman app")
 manageConnection = (retryCallback) ->
 	connman.init (err) ->
-		retryCallback(err) if err?
+		if err?
+			console.log(err)
+			retryCallback(err)
 		console.log("Connman initialized")
 		connman.initWiFi (err, wifi, properties) ->
-			retryCallback(err) if err?
+			if err?
+				console.log(err)
+				retryCallback(err)
 			console.log("WiFi initialized")
 
 			app.use(bodyParser())
