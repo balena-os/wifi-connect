@@ -60,12 +60,12 @@ manageConnection = (retryCallback) ->
 	connman.init (err) ->
 		if err?
 			console.log(err)
-			retryCallback(err)
+			return retryCallback(err)
 		console.log("Connman initialized")
 		connman.initWiFi (err, wifi, properties) ->
 			if err?
 				console.log(err)
-				retryCallback(err)
+				return retryCallback(err)
 			console.log("WiFi initialized")
 
 			app.use(bodyParser())
