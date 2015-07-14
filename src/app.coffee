@@ -56,48 +56,51 @@ startServer = (wifi) ->
 						console.log("Server listening")
 
 console.log("Starting node connman app")
-connman.init (err) ->
-	throw err if err?
-	console.log("Connman initialized")
-	connman.initWiFi (err, wifi, properties) ->
-		throw err if err?
-		console.log("WiFi initialized")
+manageConnection = (retryCallback) ->
+	connman.init (err) ->
+		retryCallback(err) if err?
+		console.log("Connman initialized")
+		connman.initWiFi (err, wifi, properties) ->
+			retryCallback(err) if err?
+			console.log("WiFi initialized")
 
-		app.use(bodyParser())
-		app.use(express.static(__dirname + '/public'))
-		app.get '/ssids', (req, res) ->
-			res.send(ssidList)
-		app.post '/connect', (req, res) ->
-			if req.body.ssid and req.body.passphrase
-				console.log("Selected " + req.body.ssid)
-				res.send('OK')
-				server.close()
+			app.use(bodyParser())
+			app.use(express.static(__dirname + '/public'))
+			app.get '/ssids', (req, res) ->
+				res.send(ssidList)
+			app.post '/connect', (req, res) ->
+				if req.body.ssid and req.body.passphrase
+					console.log("Selected " + req.body.ssid)
+					res.send('OK')
+					server.close()
+					iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
+						iptables.flush 'nat', 'TETHER', ->
+							dnsServer.kill()
+							console.log("Server closed and captive portal disabled")
+							wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
+								console.log(err) if err
+								return startServer(wifi) if err
+								console.log("Joined! Exiting.")
+								retryCallback()
+			app.use (req, res) ->
+				res.redirect('/')
+
+			# Create TETHER iptables chain (will silently fail if it already exists)
+			iptables.createChain 'nat', 'TETHER', ->
+				# Ensure no rules exist from an unclean shutdown
 				iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
 					iptables.flush 'nat', 'TETHER', ->
-						dnsServer.kill()
-						console.log("Server closed and captive portal disabled")
-						wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
-							console.log(err) if err
-							return startServer(wifi) if err
-							console.log("Joined! Exiting.")
-							process.exit()
-		app.use (req, res) ->
-			res.redirect('/')
-
-		# Create TETHER iptables chain (will silently fail if it already exists)
-		iptables.createChain 'nat', 'TETHER', ->
-			# Ensure no rules exist from an unclean shutdown
-			iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
-				iptables.flush 'nat', 'TETHER', ->
-					if !properties.connected
-						console.log("Trying to join wifi")
-						wifi.joinFavorite (err) ->
-							if err
-								startServer(wifi)
-					else
-						console.log("Already connected")
-						process.exit()
-						
-
+						if !properties.connected
+							console.log("Trying to join wifi")
+							wifi.joinFavorite (err) ->
+								if err
+									startServer(wifi)
+						else
+							console.log("Already connected")
+							retryCallback()
+							
+async.retry {times: 10, interval: 1000}, manageConnection, (err) ->
+	throw err if err?
+	process.exit()
 							
 
