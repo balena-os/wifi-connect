@@ -13,6 +13,7 @@
     "async": "^1.3.0",
     "bluebird": "^2.9.34",
     "body-parser": "^1.13.1",
+    "bower": "^1.4.1",
     "coffee-script": "^1.9.3",
     "connman-simplified": "git+https://github.com/pcarranzav/connman-simplified.git",
     "express": "^4.13.0",

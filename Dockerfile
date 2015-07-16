@@ -20,6 +20,7 @@ RUN cd /usr/src/app && JOBS=MAX npm install --unsafe-perm --production && npm ca
 COPY . /usr/src/app
 RUN /usr/src/app/node_modules/.bin/coffee -c /usr/src/app/src
 RUN chmod +x /usr/src/app/start
+RUN cd /usr/src/app && /usr/src/app/node_modules/.bin/bower install
 
 VOLUME /var/lib/connman
 
