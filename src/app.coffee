@@ -1,8 +1,9 @@
-connman = require('connman-simplified')()
+Promise = require('bluebird')
+connman = Promise.promisifyAll(require('connman-simplified')())
 express = require('express')
 app = express()
 bodyParser = require('body-parser')
-iptables = require('./iptables')
+iptables = Promise.promisifyAll(require('./iptables'))
 spawn = require('child_process').spawn
 os = require('os')
 async = require('async')
@@ -41,68 +42,75 @@ getIptablesRules = (callback) ->
 
 
 startServer = (wifi) ->
-	wifi.getNetworks (err, list) ->
-		throw err if err?
+	wifi.getNetworksAsync().then (list) ->
 		ssidList = list
-		wifi.openHotspot ssid, passphrase, (err) ->
-			throw err if err?
+	.then ->
+		wifi.openHotspotAsync(ssid, passphrase)
+	.then ->
 			console.log("Hotspot enabled")
 			dnsServer = spawn('named', ['-f'])
 			getIptablesRules (err, iptablesRules) ->
-				iptables.appendMany iptablesRules, (err) ->
-					throw err if err?
+				iptables.appendManyAsync(iptablesRules)
+				.then ->
 					console.log("Captive portal enabled")
 					server = app.listen port, ->
 						console.log("Server listening")
 
 console.log("Starting node connman app")
 manageConnection = (retryCallback) ->
-	connman.init (err) ->
-		if err?
-			console.log(err)
-			return retryCallback(err)
+	connman.initAsync()
+	.then ->
 		console.log("Connman initialized")
-		connman.initWiFi (err, wifi, properties) ->
-			if err?
-				console.log(err)
-				return retryCallback(err)
-			console.log("WiFi initialized")
+		connman.initWiFiAsync()
+	.spread (wifi, properties) ->
+		console.log("WiFi initialized")
 
-			app.use(bodyParser())
-			app.use(express.static(__dirname + '/public'))
-			app.get '/ssids', (req, res) ->
-				res.send(ssidList)
-			app.post '/connect', (req, res) ->
-				if req.body.ssid and req.body.passphrase
-					console.log("Selected " + req.body.ssid)
-					res.send('OK')
-					server.close()
-					iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
-						iptables.flush 'nat', 'TETHER', ->
-							dnsServer.kill()
-							console.log("Server closed and captive portal disabled")
-							wifi.joinWithAgent req.body.ssid, req.body.passphrase, (err) ->
-								console.log(err) if err
-								return startServer(wifi) if err
-								console.log("Joined! Exiting.")
-								retryCallback()
-			app.use (req, res) ->
-				res.redirect('/')
-
-			# Create TETHER iptables chain (will silently fail if it already exists)
-			iptables.createChain 'nat', 'TETHER', ->
-				# Ensure no rules exist from an unclean shutdown
+		app.use(bodyParser())
+		app.use(express.static(__dirname + '/public'))
+		app.get '/ssids', (req, res) ->
+			res.send(ssidList)
+		app.post '/connect', (req, res) ->
+			if req.body.ssid and req.body.passphrase
+				console.log("Selected " + req.body.ssid)
+				res.send('OK')
+				server.close()
 				iptables.delete { table: 'nat', rule: "PREROUTING -i tether -j TETHER"}, ->
 					iptables.flush 'nat', 'TETHER', ->
-						if !properties.connected
-							console.log("Trying to join wifi")
-							wifi.joinFavorite (err) ->
-								if err
-									startServer(wifi)
-						else
-							console.log("Already connected")
+						dnsServer.kill()
+						console.log("Server closed and captive portal disabled")
+						wifi.joinWithAgentAsync(req.body.ssid, req.body.passphrase)
+						.then ->
+							console.log("Joined! Exiting.")
 							retryCallback()
-							
+						.catch (err) ->
+							console.log(err)
+							return startServer(wifi)
+		app.use (req, res) ->
+			res.redirect('/')
+
+		# Create TETHER iptables chain (will silently fail if it already exists)
+		iptables.createChainAsync('nat', 'TETHER')
+		.catch ->
+			return
+		.then ->
+			iptables.deleteAsync({ table: 'nat', rule: "PREROUTING -i tether -j TETHER"})
+		.catch ->
+			return
+		.then ->
+				iptables.flushAsync('nat', 'TETHER')
+		.then ->
+			if !properties.connected
+				console.log("Trying to join wifi")
+				wifi.joinFavoriteAsync()
+				.catch (err) ->
+					startServer(wifi)
+			else
+				console.log("Already connected")
+				retryCallback()
+	.catch (err) ->
+		console.log(err)
+		return retryCallback(err)
+
 async.retry {times: 10, interval: 1000}, manageConnection, (err) ->
 	throw err if err?
 	process.exit()
