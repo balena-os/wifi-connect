@@ -4,7 +4,7 @@
   "repository": "https://github.com/pcarranzav/resin-wifi-connect",
   "description": "A tool to allow wifi configuration to be set via a captive portal",
   "scripts": {
-    "start": "coffee app.coffee",
+    "start": "cd src && node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Pablo Carranza Vélez <pablo@resin.io>",
