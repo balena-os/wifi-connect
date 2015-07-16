@@ -16,13 +16,14 @@ RUN apt-get update && apt-get install -y \
 
 COPY ./assets/bind /etc/bind
 
-RUN mkdir -p /usr/src/app
-COPY ./package.json /usr/src/app
+RUN mkdir -p /usr/src/app/
+COPY package.json /usr/src/app/
 RUN cd /usr/src/app && JOBS=MAX npm install --unsafe-perm --production && npm cache clean
 
 COPY . /usr/src/app
 RUN /usr/src/app/node_modules/.bin/coffee -c /usr/src/app/src
+RUN chmod +x /usr/src/app/start
 
 VOLUME /var/lib/connman
 
-CMD cd /usr/src/app && npm start
+CMD cd /usr/src/app && ./start

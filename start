@@ -1,0 +1,8 @@
+#!/bin/bash
+npm start
+
+while true
+do
+	echo "App exited but container is still running"
+	sleep 3600
+done
