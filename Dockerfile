@@ -4,13 +4,10 @@ RUN apt-get update && apt-get install -y \
 	bind9 \
 	bridge-utils \
 	connman \
-	dropbear \
 	iptables \
 	libdbus-1-dev \
 	libexpat-dev \
-	nano \
 	net-tools \
-	sudo \
 	usbutils \
 	wireless-tools	
 
