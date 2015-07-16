@@ -42,6 +42,7 @@ getIptablesRules = (callback) ->
 
 
 startServer = (wifi) ->
+	console.log("Getting networks list")
 	wifi.getNetworksAsync().then (list) ->
 		ssidList = list
 	.then ->
@@ -63,6 +64,7 @@ manageConnection = (retryCallback) ->
 		console.log("Connman initialized")
 		connman.initWiFiAsync()
 	.spread (wifi, properties) ->
+		wifi = Promise.promisifyAll(wifi)
 		console.log("WiFi initialized")
 
 		app.use(bodyParser())
