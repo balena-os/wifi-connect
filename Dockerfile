@@ -18,7 +18,7 @@ COPY ./assets/bind /etc/bind
 
 RUN mkdir -p /app/src
 COPY ./src/package.json /app/src/
-RUN cd /app/src && npm install
+RUN cd /app/src && JOBS=MAX npm install --unsafe-perm --production && npm cache clean
 
 COPY . /app
 
