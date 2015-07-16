@@ -1,18 +1,18 @@
 FROM resin/armv7hf-node:0.12.2
 
 RUN apt-get update && apt-get install -y \
+	bind9 \
+	bridge-utils \
+	connman \
 	dropbear \
-	usbutils\
-	wireless-tools\
-	sudo \
-	net-tools \
 	iptables \
 	libdbus-1-dev \
 	libexpat-dev \
 	nano \
-	connman \
-	bridge-utils \
-	bind9
+	net-tools \
+	sudo \
+	usbutils \
+	wireless-tools	
 
 COPY ./assets/bind /etc/bind
 
