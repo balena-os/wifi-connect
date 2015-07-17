@@ -17,13 +17,15 @@ server = null
 ssidList = null
 dnsServer = null
 
+ignore = ->
+
 getIptablesRules = (callback) ->
 	async.retry {times: 100, interval: 100}, (cb) ->
 		Promise.try ->
 			os.networkInterfaces().tether[0].address
 		.nodeify(cb)
 	, (err, myIP) ->
-		throw err if err?
+		return callback(err) if err?
 		callback null, [
 				table: 'nat'
 				rule: 'PREROUTING -i tether -j TETHER'
@@ -43,16 +45,17 @@ startServer = (wifi) ->
 	console.log('Getting networks list')
 	wifi.getNetworksAsync().then (list) ->
 		ssidList = list
-	.then ->
 		wifi.openHotspotAsync(ssid, passphrase)
 	.then ->
 		console.log('Hotspot enabled')
 		dnsServer = spawn('named', ['-f'])
 		getIptablesRules (err, iptablesRules) ->
+			throw err if err?
 			iptables.appendManyAsync(iptablesRules)
 			.then ->
 				console.log('Captive portal enabled')
-				server = app.listen port, ->
+				server = app.listen port, (err) ->
+					throw err if err?
 					console.log('Server listening')
 
 console.log('Starting node connman app')
@@ -70,32 +73,36 @@ manageConnection = (retryCallback) ->
 		app.get '/ssids', (req, res) ->
 			res.send(ssidList)
 		app.post '/connect', (req, res) ->
-			if req.body.ssid and req.body.passphrase
-				console.log('Selected ' + req.body.ssid)
-				res.send('OK')
-				server.close()
-				iptables.delete { table: 'nat', rule: 'PREROUTING -i tether -j TETHER'}, ->
-					iptables.flush 'nat', 'TETHER', ->
-						dnsServer.kill()
-						console.log('Server closed and captive portal disabled')
-						wifi.joinWithAgentAsync(req.body.ssid, req.body.passphrase)
-						.then ->
-							console.log('Joined! Exiting.')
-							retryCallback()
-						.catch (err) ->
-							console.log(err)
-							return startServer(wifi)
+			if not (req.body.ssid? and req.body.passphrase?)
+				return res.sendStatus(400)
+			console.log('Selected ' + req.body.ssid)
+			res.send('OK')
+			server.close()
+			iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
+			.catch(ignore)
+			.then ->
+				iptables.flushAsync('nat', 'TETHER')
+			.catch(ignore)
+			.then ->
+				dnsServer.kill()
+				console.log('Server closed and captive portal disabled')
+				wifi.joinWithAgentAsync(req.body.ssid, req.body.passphrase)
+			.then ->
+				console.log('Joined! Exiting.')
+				retryCallback()
+			.catch (err) ->
+				console.log('Error joining network', err, err.stack)
+				return startServer(wifi)
+
 		app.use (req, res) ->
 			res.redirect('/')
 
 		# Create TETHER iptables chain (will silently fail if it already exists)
 		iptables.createChainAsync('nat', 'TETHER')
-		.catch ->
-			return
+		.catch(ignore)
 		.then ->
 			iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
-		.catch ->
-			return
+		.catch(ignore)
 		.then ->
 			iptables.flushAsync('nat', 'TETHER')
 		.then ->
