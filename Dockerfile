@@ -9,19 +9,24 @@ RUN apt-get update && apt-get install -y \
 	libexpat-dev \
 	net-tools \
 	usbutils \
-	wireless-tools	
+	wireless-tools \
+	&& rm -rf /var/lib/apt/lists/*
 
 COPY ./assets/bind /etc/bind
 
 RUN mkdir -p /usr/src/app/
-COPY package.json /usr/src/app/
-RUN cd /usr/src/app && JOBS=MAX npm install --unsafe-perm --production && npm cache clean
+WORKDIR /usr/src/app
 
-COPY . /usr/src/app
-RUN /usr/src/app/node_modules/.bin/coffee -c /usr/src/app/src
-RUN chmod +x /usr/src/app/start
-RUN cd /usr/src/app && /usr/src/app/node_modules/.bin/bower install
+COPY package.json ./
+RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean
+
+COPY bower.json .bowerrc ./
+RUN ./node_modules/.bin/bower install
+
+COPY . ./
+RUN ./node_modules/.bin/coffee -c ./src
+RUN chmod +x ./start
 
 VOLUME /var/lib/connman
 
-CMD cd /usr/src/app && ./start
+CMD ./start
