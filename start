@@ -3,6 +3,6 @@ npm start
 
 while true
 do
-	echo "App exited but container is still running"
+	echo "App exited but container is still running to allow web terminal access"
 	sleep 3600
 done
