@@ -1,6 +1,5 @@
 async = require('async')
 exec = require('child_process').exec
-#iptables = require('netfilter').iptables
 
 iptables = {}
 
