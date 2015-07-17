@@ -21,7 +21,7 @@ COPY package.json ./
 RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean
 
 COPY bower.json .bowerrc ./
-RUN ./node_modules/.bin/bower install
+RUN ./node_modules/.bin/bower --allow-root install
 
 COPY . ./
 RUN ./node_modules/.bin/coffee -c ./src
