@@ -19,11 +19,9 @@ dnsServer = null
 
 getIptablesRules = (callback) ->
 	async.retry {times: 100, interval: 100}, (cb) ->
-		try
-			myIP = os.networkInterfaces().tether[0].address
-			cb(null, myIP)
-		catch err
-			cb(err)
+		Promise.try ->
+			os.networkInterfaces().tether[0].address
+		.nodeify(cb)
 	, (err, myIP) ->
 		throw err if err?
 		callback null, [
