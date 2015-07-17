@@ -7,9 +7,9 @@ This is a [resin.io](http://resin.io) application. Check out our [Getting Starte
 
 This project is meant to be integrated as part of a larger application (that is, _your_ application).
 
-If you need to add dependencies, add the corresponding statements in the [Dockerfile](./Dockerfile). You can add the commands that run your app in the [start](./start) script. This app only exits after a successful connection, so if you add your app after [line 3](./start#L3) you ensure that everything happens after wifi is correctly configured.
+If you need to add dependencies, add the corresponding statements in the [Dockerfile](./Dockerfile.template) template. You can add the commands that run your app in the [start](./start) script. This app only exits after a successful connection, so if you add your app after [line 3](./start#L3) you ensure that everything happens after wifi is correctly configured.
 
-This is a node.js application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](http://docs.resin.io/#/pages/using/dockerfile.md).
+This is a node.js application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](http://docs.resin.io/#/pages/using/dockerfile.md). This project uses a Resin feature called "Dockerfile template": the base image is chosen depending on the architecture, specified by the `%%RESIN_ARCH%%` variable (see [line 1](./Dockerfile.template#L1) in the template).
 
 ## How it works
 This app interacts with the Connman connection manager in Resin's base OS. It checks whether WiFi is connected, tries to join the favorite network, and if this fails, it opens an Access Point to which you can connect using a laptop or mobile phone.
