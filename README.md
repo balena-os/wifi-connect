@@ -1,7 +1,7 @@
 # resin-wifi-connect Python example
 
 This repo is a fork of [resin-wifi-connect](https://github.com/resin-io/resin-wifi-connect) that shows how to integrate that tool on a Python project.
-This app runs the resin-wifi-connect node application and, after a wifi connection has been established, runs a Hello World python (Flask) server.
+This app runs the resin-wifi-connect node application and, after a wifi connection has been established, runs a Hello World python (Flask) server like the one on [this Resin example project](https://github.com/resin-io-projects/simple-server-python).
 
 The differences between this repo and resin-wifi-connect can be seen in [Dockerfile.template](./Dockerfile.template), the [start](./start) script and the [python-server](./python-server) folder.
 
