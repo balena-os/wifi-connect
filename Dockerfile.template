@@ -1,5 +1,6 @@
 FROM resin/%%RESIN_ARCH%%-node:0.12.2
 
+# Note we added the python dependencies after resin-wifi-connect's deps.
 RUN apt-get update && apt-get install -y \
 	bind9 \
 	bridge-utils \
@@ -10,6 +11,10 @@ RUN apt-get update && apt-get install -y \
 	net-tools \
 	usbutils \
 	wireless-tools \
+	python \
+	python-dev \
+	python-dbus \
+	python-pip \
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY ./assets/bind /etc/bind
@@ -29,5 +34,9 @@ RUN ./node_modules/.bin/coffee -c ./src
 RUN chmod +x ./start
 
 VOLUME /var/lib/connman
+
+# Here we add the Python server
+RUN pip install flask
+COPY ./python-server /app
 
 CMD ./start
