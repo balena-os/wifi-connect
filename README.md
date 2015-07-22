@@ -1,5 +1,9 @@
-# resin-wifi-connect
-An app to allow WiFi configuration to be set via a captive portal. It checks whether WiFi is connected, tries to join the saved network, and if this fails, it opens an access point to which you can connect using a laptop or mobile phone and input new WiFi credentials.
+# resin-wifi-connect Python example
+
+This repo is a fork of [resin-wifi-connect](https://github.com/resin-io/resin-wifi-connect) that shows how to integrate that tool on a Python project.
+This app runs the resin-wifi-connect node application and, after a wifi connection has been established, runs a Hello World python (Flask) server.
+
+The differences between this repo and resin-wifi-connect can be seen in [Dockerfile.template](./Dockerfile.template), the [start](./start) script and the [python-server](./python-server) folder.
 
 ## How to use this
 This is a [resin.io](http://resin.io) application. Check out our [Getting Started](http://docs.resin.io/#/pages/installing/gettingStarted.md) guide if it's your first time using Resin.
