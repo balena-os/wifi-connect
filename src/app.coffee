@@ -109,8 +109,12 @@ manageConnection = (retryCallback) ->
 			if !properties.connected
 				console.log('Trying to join wifi')
 				wifi.joinFavoriteAsync()
+				.then ->
+					console.log('Joined! Exiting.')
+					retryCallback()
 				.catch (err) ->
 					startServer(wifi)
+
 			else
 				console.log('Already connected')
 				retryCallback()
