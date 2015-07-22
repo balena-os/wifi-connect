@@ -1,7 +1,7 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-node:6
 
-RUN apt-get update \
-	&& apt-get install -y \
+# Note we added the python dependencies after resin-wifi-connect's deps.
+RUN apt-get update && apt-get install -yq --no-recommends \
 		dnsmasq \
 		hostapd \
 		iproute2 \
@@ -9,7 +9,11 @@ RUN apt-get update \
 		libdbus-1-dev \
 		libexpat-dev \
 		rfkill \
-	&& rm -rf /var/lib/apt/lists/*
+		python \
+		python-dev \
+		python-dbus \
+		python-pip && \
+		apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /usr/src/app/
 
@@ -28,5 +32,9 @@ RUN ./node_modules/.bin/bower --allow-root install \
 COPY . /usr/src/app/
 
 RUN ./node_modules/.bin/coffee -c ./src
+
+# Add the Python server
+RUN pip install flask
+COPY ./python-server /app
 
 CMD bash start
