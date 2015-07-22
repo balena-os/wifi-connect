@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1"
+	 xmlns="http://www.w3.org/2000/svg"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 xml:space="preserve"
+
+	 x="0px"
+	 y="0px"
+	 width="363px"
+	 height="420px"
+	 viewbox="0 0 363 420">
+	<g transform="scale(0.6)">
+		<g>
+			<polygon points="303,0 0,175 303,350 605,175" fill="#e0a800"></polygon>
+			<polygon points="0,175 0,525 303,700 303,350" fill="#ffec52"></polygon>
+			<polygon points="303,700 605,525 605,175 303,350" fill="#f7c30f"></polygon>
+		</g>
+		<g transform="translate(303, 350) scale(0.618) rotate(180) translate(-303, -350)">
+			<polygon points="303,0 0,175 303,350 605,175" fill="#e0a800"></polygon>
+			<polygon points="0,175 0,525 303,700 303,350" fill="#ffec52"></polygon>
+			<polygon points="303,700 605,525 605,175 303,350" fill="#f7c30f"></polygon>
+		</g>
+		<g transform="translate(303, 350) scale(0.474) translate(-303, -350)">
+			<polygon points="303,0 0,175 303,350 605,175" fill="#e0a800"></polygon>
+			<polygon points="0,175 0,525 303,700 303,350" fill="#ffec52"></polygon>
+			<polygon points="303,700 605,525 605,175 303,350" fill="#f7c30f"></polygon>
+		</g>
+	</g>
+</svg>
