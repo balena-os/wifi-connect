@@ -7,8 +7,11 @@ sleep 1 # Delay needed to avoid DBUS introspection errors
 node src/app.js --clear=false
 
 # We run the Python app after the wifi connection has been established
+# and the previous command has exited.
 cd /app && python main.py
 
+# If our Python server ever crashed/exited, the following loop will
+# allow us to still access our device on the web terminal.
 while true; do
 	echo "App exited but container is still running to allow web terminal access"
 	sleep 3600
