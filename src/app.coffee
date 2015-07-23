@@ -8,7 +8,7 @@ spawn = require('child_process').spawn
 os = require('os')
 async = require('async')
 
-config = require('./config.json')
+config = require('./wifi.json')
 ssid = process.env.PORTAL_SSID or config.ssid
 passphrase = process.env.PORTAL_PASSPHRASE or config.passphrase
 port = process.env.PORTAL_PORT or config.port
