@@ -9,9 +9,9 @@ os = require('os')
 async = require('async')
 
 config = require('./config.json')
-ssid = config.ssid
-passphrase = config.passphrase
-port = config.port
+ssid = process.env.PORTAL_SSID or config.ssid
+passphrase = process.env.PORTAL_PASSPHRASE or config.passphrase
+port = process.env.PORTAL_PORT or config.port
 
 server = null
 ssidList = null
