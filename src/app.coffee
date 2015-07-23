@@ -8,10 +8,10 @@ spawn = require('child_process').spawn
 os = require('os')
 async = require('async')
 
-ssid = process.env.SSID or 'ResinAP'
-passphrase = process.env.PASSPHRASE or null
-
-port = process.env.PORT or 8080
+config = require('./config.json')
+ssid = process.env.PORTAL_SSID or config.ssid
+passphrase = process.env.PORTAL_PASSPHRASE or config.passphrase
+port = process.env.PORTAL_PORT or config.port
 
 server = null
 ssidList = null
@@ -31,10 +31,10 @@ getIptablesRules = (callback) ->
 				rule: 'PREROUTING -i tether -j TETHER'
 			,
 				table: 'nat'
-				rule: "TETHER -p tcp --dport 80 -j DNAT --to-destination #{myIP}:8080"
+				rule: "TETHER -p tcp --dport 80 -j DNAT --to-destination #{myIP}:#{port}"
 			,
 				table: 'nat'
-				rule: "TETHER -p tcp --dport 443 -j DNAT --to-destination #{myIP}:8080"
+				rule: "TETHER -p tcp --dport 443 -j DNAT --to-destination #{myIP}:#{port}"
 			,
 				table: 'nat'
 				rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
