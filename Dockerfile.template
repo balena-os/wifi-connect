@@ -1,4 +1,4 @@
-FROM resin/%%RESIN_ARCH%%-node:0.12.2
+FROM resin/%%RESIN_ARCH%%-node:0.10.38
 
 RUN apt-get update && apt-get install -y \
 	bind9 \
