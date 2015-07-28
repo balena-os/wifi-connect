@@ -5,7 +5,7 @@ app = express()
 bodyParser = require('body-parser')
 iptables = Promise.promisifyAll(require('./iptables'))
 spawn = require('child_process').spawn
-exec = require('child_process').exec
+execAsync = Promise.promisify(require('child_process').exec)
 os = require('os')
 async = require('async')
 fs = Promise.promisifyAll(require('fs'))
@@ -48,6 +48,25 @@ getIptablesRules = (callback) ->
 				rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
 		]
 
+openHotspot = (wifi, ssid, passphrase) ->
+	execAsync 'modprobe -r bcm4334x'
+	.delay(5000)
+	.then ->
+		execAsync 'modprobe bcm4334x op_mode=2'
+	.delay(3000)
+	.then ->
+		wifi.openHotspotAsync(ssid, passphrase)
+
+closeHotspot = (wifi) ->
+	wifi.closeHotspotAsync()
+	.delay(5000)
+	.then ->
+		execAsync 'modprobe -r bcm4334x'
+	.delay(3000)
+	.then ->
+		execAsync 'modprobe bcm4334x'
+	.delay(2000)
+
 
 startServer = (wifi) ->
 	console.log('Getting networks list')
@@ -57,7 +76,7 @@ startServer = (wifi) ->
 		return []
 	.then (list) ->
 		ssidList = list
-		wifi.openHotspotAsync(ssid, passphrase)
+		openHotspot(wifi, ssid, passphrase)
 	.then ->
 		console.log('Hotspot enabled')
 		dnsServer = spawn('named', ['-f'])
@@ -112,7 +131,9 @@ manageConnection = (retryCallback) ->
 			console.log('Selected ' + req.body.ssid)
 			res.send('OK')
 			server.close()
-			iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
+			closeHotspot(wifi)
+			.then ->
+				iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
 			.catch(ignore)
 			.then ->
 				iptables.flushAsync('nat', 'TETHER')
