@@ -48,25 +48,64 @@ getIptablesRules = (callback) ->
 				rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
 		]
 
-openHotspot = (wifi, ssid, passphrase) ->
-	execAsync 'modprobe -r bcm4334x'
-	.delay(5000)
+reboot = ->
+	execAsync('sync')
 	.then ->
-		execAsync 'modprobe bcm4334x op_mode=2'
-	.delay(5000)
+		execAsync('dbus-send --print-reply --reply-timeout=2000 --type=method_call --system --dest=org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager.Reboot')
 	.then ->
-		wifi.openHotspotAsync(ssid, passphrase)
+		process.exit()
 
-closeHotspot = (wifi) ->
-	wifi.closeHotspotAsync()
-	.delay(5000)
+loadModuleForStation = ->
+	console.log("Removing bcm module")
+	return Promise.delay(5000)
 	.then ->
 		execAsync 'modprobe -r bcm4334x'
+	.catch(ignore)
 	.delay(5000)
 	.then ->
+		console.log("Reloading bcm module")
 		execAsync 'modprobe bcm4334x'
+	.catch(ignore)
 	.delay(5000)
 
+
+loadModuleForAP = (wifi) ->
+	console.log("Removing bcm module")
+	execAsync 'modprobe -r bcm4334x'
+	.catch(ignore)
+	.delay(5000)
+	.then ->
+		console.log("Reloading bcm module")
+		execAsync 'modprobe bcm4334x op_mode=2'
+	.catch(ignore)
+	.delay(5000)
+
+openHotspot = (wifi, ssid, passphrase) ->
+	loadModuleForAP(wifi)
+	.then ->
+		console.log("Opening hotspot")
+		wifi.openHotspotAsync(ssid, passphrase)
+	.catch (err) ->
+		console.log(err)
+
+closeHotspot = (wifi) ->
+	console.log("Closing hotspot")
+	wifi.closeHotspotAsync()
+	.then ->
+		loadModuleForStation(wifi)
+
+connectOrStartServer = (wifi, retryCallback) ->
+	fs.exists connectionFile, (exists) ->
+		if exists
+			conn = require(connectionFile)
+			wifi.joinWithAgentAsync(conn.ssid, conn.passphrase)
+			.then ->
+				console.log('Joined! Exiting.')
+				retryCallback()
+			.catch ->
+				startServer(wifi)
+		else
+			startServer(wifi)
 
 startServer = (wifi) ->
 	console.log('Getting networks list')
@@ -141,19 +180,10 @@ manageConnection = (retryCallback) ->
 			.then ->
 				dnsServer.kill()
 				console.log('Server closed and captive portal disabled')
-				Promise.fromNode (callback) ->
-					async.retry {times: 3, interval: 1000}, (done) ->
-						wifi.joinAsync(req.body.ssid, req.body.passphrase)
-						.nodeify(done)
-					, callback
-			.then ->
 				saveToFile(req.body.ssid, req.body.passphrase)
 			.then ->
-				console.log('Joined! Exiting.')
-				retryCallback()
-			.catch (err) ->
-				console.log('Error joining network', err, err.stack)
-				return startServer(wifi)
+				console.log('Rebooting')
+				reboot()
 
 		app.use (req, res) ->
 			res.redirect('/')
