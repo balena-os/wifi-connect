@@ -1,8 +1,8 @@
 #!/bin/bash
 if [[ "$INITSYSTEM" == "on" ]]; then
-	DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host_run/dbus/system_bus_socket npm start > wifi.log
+	DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host_run/dbus/system_bus_socket npm start &> wifi.log
 else
-	npm start > wifi.log
+	npm start &> wifi.log
 fi
 
 while true
