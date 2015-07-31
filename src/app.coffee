@@ -85,6 +85,9 @@ openHotspot = (wifi, ssid, passphrase) ->
 	.then ->
 		console.log("Opening hotspot")
 		execAsync("connmanctl tether wifi on #{ssid} #{passphrase}")
+	.delay(3000)
+	.then ->
+		execAsync("brctl addif tether wlan0")
 	.catch (err) ->
 		console.log(err)
 
