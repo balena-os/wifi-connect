@@ -84,7 +84,7 @@ openHotspot = (wifi, ssid, passphrase) ->
 	loadModuleForAP(wifi)
 	.then ->
 		console.log("Opening hotspot")
-		wifi.openHotspotAsync(ssid, passphrase)
+		execAsync("connmanctl tether wifi on #{ssid} #{passphrase}")
 	.catch (err) ->
 		console.log(err)
 
