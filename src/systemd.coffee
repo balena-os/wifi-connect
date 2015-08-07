@@ -1,3 +1,4 @@
+Promise = require('bluebird')
 execAsync = Promise.promisify(require('child_process').exec)
 
 exports.callMethod = callMethod = (method, methodArgs) ->
