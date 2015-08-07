@@ -123,9 +123,9 @@ openHotspot = (wifi, ssid, passphrase) ->
 
 closeHotspot = (wifi) ->
 	console.log("Closing hotspot")
-	udhcpd.disableAsync()
+	udhcpd.disableAsync('wlan0')
 	.then ->
-		hostapd.disableAsync()
+		hostapd.disableAsync('wlan0')
 	.then ->
 		loadModuleForStation(wifi)
 
