@@ -9,6 +9,9 @@ execAsync = Promise.promisify(require('child_process').exec)
 os = require('os')
 async = require('async')
 fs = Promise.promisifyAll(require('fs'))
+systemd = require('./systemd')
+hostapd = Promise.promisifyAll(require('wireless-tools/hostapd'))
+udhcpd = Promise.promisifyAll(require('wireless-tools/udhcpd'))
 
 config = require('./wifi.json')
 ssid = process.env.PORTAL_SSID or config.ssid
@@ -30,13 +33,13 @@ ignore = ->
 getIptablesRules = (callback) ->
 	async.retry {times: 100, interval: 200}, (cb) ->
 		Promise.try ->
-			os.networkInterfaces().tether[0].address
+			os.networkInterfaces().wlan0[0].address
 		.nodeify(cb)
 	, (err, myIP) ->
 		return callback(err) if err?
 		callback null, [
 				table: 'nat'
-				rule: 'PREROUTING -i tether -j TETHER'
+				rule: 'PREROUTING -i wlan0 -j TETHER'
 			,
 				table: 'nat'
 				rule: "TETHER -p tcp --dport 80 -j DNAT --to-destination #{myIP}:#{port}"
@@ -47,13 +50,6 @@ getIptablesRules = (callback) ->
 				table: 'nat'
 				rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
 		]
-
-reboot = ->
-	execAsync('sync')
-	.then ->
-		execAsync('dbus-send --print-reply --reply-timeout=2000 --type=method_call --system --dest=org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager.Reboot')
-	.then ->
-		process.exit()
 
 loadModuleForStation = ->
 	console.log("Removing bcm module")
@@ -80,20 +76,56 @@ loadModuleForAP = (wifi) ->
 	.catch(ignore)
 	.delay(5000)
 
-openHotspot = (wifi, ssid, passphrase) ->
-	loadModuleForAP(wifi)
+setupHostapd = (ssid, passphrase) ->
+	options = {
+		interface: 'wlan0'
+		channel: 1
+		driver: 'nl80211'
+		hw_mode: 'g'
+		ssid: ssid
+	}
+	if passphrase?
+		options.wpa = 2
+		options.wpa_passphrase = passphrase
+
+	hostapd.enableAsync(options)
+
+setupUdhcpd = ->
+	options = {
+		interface: 'wlan0',
+		start: '192.168.42.100',
+		end: '192.168.42.200',
+		option: {
+			router: '192.168.42.1',
+			subnet: '255.255.255.0',
+			dns: [ '192.168.42.1' ]
+		}
+	}
+	execAsync('ifconfig wlan0 192.168.42.1 up')
 	.then ->
-		console.log("Opening hotspot")
-		execAsync("connmanctl tether wifi on #{ssid} #{passphrase}")
+		udhcpd.enableAsync(options)
+
+
+openHotspot = (wifi, ssid, passphrase) ->	
+	systemd.stop('wpa_supplicant')
 	.delay(3000)
 	.then ->
-		execAsync("brctl addif tether wlan0")
+		loadModuleForAP(wifi)
+	.delay(3000)
+	.then ->
+		console.log("Opening hotspot")
+		setupHostapd(ssid, passphrase)
+	.delay(3000)
+	.then ->
+		setupUdhcpd()
 	.catch (err) ->
 		console.log(err)
 
 closeHotspot = (wifi) ->
 	console.log("Closing hotspot")
-	wifi.closeHotspotAsync()
+	udhcpd.disableAsync()
+	.then ->
+		hostapd.disableAsync()
 	.then ->
 		loadModuleForStation(wifi)
 
@@ -175,7 +207,7 @@ manageConnection = (retryCallback) ->
 			server.close()
 			closeHotspot(wifi)
 			.then ->
-				iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
+				iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i wlan0 -j TETHER'})
 			.catch(ignore)
 			.then ->
 				iptables.flushAsync('nat', 'TETHER')
@@ -186,7 +218,7 @@ manageConnection = (retryCallback) ->
 				saveToFile(req.body.ssid, req.body.passphrase)
 			.then ->
 				console.log('Rebooting')
-				reboot()
+				systemd.reboot()
 
 		app.use (req, res) ->
 			res.redirect('/')
@@ -199,7 +231,7 @@ manageConnection = (retryCallback) ->
 			iptables.createChainAsync('nat', 'TETHER')
 		.catch(ignore)
 		.then ->
-			iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
+			iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i wlan0 -j TETHER'})
 		.catch(ignore)
 		.then ->
 			iptables.flushAsync('nat', 'TETHER')
