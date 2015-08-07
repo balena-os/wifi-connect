@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
 RUN systemctl disable connman
 
 COPY ./assets/bind /etc/bind
+COPY ./assets/firmware /etc/firmware
 COPY ./assets/sbin /usr/sbin
 
 RUN mkdir -p /usr/src/app/

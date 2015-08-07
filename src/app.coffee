@@ -60,7 +60,7 @@ loadModuleForStation = ->
 	.delay(5000)
 	.then ->
 		console.log("Reloading bcm module")
-		execAsync 'modprobe bcm4334x'
+		execAsync 'modprobe bcm4334x firmware_path="/etc/firmware/fw_bcmdhd.bin" nvram_path="/etc/firmware/bcmdhd.cal"'
 	.catch(ignore)
 	.delay(5000)
 
@@ -72,7 +72,7 @@ loadModuleForAP = (wifi) ->
 	.delay(5000)
 	.then ->
 		console.log("Reloading bcm module")
-		execAsync 'modprobe bcm4334x op_mode=2'
+		execAsync 'modprobe bcm4334x op_mode=2 firmware_path="/etc/firmware/fw_bcmdhd.bin" nvram_path="/etc/firmware/bcmdhd.cal"'
 	.catch(ignore)
 	.delay(5000)
 
