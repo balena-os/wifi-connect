@@ -5,6 +5,7 @@ app = express()
 bodyParser = require('body-parser')
 iptables = Promise.promisifyAll(require('./iptables'))
 spawn = require('child_process').spawn
+exec = require('child_process').exec
 os = require('os')
 async = require('async')
 
@@ -16,6 +17,11 @@ port = process.env.PORTAL_PORT or config.port
 server = null
 ssidList = null
 dnsServer = null
+
+connectionFile = '/data/connections.json'
+connectionsFromFile = null
+if fs.existsSync(connectionFile)
+	connectionsFromFile = require(connectionFile)
 
 ignore = ->
 
@@ -58,6 +64,32 @@ startServer = (wifi) ->
 					throw err if err?
 					console.log('Server listening')
 
+connectOrStartServer = (wifi, retryCallback) ->
+	if connectionsFromFile?
+		console.log('Trying to join previously known networks')
+		Promise.each connectionsFromFile, (conn) ->
+			wifi.joinAsync(conn.ssid, conn.passphrase)
+			.then ->
+				console.log('Joined! Exiting.')
+				retryCallback()
+			.catch(ignore)
+		.then ->
+			startServer(wifi)
+	else
+		startServer(wifi)
+
+saveToFile = (ssid, passphrase) ->
+	if connectionsFromFile?
+		connectionsFromFile.push({ ssid, passphrase })
+	else
+		connectionsFromFile = [ { ssid, passphrase } ]
+	return new Promise (resolve, reject) ->
+		fs.writeFile connectionFile, JSON.stringify(connectionsFromFile), (err) ->
+			return reject(err) if err?
+			exec 'sync', (err) ->
+				reject(err) if err?
+				resolve()
+
 console.log('Starting node connman app')
 manageConnection = (retryCallback) ->
 	connman.initAsync()
@@ -88,6 +120,8 @@ manageConnection = (retryCallback) ->
 				console.log('Server closed and captive portal disabled')
 				wifi.joinAsync(req.body.ssid, req.body.passphrase)
 			.then ->
+				saveToFile(req.body.ssid, req.body.passphrase)
+			.then ->
 				console.log('Joined! Exiting.')
 				retryCallback()
 			.catch (err) ->
@@ -113,8 +147,7 @@ manageConnection = (retryCallback) ->
 					console.log('Joined! Exiting.')
 					retryCallback()
 				.catch (err) ->
-					startServer(wifi)
-
+					connectOrStartServer(wifi, retryCallback)
 			else
 				console.log('Already connected')
 				retryCallback()
