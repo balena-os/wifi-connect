@@ -11,6 +11,26 @@ If you need to add dependencies, add the corresponding statements in the [Docker
 
 This is a node.js application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](http://docs.resin.io/#/pages/using/dockerfile.md). This project uses a Resin feature called "Dockerfile template": the base image is chosen depending on the architecture, specified by the `%%RESIN_ARCH%%` variable (see [line 1](./Dockerfile.template#L1) in the template).
 
+## Supported boards / dongles
+*For the Intel Edison version of this software, check the [edison branch](https://github.com/resin-io/resin-wifi-connect/tree/edison) in this repository.*
+This software has been successfully tested on Raspberry Pi's A+ and 2B using the following WiFi dongles:
+
+Dongle                                     | Chip
+-------------------------------------------|-------------------
+[TP-LINK TL-WN722N](http://bit.ly/1P1MdAG) | Atheros AR9271
+[ModMyPi](http://bit.ly/1gY3IHF)           | Ralink RT3070
+[ThePiHut](http://bit.ly/1LfkCgZ)          | Ralink RT5370
+
+Given these results, it is probable that most dongles with *Atheros* or *Ralink* chipsets will work.
+The following dongles are known *not* to work (as the driver is not friendly with AP mode and Connman):
+* Official Raspberry Pi dongle (BCM43143 chip)
+* Addon NWU276 (Mediatek MT7601 chip)
+* Edimax (Realtek RTL8188CUS chip)
+Dongles with similar chipsets will probably not work.
+
+The software is expected to work with other Resin supported boards as long as you use the correct dongles.
+Please [contact us](https://resin.io/contact/) or raise [an issue](https://github.com/resin-io/resin-wifi-connect/issues) if you hit any trouble.
+
 ## How it works
 This app interacts with the Connman connection manager in Resin's base OS. It checks whether WiFi is connected, tries to join the favorite network, and if this fails, it opens an Access Point to which you can connect using a laptop or mobile phone.
 
