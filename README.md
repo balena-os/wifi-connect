@@ -12,7 +12,8 @@ If you need to add dependencies, add the corresponding statements in the [Docker
 This is a node.js application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](http://docs.resin.io/#/pages/using/dockerfile.md). This project uses a Resin feature called "Dockerfile template": the base image is chosen depending on the architecture, specified by the `%%RESIN_ARCH%%` variable (see [line 1](./Dockerfile.template#L1) in the template).
 
 ## Supported boards / dongles
-*For the Intel Edison version of this software, check the [edison branch](https://github.com/resin-io/resin-wifi-connect/tree/edison) in this repository.*
+**For the Intel Edison version of this software, check the [edison branch](https://github.com/resin-io/resin-wifi-connect/tree/edison) in this repository.**
+
 This software has been successfully tested on Raspberry Pi's A+ and 2B using the following WiFi dongles:
 
 Dongle                                     | Chip
@@ -22,7 +23,8 @@ Dongle                                     | Chip
 [ThePiHut](http://bit.ly/1LfkCgZ)          | Ralink RT5370
 
 Given these results, it is probable that most dongles with *Atheros* or *Ralink* chipsets will work.
-The following dongles are known *not* to work (as the driver is not friendly with AP mode and Connman):
+
+The following dongles are known **not** to work (as the driver is not friendly with AP mode and Connman):
 * Official Raspberry Pi dongle (BCM43143 chip)
 * Addon NWU276 (Mediatek MT7601 chip)
 * Edimax (Realtek RTL8188CUS chip)
