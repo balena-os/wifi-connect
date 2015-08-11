@@ -8,6 +8,7 @@ spawn = require('child_process').spawn
 exec = require('child_process').exec
 os = require('os')
 async = require('async')
+fs = Promise.promisifyAll(require('fs'))
 
 config = require('./wifi.json')
 ssid = process.env.PORTAL_SSID or config.ssid
@@ -79,16 +80,15 @@ connectOrStartServer = (wifi, retryCallback) ->
 		startServer(wifi)
 
 saveToFile = (ssid, passphrase) ->
-	if connectionsFromFile?
-		connectionsFromFile.push({ ssid, passphrase })
-	else
-		connectionsFromFile = [ { ssid, passphrase } ]
-	return new Promise (resolve, reject) ->
-		fs.writeFile connectionFile, JSON.stringify(connectionsFromFile), (err) ->
-			return reject(err) if err?
-			exec 'sync', (err) ->
-				reject(err) if err?
-				resolve()
+	connectionsFromFile ?= []
+	connectionsFromFile.push({ ssid, passphrase })
+	fs.openAsync(connectionFile, 'w')
+	.tap (fd) ->
+		fs.writeAsync(fd, JSON.stringify(connectionsFromFile))
+	.tap (fd) ->
+		fs.fsyncAsync(fd)
+	.then (fd) ->
+		fs.closeAsync(fd)
 
 console.log('Starting node connman app')
 manageConnection = (retryCallback) ->
