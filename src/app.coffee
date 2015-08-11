@@ -20,9 +20,10 @@ ssidList = null
 dnsServer = null
 
 connectionFile = '/data/connections.json'
-connectionsFromFile = null
-if fs.existsSync(connectionFile)
+try
 	connectionsFromFile = require(connectionFile)
+catch
+	connectionsFromFile = null
 
 ignore = ->
 
