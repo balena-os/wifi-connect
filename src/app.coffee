@@ -1,5 +1,5 @@
 Promise = require('bluebird')
-connman = Promise.promisifyAll(require('connman-simplified-resin')())
+connman = Promise.promisifyAll(require('connman-simplified')())
 express = require('express')
 app = express()
 bodyParser = require('body-parser')
@@ -86,7 +86,7 @@ manageConnection = (retryCallback) ->
 			.then ->
 				dnsServer.kill()
 				console.log('Server closed and captive portal disabled')
-				wifi.joinWithAgentAsync(req.body.ssid, req.body.passphrase)
+				wifi.joinAsync(req.body.ssid, req.body.passphrase)
 			.then ->
 				console.log('Joined! Exiting.')
 				retryCallback()
