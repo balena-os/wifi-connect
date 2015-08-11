@@ -23,7 +23,7 @@ connectionFile = '/data/connections.json'
 try
 	connectionsFromFile = require(connectionFile)
 catch
-	connectionsFromFile = null
+	connectionsFromFile = []
 
 ignore = ->
 
@@ -67,21 +67,17 @@ startServer = (wifi) ->
 					console.log('Server listening')
 
 connectOrStartServer = (wifi, retryCallback) ->
-	if connectionsFromFile?
-		console.log('Trying to join previously known networks')
-		Promise.each connectionsFromFile, (conn) ->
-			wifi.joinAsync(conn.ssid, conn.passphrase)
-			.then ->
-				console.log('Joined! Exiting.')
-				retryCallback()
-			.catch(ignore)
+	console.log('Trying to join previously known networks')
+	Promise.each connectionsFromFile, (conn) ->
+		wifi.joinAsync(conn.ssid, conn.passphrase)
 		.then ->
-			startServer(wifi)
-	else
+			console.log('Joined! Exiting.')
+			retryCallback()
+		.catch(ignore)
+	.finally ->
 		startServer(wifi)
 
 saveToFile = (ssid, passphrase) ->
-	connectionsFromFile ?= []
 	connectionsFromFile.push({ ssid, passphrase })
 	fs.openAsync(connectionFile, 'w')
 	.tap (fd) ->
