@@ -5,8 +5,10 @@ app = express()
 bodyParser = require('body-parser')
 iptables = Promise.promisifyAll(require('./iptables'))
 spawn = require('child_process').spawn
+exec = require('child_process').exec
 os = require('os')
 async = require('async')
+fs = Promise.promisifyAll(require('fs'))
 
 config = require('./wifi.json')
 ssid = process.env.PORTAL_SSID or config.ssid
@@ -16,6 +18,12 @@ port = process.env.PORTAL_PORT or config.port
 server = null
 ssidList = null
 dnsServer = null
+
+connectionFile = '/data/connections.json'
+try
+	connectionsFromFile = require(connectionFile)
+catch
+	connectionsFromFile = []
 
 ignore = ->
 
@@ -58,6 +66,27 @@ startServer = (wifi) ->
 					throw err if err?
 					console.log('Server listening')
 
+connectOrStartServer = (wifi, retryCallback) ->
+	console.log('Trying to join previously known networks')
+	Promise.each connectionsFromFile, (conn) ->
+		wifi.joinAsync(conn.ssid, conn.passphrase)
+		.then ->
+			console.log('Joined! Exiting.')
+			retryCallback()
+		.catch(ignore)
+	.finally ->
+		startServer(wifi)
+
+saveToFile = (ssid, passphrase) ->
+	connectionsFromFile.push({ ssid, passphrase })
+	fs.openAsync(connectionFile, 'w')
+	.tap (fd) ->
+		fs.writeAsync(fd, JSON.stringify(connectionsFromFile))
+	.tap (fd) ->
+		fs.fsyncAsync(fd)
+	.then (fd) ->
+		fs.closeAsync(fd)
+
 console.log('Starting node connman app')
 manageConnection = (retryCallback) ->
 	connman.initAsync()
@@ -88,6 +117,8 @@ manageConnection = (retryCallback) ->
 				console.log('Server closed and captive portal disabled')
 				wifi.joinAsync(req.body.ssid, req.body.passphrase)
 			.then ->
+				saveToFile(req.body.ssid, req.body.passphrase)
+			.then ->
 				console.log('Joined! Exiting.')
 				retryCallback()
 			.catch (err) ->
@@ -113,8 +144,7 @@ manageConnection = (retryCallback) ->
 					console.log('Joined! Exiting.')
 					retryCallback()
 				.catch (err) ->
-					startServer(wifi)
-
+					connectOrStartServer(wifi, retryCallback)
 			else
 				console.log('Already connected')
 				retryCallback()
