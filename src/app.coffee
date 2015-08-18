@@ -133,8 +133,12 @@ manageConnection = (retryCallback) ->
 		app.use (req, res) ->
 			res.redirect('/')
 
-		# Create TETHER iptables chain (will silently fail if it already exists)
-		iptables.createChainAsync('nat', 'TETHER')
+		# Ensure tethering is disabled before starting
+		wifi.closeHotspotAsync()
+		.catch(ignore)
+		.then ->
+			# Create TETHER iptables chain (will silently fail if it already exists)
+			iptables.createChainAsync('nat', 'TETHER')
 		.catch(ignore)
 		.then ->
 			iptables.deleteAsync({ table: 'nat', rule: 'PREROUTING -i tether -j TETHER'})
