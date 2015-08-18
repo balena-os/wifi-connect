@@ -85,7 +85,8 @@ saveToFile = (ssid, passphrase) ->
 	connectionsFromFile.push({ ssid, passphrase })
 	fs.openAsync(connectionFile, 'w')
 	.tap (fd) ->
-		fs.writeAsync(fd, JSON.stringify(connectionsFromFile))
+		buf = new Buffer(JSON.stringify(connectionsFromFile))
+		fs.writeAsync(fd, buf, 0, buf.length, null)
 	.tap (fd) ->
 		fs.fsyncAsync(fd)
 	.then (fd) ->
