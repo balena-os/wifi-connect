@@ -1,8 +1,13 @@
 $(function(){
 	$.get("/ssids", function(data){
-		$.each(data, function(i, val){
-			$("#ssid-select").append("<option value='" + val.ssid + "'>" + val.ssid + "</option>");
-		});		
+		if(data.length == 0){
+			$('.before-submit').hide();
+			$('#no-networks-message').removeClass('hidden');
+		} else {
+			$.each(data, function(i, val){
+				$("#ssid-select").append("<option value='" + val.ssid + "'>" + val.ssid + "</option>");
+			});
+		}
 	})
 
 	$('#connect-form').submit(function(ev){
