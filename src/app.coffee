@@ -138,13 +138,7 @@ manageConnection = (retryCallback) ->
 			iptables.flushAsync('nat', 'TETHER')
 		.then ->
 			if !properties.connected
-				console.log('Trying to join wifi')
-				wifi.joinFavoriteAsync()
-				.then ->
-					console.log('Joined! Exiting.')
-					retryCallback()
-				.catch (err) ->
-					connectOrStartServer(wifi, retryCallback)
+				connectOrStartServer(wifi, retryCallback)
 			else
 				console.log('Already connected')
 				retryCallback()
