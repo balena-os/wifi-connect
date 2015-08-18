@@ -54,6 +54,7 @@ startServer = (wifi) ->
 	wifi.getNetworksAsync()
 	.catch (err) ->
 		throw err unless err.message == 'No WiFi networks found'
+		return []
 	.then (list) ->
 		ssidList = list
 		wifi.openHotspotAsync(ssid, passphrase)
