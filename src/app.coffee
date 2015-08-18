@@ -51,7 +51,11 @@ getIptablesRules = (callback) ->
 
 startServer = (wifi) ->
 	console.log('Getting networks list')
-	wifi.getNetworksAsync().then (list) ->
+	wifi.getNetworksAsync()
+	.catch (err) ->
+		throw err unless err.message == 'No WiFi networks found'
+		return []
+	.then (list) ->
 		ssidList = list
 		wifi.openHotspotAsync(ssid, passphrase)
 	.then ->
