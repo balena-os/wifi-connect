@@ -28,7 +28,7 @@ catch
 ignore = ->
 
 getIptablesRules = (callback) ->
-	async.retry {times: 100, interval: 100}, (cb) ->
+	async.retry {times: 100, interval: 200}, (cb) ->
 		Promise.try ->
 			os.networkInterfaces().tether[0].address
 		.nodeify(cb)
