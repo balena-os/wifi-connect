@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
 	wireless-tools \
 	&& rm -rf /var/lib/apt/lists/*
 
+RUN systemctl disable connman
+
 COPY ./assets/bind /etc/bind
 
 RUN mkdir -p /usr/src/app/
