@@ -1,6 +1,6 @@
 # resin-wifi-connect
 
-A tool to allow wifi configuration to be set via a captive portal.
+A tool to allow WiFi configuration to be set via a captive portal. It checks whether WiFi is connected, tries to join the favorite network, and if this fails, it opens an Access Point to which you can connect using a laptop or mobile phone and input new WiFi credentials.
 
 ## How to use this
 This is a [resin.io](http://resin.io) application. Check out our [Getting Started](http://docs.resin.io/#/pages/installing/gettingStarted.md) guide if it's your first time using Resin.
