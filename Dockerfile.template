@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y \
 	bind9 \
 	bridge-utils \
 	connman \
+	hostapd \
 	iptables \
 	libdbus-1-dev \
 	libexpat-dev \
@@ -16,8 +17,6 @@ RUN apt-get update && apt-get install -y \
 RUN systemctl disable connman
 
 COPY ./assets/bind /etc/bind
-COPY ./assets/firmware /etc/firmware
-COPY ./assets/sbin /usr/sbin
 
 RUN mkdir -p /usr/src/app/
 WORKDIR /usr/src/app

@@ -51,31 +51,6 @@ getIptablesRules = (callback) ->
 				rule: "TETHER -p udp --dport 53 -j DNAT --to-destination #{myIP}:53"
 		]
 
-loadModuleForStation = ->
-	console.log("Removing bcm module")
-	return Promise.delay(5000)
-	.then ->
-		execAsync 'modprobe -r bcm4334x'
-	.catch(ignore)
-	.delay(5000)
-	.then ->
-		console.log("Reloading bcm module")
-		execAsync 'modprobe bcm4334x firmware_path="/etc/firmware/fw_bcmdhd.bin" nvram_path="/etc/firmware/bcmdhd.cal"'
-	.catch(ignore)
-	.delay(5000)
-
-
-loadModuleForAP = (wifi) ->
-	console.log("Removing bcm module")
-	execAsync 'modprobe -r bcm4334x'
-	.catch(ignore)
-	.delay(5000)
-	.then ->
-		console.log("Reloading bcm module")
-		execAsync 'modprobe bcm4334x op_mode=2 firmware_path="/etc/firmware/fw_bcmdhd.bin" nvram_path="/etc/firmware/bcmdhd.cal"'
-	.catch(ignore)
-	.delay(5000)
-
 setupHostapd = (ssid, passphrase) ->
 	options = {
 		interface: 'wlan0'
@@ -110,9 +85,6 @@ openHotspot = (wifi, ssid, passphrase) ->
 	systemd.stop('wpa_supplicant')
 	.delay(3000)
 	.then ->
-		loadModuleForAP(wifi)
-	.delay(3000)
-	.then ->
 		console.log("Opening hotspot")
 		setupHostapd(ssid, passphrase)
 	.delay(3000)
@@ -126,8 +98,6 @@ closeHotspot = (wifi) ->
 	udhcpd.disableAsync('wlan0')
 	.then ->
 		hostapd.disableAsync('wlan0')
-	.then ->
-		loadModuleForStation(wifi)
 
 connectOrStartServer = (wifi, retryCallback) ->
 	fs.exists connectionFile, (exists) ->
