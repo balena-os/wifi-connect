@@ -133,15 +133,12 @@ startServer = (wifi) ->
 					throw err if err?
 					console.log('Server listening')
 
+retryAsync = Promise.promisify(async.retry)
 connectOrStartServer = (wifi, retryCallback) ->
 	console.log('Trying to join previously known networks')
 	Promise.each connectionsFromFile, (conn) ->
-		new Promise (resolve, reject) ->
-			async.retry {times: 3, interval: 1000}, (done) ->
-				wifi.join(conn.ssid, conn.passphrase, done)
-			, (err) ->
-				reject(err) if err?
-				resolve()
+		retryAsync {times: 3, interval: 1000}, (done) ->
+			wifi.join(conn.ssid, conn.passphrase, done)
 		.then ->
 			console.log('Joined! Exiting.')
 			retryCallback()
