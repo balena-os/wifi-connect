@@ -42,3 +42,19 @@ The server for wifi configuration uses port 8080 by default. This can also be co
 These three configurations can also be set with the environment variables `PORTAL_SSID`, `PORTAL_PASSPHRASE` and `PORTAL_PORT`, but keep in mind that the device has to be online to be able to download the new settings (you can use an ethernet cable or a WiFi network to which you've already connected).
 
 When you connect to the access point, any web page you open will be redirected to our captive portal page, where you can select the SSID and passphrase of the WiFi network to connect to. After this, the app will disable the AP and try to connect. If it fails, it will enable the AP for you to try again. If it succeeds, the network will be remembered by Connman as a favorite.
+
+## License
+
+Copyright 2016 Resinio Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
