@@ -102,7 +102,9 @@ manageConnection = (retryCallback) ->
 		wifi = Promise.promisifyAll(wifi)
 		console.log('WiFi initialized')
 
-		app.use(bodyParser())
+		app.use(bodyParser.urlencoded());
+		app.use(bodyParser.json());
+		
 		app.use(express.static(__dirname + '/public'))
 		app.get '/ssids', (req, res) ->
 			res.send(ssidList)
