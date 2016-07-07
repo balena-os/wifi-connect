@@ -81,7 +81,7 @@ setupUdhcpd = ->
 		udhcpd.enableAsync(options)
 
 
-openHotspot = (wifi, ssid, passphrase) ->	
+openHotspot = (wifi, ssid, passphrase) ->
 	systemd.stop('wpa_supplicant')
 	.delay(3000)
 	.then ->
@@ -167,7 +167,11 @@ manageConnection = (retryCallback) ->
 		wifi = Promise.promisifyAll(wifi)
 		console.log('WiFi initialized')
 
-		app.use(bodyParser())
+		app.use(bodyParser.urlencoded({
+		  extended: true
+		}))
+		app.use(bodyParser.json())
+		
 		app.use(express.static(__dirname + '/public'))
 		app.get '/ssids', (req, res) ->
 			res.send(ssidList)
