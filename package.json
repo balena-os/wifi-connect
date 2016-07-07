@@ -15,7 +15,7 @@
     "body-parser": "^1.13.1",
     "bower": "^1.4.1",
     "coffee-script": "~1.9.3",
-    "connman-simplified-resin": "^0.1.5",
+    "connman-simplified-resin": "^0.1.6",
     "express": "^4.13.0"
   }
 }
