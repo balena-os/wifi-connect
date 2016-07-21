@@ -1,12 +1,13 @@
 #!/bin/bash
-if [[ "$INITSYSTEM" == "on" ]]; then
-	DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host_run/dbus/system_bus_socket npm start &> wifi.log
+
+DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+
+if [ ! -f /data/network.config ]; then
+	node src/app.js
 else
-	npm start &> wifi.log
+	cp /data/network.config /host/var/lib/connman/network.config
 fi
 
-while true
-do
-	echo "App exited but container is still running to allow web terminal access"
-	sleep 3600
+while true; do
+	sleep 100;
 done

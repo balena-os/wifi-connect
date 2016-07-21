@@ -1,37 +1,32 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-node:0.10
 
-RUN apt-get update && apt-get install -y \
-	bind9 \
-	bridge-utils \
-	connman \
-	hostapd \
-	iptables \
-	libdbus-1-dev \
-	libexpat-dev \
-	net-tools \
-	udhcpd \
-	usbutils \
-	wireless-tools \
+RUN apt-get update \
+	&& apt-get install -y \
+		dnsmasq \
+		hostapd \
+		iproute2 \
+		iw \
+		libdbus-1-dev \
+		libexpat-dev \
+		rfkill \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN systemctl disable connman
-
-COPY ./assets/bind /etc/bind
-
 RUN mkdir -p /usr/src/app/
+
 WORKDIR /usr/src/app
 
-COPY package.json ./
-RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean
+COPY package.json /usr/src/app/
 
-COPY bower.json .bowerrc ./
+RUN JOBS=MAX npm install --unsafe-perm --production \
+	&& npm cache clean
+
+COPY bower.json .bowerrc /usr/src/app/
+
 RUN ./node_modules/.bin/bower --allow-root install \
 	&& ./node_modules/.bin/bower --allow-root cache clean
 
-COPY . ./
+COPY . /usr/src/app/
+
 RUN ./node_modules/.bin/coffee -c ./src
-RUN chmod +x ./start
 
-VOLUME /var/lib/connman
-
-CMD ./start
+CMD bash start

@@ -1,22 +1,19 @@
-Promise = require('bluebird')
-execAsync = Promise.promisify(require('child_process').exec)
+DBus = require './dbus-promise'
 
-exports.callMethod = callMethod = (method, methodArgs) ->
-	theArgs = methodArgs or ""
-	execAsync("dbus-send --print-reply --reply-timeout=2000 --type=method_call --system --dest=org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager.#{method} #{theArgs}")
+dbus = new DBus()
 
-exports.reboot = reboot = ->
-	execAsync('sync')
-	.then ->
-		callMethod('Reboot')
-	.then ->
-		process.exit()
+bus = dbus.getBus('system')
 
-exports.stop = stop = (service) ->
-	callMethod('StopUnit', "string:\"#{service}.service\" string:\"fail\"")
+SERVICE = 'org.freedesktop.systemd1'
+MANAGER_OBJECT = '/org/freedesktop/systemd1'
+MANAGER_INTERFACE = 'org.freedesktop.systemd1.Manager'
 
-exports.start = start = (service) ->
-	callMethod('StartUnit', "string:\"#{service}.service\" string:\"fail\"")
+exports.start = (unit, mode='fail') ->
+	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
+	.then (manager) ->
+		manager.StartUnitAsync(unit, mode)
 
-exports.restart = restart = (service) ->
-	callMethod('RestartUnit', "string:\"#{service}.service\" string:\"fail\"")
+exports.stop = (unit, mode='fail') ->
+	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
+	.then (manager) ->
+		manager.StopUnitAsync(unit, mode)
