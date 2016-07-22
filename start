@@ -1,9 +1,6 @@
 #!/bin/bash
-if [[ "$INITSYSTEM" == "on" ]]; then
-	DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host_run/dbus/system_bus_socket npm start
-else
-	npm start
-fi
+
+DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host_run/dbus/system_bus_socket npm start
 
 while true
 do
