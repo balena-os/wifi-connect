@@ -23,7 +23,8 @@ exports.start = ->
 	.then ->
 		execAsync('rfkill unblock wifi')
 	.then ->
-		execAsync("ip addr add #{config.gateway}/24 dev #{config.iface}")
+		# XXX: detect if the IP is already set instead of doing `|| true`
+		execAsync("ip addr add #{config.gateway}/24 dev #{config.iface} || true")
 	.then ->
 		hostapd.start()
 	.then ->
