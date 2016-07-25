@@ -1,2 +1,3 @@
 Eliminate all parsing of command line output with appropriate library bindings (libnl)
 Eliminate a couple of aftificial `.delay(X)` by handling the appropriate events
+Detect whenever either of hostapd or dnsmasq crashes and restart them
