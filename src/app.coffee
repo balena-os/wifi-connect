@@ -16,10 +16,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded(extended: true))
 app.use(express.static(__dirname + '/public'))
 
+ssids = []
+
 app.get '/ssids', (req, res) ->
-	wifiScan.scanAsync()
-	.then (ssids) ->
-		res.json(ssids)
+	res.json(ssids)
 
 app.post '/connect', (req, res) ->
 	if not (req.body.ssid? and req.body.passphrase?)
@@ -60,6 +60,10 @@ app.post '/connect', (req, res) ->
 app.use (req, res) ->
 	res.redirect('/')
 
-hotspot.start()
+wifiScan.scanAsync()
+.then (results) ->
+	ssids = results
+
+	hotspot.start()
 
 app.listen(80)
