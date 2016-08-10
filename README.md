@@ -22,6 +22,8 @@ Dongle                                     | Chip
 [ModMyPi](http://bit.ly/1gY3IHF)           | Ralink RT3070
 [ThePiHut](http://bit.ly/1LfkCgZ)          | Ralink RT5370
 
+The software has also been successfully tested on RaspberryPi 3 with its onboard wifi.
+
 Given these results, it is probable that most dongles with *Atheros* or *Ralink* chipsets will work.
 
 The following dongles are known **not** to work (as the driver is not friendly with AP mode and Connman):
@@ -34,11 +36,11 @@ The software is expected to work with other Resin supported boards as long as yo
 Please [contact us](https://resin.io/contact/) or raise [an issue](https://github.com/resin-io/resin-wifi-connect/issues) if you hit any trouble.
 
 ## How it works
-This app interacts with the Connman connection manager in Resin's base OS. It checks whether WiFi is connected, tries to join the favorite network, and if this fails, it opens an Access Point to which you can connect using a laptop or mobile phone.
 
-The access point's name (SSID) is, by default, "ResinAP". You can change this by changing the "ssid" field in [wifi.json](./src/wifi.json). By default, the network is unprotected, but you can add a WPA2 passphrase by setting the "passphrase" field in the same file. Keep in mind that, once you set a passphrase, you can't go back to an unprotected network on an already provisioned device.
-The server for wifi configuration uses port 8080 by default. This can also be configured in wifi.json, but it will be transparent to the user as all web traffic is redirected when in Access Point mode.
+This app interacts with the Connman connection manager in Resin's base OS. It checks whether the wifi has been previously provisioned, and if it hasn't, it opens an Access Point to which you can connect using a laptop or mobile phone.
 
-These three configurations can also be set with the environment variables `PORTAL_SSID`, `PORTAL_PASSPHRASE` and `PORTAL_PORT`, but keep in mind that the device has to be online to be able to download the new settings (you can use an ethernet cable or a WiFi network to which you've already connected).
+The access point's name (SSID) is, by default, "ResinAP". You can change this by setting the `PORTAL_SSID` environment variable. By default, the network is unprotected, but you can add a WPA2 passphrase by setting the `PORTAL_PASSPHRASE` environment variable.
 
 When you connect to the access point, any web page you open will be redirected to our captive portal page, where you can select the SSID and passphrase of the WiFi network to connect to. After this, the app will disable the AP and try to connect. If it fails, it will enable the AP for you to try again. If it succeeds, the network will be remembered by Connman as a favorite.
+
+An important detail is that by default, the project will not attempt to enter AP mode if a successful configuration has happened in the past. This means that if you go through the process and then move the device to a different network, it will be trying to connect forever. It is left to the user application to decide which is the appropriate condition to re-enter AP mode. This can be "been offline for more than 1 day" or "user pushed the reset button" or something else. To re-enter AP mode, simply re-run `node src/app.js` as done in the provided [start](https://github.com/resin-io/resin-wifi-connect/blob/master/start) script.
