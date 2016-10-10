@@ -2,7 +2,7 @@
 
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
-node src/app.js true
+node src/app.js retry
 
 while true; do
 	sleep 100;
