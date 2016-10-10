@@ -29,3 +29,6 @@ node_modules
 .bower-cache
 .bower-registry
 src/public/bower_components
+
+# Resin
+.resin-sync.yml
