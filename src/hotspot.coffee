@@ -10,15 +10,15 @@ systemd = require './systemd'
 
 started = false
 
-exports.start = ->
+exports.start = (manager) ->
 	if started
 		return Promise.resolve()
 
 	started = true
 
-	console.log('Stopping connman..')
-
-	systemd.stop('connman.service')
+	console.log("Stopping service, starting hotspot")
+	
+	manager.stop()
 	.delay(2000)
 	.then ->
 		execAsync('rfkill unblock wifi')
@@ -28,11 +28,13 @@ exports.start = ->
 	.then ->
 		hostapd.start()
 	.then ->
-		dnsmasq.start()
+		dnsmasq.start()		
 
-exports.stop = ->
+exports.stop = (manager) ->
 	if not started
 		return Promise.resolve()
+
+	console.log("Starting service, stopping hotspot")
 
 	started = false
 
@@ -41,4 +43,4 @@ exports.stop = ->
 		dnsmasq.stop()
 	]
 	.then ->
-		systemd.start('connman.service')
+		manager.start()
