@@ -2,11 +2,7 @@
 
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
-if [ ! -f /data/network.config ]; then
-	node src/app.js
-else
-	cp /data/network.config /host/var/lib/connman/network.config
-fi
+node src/app.js true
 
 while true; do
 	sleep 100;
