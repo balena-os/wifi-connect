@@ -5,7 +5,8 @@
   "description": "A tool to allow wifi configuration to be set via a captive portal",
   "scripts": {
     "start": "cd src && node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "resin-lint src",
+    "test": "npm run lint"
   },
   "author": "Pablo Carranza Vélez <pablo@resin.io>",
   "license": "ISC",
@@ -16,5 +17,8 @@
     "coffee-script": "~1.9.3",
     "dbus": "^0.2.19",
     "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "resin-lint": "^1.4.0"
   }
 }
