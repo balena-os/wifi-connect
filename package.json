@@ -20,6 +20,6 @@
     "fs-extra": "^0.30.0"
   },
   "devDependencies": {
-    "resin-lint": "^1.4.0"    
+    "resin-lint": "^1.4.0"
   }
 }
