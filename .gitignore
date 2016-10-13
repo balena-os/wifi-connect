@@ -32,3 +32,6 @@ src/public/bower_components
 
 # Resin
 .resin-sync.yml
+
+# VSCode
+.vscode

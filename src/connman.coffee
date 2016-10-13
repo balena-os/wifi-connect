@@ -52,7 +52,7 @@ exports.setCredentials = (ssid, passphrase) ->
 
 	return utils.durableWriteFile(config.persistentConfig, data)
 
-exports.clearCredentials = () ->
+exports.clearCredentials = ->
 	fs.unlinkAsync(config.persistentConfig)
 
 exports.connect  = (timeout) ->

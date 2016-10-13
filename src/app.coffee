@@ -13,10 +13,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded(extended: true))
 app.use(express.static(__dirname + '/public'))
 
-ssids = []
+_ssids = []
 
 app.get '/ssids', (req, res) ->
-	res.json(ssids)
+	res.json(_ssids)
 
 app.post '/connect', (req, res) ->
 	if not (req.body.ssid? and req.body.passphrase?)
@@ -35,14 +35,10 @@ app.use (req, res) ->
 
 run = ->
 	manager.isSetup()
-	.then (isSetup) ->
-		if isSetup
+	.then (setup) ->
+		if setup
 			console.log('Credentials found')
 			hotspot.stop()
-			.catch (e) ->
-				console.log(e)
-				console.log('Exiting')
-				process.exit()
 			.then ->
 				console.log('Connecting')
 				manager.connect(15000)
@@ -51,18 +47,21 @@ run = ->
 				console.log('Exiting')
 				process.exit()
 			.catch (e) ->
+				console.log('Connecting failed')
 				if retry
+					console.log('Retrying')
 					console.log('Clearing credentials')
 					manager.clearCredentials()
 					.then ->
-						console.log("here")
 						run()
 					.catch (e) ->
 						console.log(e)
 						console.log('Exiting')
 						process.exit()
 				else
-					run()
+					console.log('Not retrying')
+					console.log('Exiting')
+					process.exit()
 		else
 			console.log('Credentials not found')
 			hotspot.start(manager)
@@ -74,12 +73,20 @@ run = ->
 app.listen(80)
 
 retry = null
-if process.argv[2] == 'retry'
-	console.log("Retry enabled")
+if process.argv[2] == '--retry=true'
+	console.log('Retry enabled')
 	retry = true
-else
-	console.log("Retry disabled")
+else if process.argv[2] == '--retry=false'
+	console.log('Retry disabled')
 	retry = false
+else if typeof(process.argv[2]) == 'undefined'
+	console.log('No retry flag passed')
+	console.log('Retry disabled')
+	retry = false
+else
+	console.log('Invalid retry flag passed')
+	console.log('Exiting')
+	process.exit()
 
 manager = null
 systemd.exists('NetworkManager.service')
@@ -92,8 +99,8 @@ systemd.exists('NetworkManager.service')
 		manager = connman
 .then ->
 	wifiScan.scanAsync()
-.then (results) ->
-	ssids = results
+.then (ssids) ->
+	_ssids = ssids
 .then ->
 	run()
 .catch (e) ->

@@ -20,7 +20,7 @@ exports.copyFile = (source, target) ->
 	fs.readFileAsync(source)
 	.then (rf) ->
 		fs.writeFileAsync(target, rf)
-		
+
 exports.exists = (path) ->
 	new Promise (resolve) ->
-        fs.exists(path, resolve)
+		fs.exists(path, resolve)

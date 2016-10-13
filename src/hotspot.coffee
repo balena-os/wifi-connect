@@ -16,8 +16,8 @@ exports.start = (manager) ->
 
 	started = true
 
-	console.log("Stopping service, starting hotspot")
-	
+	console.log('Stopping service, starting hotspot')
+
 	manager.stop()
 	.delay(2000)
 	.then ->
@@ -28,13 +28,13 @@ exports.start = (manager) ->
 	.then ->
 		hostapd.start()
 	.then ->
-		dnsmasq.start()		
+		dnsmasq.start()
 
 exports.stop = (manager) ->
 	if not started
 		return Promise.resolve()
 
-	console.log("Starting service, stopping hotspot")
+	console.log('Starting service, stopping hotspot')
 
 	started = false
 

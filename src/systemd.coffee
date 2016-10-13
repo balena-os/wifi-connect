@@ -18,7 +18,7 @@ exports.stop = (unit, mode = 'fail') ->
 	.then (manager) ->
 		manager.StopUnitAsync(unit, mode)
 
-exports.exists = (unit, mode='fail') ->
+exports.exists = (unit, mode = 'fail') ->
 	new Promise (resolve, reject) ->
 		bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
 		.then (manager) ->
