@@ -6,15 +6,14 @@ config = require './config'
 
 hostapd = require './hostapd'
 dnsmasq = require './dnsmasq'
-systemd = require './systemd'
 
-started = false
+_started = false
 
 exports.start = (manager) ->
-	if started
+	if _started
 		return Promise.resolve()
 
-	started = true
+	_started = true
 
 	console.log('Stopping service, starting hotspot')
 
@@ -31,12 +30,12 @@ exports.start = (manager) ->
 		dnsmasq.start()
 
 exports.stop = (manager) ->
-	if not started
+	if not _started
 		return Promise.resolve()
 
 	console.log('Starting service, stopping hotspot')
 
-	started = false
+	_started = false
 
 	Promise.all [
 		hostapd.stop()

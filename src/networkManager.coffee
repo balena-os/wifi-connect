@@ -5,13 +5,9 @@ dbus = new DBus()
 
 bus = dbus.getBus('system')
 
-config = require './config'
-fs = Promise.promisifyAll(require('fs'))
 systemd = require './systemd'
-utils = require './utils'
 
 SERVICE = 'org.freedesktop.NetworkManager'
-
 WHITE_LIST = ['resin-vpn', 'eth0']
 
 exports.start = ->

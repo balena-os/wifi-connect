@@ -21,17 +21,14 @@ exports.stop = ->
 	systemd.stop('connman.service')
 
 exports.isSetup = ->
-	new Promise (resolve, reject) ->
-		utils.exists(config.persistentConfig)
-		.then (exists) ->
-			if exists
-				utils.copyFile(config.persistentConfig, config.connmanConfig)
-				.then ->
-					resolve (true)
-				.catch (e) ->
-					reject (e)
-			else
-				resolve (false)
+	fs.existsAsync(config.persistentConfig)
+	.then (exists) ->
+		if exists
+			utils.copyFile(config.persistentConfig, config.connmanConfig)
+			.then ->
+				return true
+		else
+			return false
 
 exports.setCredentials = (ssid, passphrase) ->
 	data = """
@@ -50,7 +47,7 @@ exports.setCredentials = (ssid, passphrase) ->
 	console.log('Saving credentials')
 	console.log(data)
 
-	return utils.durableWriteFile(config.persistentConfig, data)
+	utils.durableWriteFile(config.persistentConfig, data)
 
 exports.clearCredentials = ->
 	fs.unlinkAsync(config.persistentConfig)
