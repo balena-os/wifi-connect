@@ -17,7 +17,7 @@
     "coffee-script": "~1.9.3",
     "dbus": "^0.2.19",
     "express": "^4.14.0",
-    "fs-extra": "^0.30.0"
+    "lodash": "^4.16.4"
   },
   "devDependencies": {
     "resin-lint": "^1.4.0"
