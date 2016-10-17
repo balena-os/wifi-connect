@@ -13,10 +13,25 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded(extended: true))
 app.use(express.static(__dirname + '/public'))
 
-_ssids = []
+ssids = []
+
+error = (e) ->
+	console.log(e)
+	if retry
+		console.log('Retrying')
+		console.log('Clearing credentials')
+		manager.clearCredentials()
+		.then ->
+			run()
+		.catch (e) ->
+			error(e)
+	else
+		console.log('Not retrying')
+		console.log('Exiting')
+		process.exit()
 
 app.get '/ssids', (req, res) ->
-	res.json(_ssids)
+	res.json(ssids)
 
 app.post '/connect', (req, res) ->
 	if not (req.body.ssid? and req.body.passphrase?)
@@ -29,6 +44,8 @@ app.post '/connect', (req, res) ->
 		manager.setCredentials(req.body.ssid, req.body.passphrase)
 	.then ->
 		run()
+	.catch (e) ->
+		error(e)
 
 app.use (req, res) ->
 	res.redirect('/')
@@ -47,42 +64,27 @@ run = ->
 				console.log('Exiting')
 				process.exit()
 			.catch (e) ->
-				console.log('Connecting failed')
-				if retry
-					console.log('Retrying')
-					console.log('Clearing credentials')
-					manager.clearCredentials()
-					.then ->
-						run()
-					.catch (e) ->
-						console.log(e)
-						console.log('Exiting')
-						process.exit()
-				else
-					console.log('Not retrying')
-					console.log('Exiting')
-					process.exit()
+				error(e)
 		else
 			console.log('Credentials not found')
-			hotspot.start(manager)
+			wifiScan.scanAsync()
+			.then (results) ->
+				ssids = results
+				hotspot.start(manager)
 			.catch (e) ->
-				console.log(e)
-				console.log('Exiting')
-				process.exit()
+				error(e)
 
 app.listen(80)
 
-retry = null
+retry = false
 if process.argv[2] == '--retry=true'
 	console.log('Retry enabled')
 	retry = true
 else if process.argv[2] == '--retry=false'
 	console.log('Retry disabled')
-	retry = false
-else if typeof(process.argv[2]) == 'undefined'
+else if not process.argv[2]?
 	console.log('No retry flag passed')
 	console.log('Retry disabled')
-	retry = false
 else
 	console.log('Invalid retry flag passed')
 	console.log('Exiting')
@@ -97,10 +99,6 @@ systemd.exists('NetworkManager.service')
 	else
 		console.log('Using connman.service')
 		manager = connman
-.then ->
-	wifiScan.scanAsync()
-.then (ssids) ->
-	_ssids = ssids
 .then ->
 	run()
 .catch (e) ->

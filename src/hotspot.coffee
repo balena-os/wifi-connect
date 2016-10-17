@@ -7,18 +7,18 @@ config = require './config'
 hostapd = require './hostapd'
 dnsmasq = require './dnsmasq'
 
-_started = false
+started = false
 
 exports.start = (manager) ->
-	if _started
+	if started
 		return Promise.resolve()
 
-	_started = true
+	started = true
 
 	console.log('Stopping service, starting hotspot')
 
 	manager.stop()
-	.delay(2000)
+	.delay(2000) # Delay needed to give service time to stop
 	.then ->
 		execAsync('rfkill unblock wifi')
 	.then ->
@@ -30,12 +30,12 @@ exports.start = (manager) ->
 		dnsmasq.start()
 
 exports.stop = (manager) ->
-	if not _started
+	if not started
 		return Promise.resolve()
 
 	console.log('Starting service, stopping hotspot')
 
-	_started = false
+	started = false
 
 	Promise.all [
 		hostapd.stop()
@@ -43,3 +43,4 @@ exports.stop = (manager) ->
 	]
 	.then ->
 		manager.start()
+	.delay(2000) # Delay needed to give service time to start
