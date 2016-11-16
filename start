@@ -4,13 +4,7 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
 sleep 1 # Delay needed to avoid DBUS introspection errors
 
-# Run with --retry=true if you would like resin-wifi-connect to continue running
-# if either; the access point isn't present or the credentials are invalid
-npm start -- --retry=true
-
-# Run with --retry=false if you would like resin-wifi-connect to exit
-# if either; the access point isn't present or the credentials are invalid
-# npm start -- --retry=false
+cd src && node app.js --clear=false
 
 while true; do
 	sleep 100

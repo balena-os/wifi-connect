@@ -55,10 +55,10 @@ run = ->
 	.then (setup) ->
 		if setup
 			console.log('Credentials found')
-			hotspot.stop()
+			hotspot.stop(manager)
 			.then ->
 				console.log('Connecting')
-				manager.connect(15000)
+				manager.connect(15000) # Delay needed to allow manager to connect
 			.then ->
 				console.log('Connected')
 				console.log('Exiting')
@@ -67,7 +67,9 @@ run = ->
 				error(e)
 		else
 			console.log('Credentials not found')
-			wifiScan.scanAsync()
+			hotspot.stop(manager)
+			.then ->
+				wifiScan.scanAsync()
 			.then (results) ->
 				ssids = results
 				hotspot.start(manager)
@@ -76,21 +78,24 @@ run = ->
 
 app.listen(80)
 
-retry = false
-if process.argv[2] == '--retry=true'
-	console.log('Retry enabled')
-	retry = true
-else if process.argv[2] == '--retry=false'
-	console.log('Retry disabled')
+retry = true
+clear = true
+manager = null
+
+if process.argv[2] == '--clear=true'
+	console.log('Clear enabled')
+	clear = true
+else if process.argv[2] == '--clear=false'
+	console.log('Clear disabled')
+	clear = false
 else if not process.argv[2]?
-	console.log('No retry flag passed')
-	console.log('Retry disabled')
+	console.log('No clear flag passed')
+	console.log('Clear enabled')
 else
-	console.log('Invalid retry flag passed')
+	console.log('Invalid clear flag passed')
 	console.log('Exiting')
 	process.exit()
 
-manager = null
 systemd.exists('NetworkManager.service')
 .then (result) ->
 	if result
@@ -99,6 +104,15 @@ systemd.exists('NetworkManager.service')
 	else
 		console.log('Using connman.service')
 		manager = connman
+.then ->
+	if clear
+		console.log('Clearing credentials')
+		manager.clearCredentials()
+.then ->
+	manager.isSetup()
+	.then (setup) ->
+		if setup
+			retry = false
 .then ->
 	run()
 .catch (e) ->

@@ -49,6 +49,8 @@ exports.setCredentials = (ssid, passphrase) ->
 
 exports.clearCredentials = ->
 	fs.unlinkAsync(config.persistentConfig)
+	.catch code: 'ENOENT', (e) ->
+		return
 
 exports.connect  = (timeout) ->
 	bus.getInterfaceAsync(SERVICE, WIFI_OBJECT, TECHNOLOGY_INTERFACE)

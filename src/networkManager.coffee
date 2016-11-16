@@ -10,8 +10,8 @@ systemd = require './systemd'
 
 SERVICE = 'org.freedesktop.NetworkManager'
 
-# This allows us to say, if there IS a connection TYPE other than '802-3-ethernet' then network manager has been set up previously.
-WHITE_LIST = ['802-3-ethernet']
+# This allows us to say, if there IS an existing connection id that is not in the whitelist then network manager has been set up previously.
+WHITE_LIST = ['resin-sample', 'Wired connection 1']
 
 NM_STATE_CONNECTED_GLOBAL = 70
 NM_DEVICE_TYPE_WIFI = 2
@@ -63,32 +63,37 @@ exports.connect  = (timeout) ->
 	.then (validDevices) ->
 		if validDevices.length is 0
 			throw ('No valid devices found.')
-		bus.getInterfaceAsync(SERVICE, '/org/freedesktop/NetworkManager', 'org.freedesktop.NetworkManager')
-		.delay(1000) # Delay needed to avoid "Error: org.freedesktop.NetworkManager.UnknownConnection at Error (native)"
-		.then (manager) ->
-			manager.ActivateConnectionAsync('/', validDevices[0], '/')
-			.then ->
-				new Promise (resolve, reject) ->
-					handler = (value) ->
-						if value == NM_STATE_CONNECTED_GLOBAL
+		getConnections()
+		.filter(validateConnection)
+		.then (validConnections) ->
+			if validConnections.length is 0
+				throw ('No valid connections found.')
+			bus.getInterfaceAsync(SERVICE, '/org/freedesktop/NetworkManager', 'org.freedesktop.NetworkManager')
+			.delay(1000) # Delay needed to avoid "Error: org.freedesktop.NetworkManager.UnknownConnection at Error (native)" when activating the connection
+			.then (manager) ->
+				manager.ActivateConnectionAsync(validConnections[0], validDevices[0], '/')
+				.then ->
+					new Promise (resolve, reject) ->
+						handler = (value) ->
+							if value == NM_STATE_CONNECTED_GLOBAL
+								manager.removeListener('StateChanged', handler)
+								resolve()
+
+						# Listen for 'Connected' signals
+						manager.on('StateChanged', handler)
+
+						# But try to read in case we registered the event handler
+						# after is was already connected
+						manager.CheckConnectivityAsync()
+						.then (state) ->
+							if state == NM_CONNECTIVITY_FULL or state == NM_CONNECTIVITY_LIMITED
+								manager.removeListener('StateChanged', handler)
+								resolve()
+
+						setTimeout ->
 							manager.removeListener('StateChanged', handler)
-							resolve()
-
-					# Listen for 'Connected' signals
-					manager.on('StateChanged', handler)
-
-					# But try to read in case we registered the event handler
-					# after is was already connected
-					manager.CheckConnectivityAsync()
-					.then (state) ->
-						if state == NM_CONNECTIVITY_FULL or state == NM_CONNECTIVITY_LIMITED
-							manager.removeListener('StateChanged', handler)
-							resolve()
-
-					setTimeout ->
-						manager.removeListener('StateChanged', handler)
-						reject('Timed out')
-					, timeout
+							reject('Timed out')
+						, timeout
 
 getConnections = ->
 	bus.getInterfaceAsync(SERVICE, '/org/freedesktop/NetworkManager/Settings', 'org.freedesktop.NetworkManager.Settings')
@@ -97,19 +102,19 @@ getConnections = ->
 getConnection = (connection) ->
 	bus.getInterfaceAsync(SERVICE, connection, 'org.freedesktop.NetworkManager.Settings.Connection')
 
-validateConnection = (connection) ->
-	getConnection(connection)
-	.call('GetSettingsAsync')
-	.then (settings) ->
-		return settings.connection.type not in WHITE_LIST
-
 deleteConnection = (connection) ->
 	getConnection(connection)
 	.then (connection) ->
 		connection.GetSettingsAsync()
 		.then (settings) ->
-			if settings.connection.type not in WHITE_LIST
+			if settings.connection.id not in WHITE_LIST
 				connection.DeleteAsync()
+
+validateConnection = (connection) ->
+	getConnection(connection)
+	.call('GetSettingsAsync')
+	.then (settings) ->
+		return settings.connection.id not in WHITE_LIST
 
 getDevices = ->
 	bus.getInterfaceAsync(SERVICE, '/org/freedesktop/NetworkManager', 'org.freedesktop.NetworkManager')
