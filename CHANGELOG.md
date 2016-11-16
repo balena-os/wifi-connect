@@ -1,3 +1,21 @@
+## v2.0.0 - 2016-11-16
+
+- Readme and testing procedure
+- PR changes
+- Ready for review
+- Checking whether NM has prior connections
+- Started NM implementation
+- Added retry parameter
+- Refactored main control flow
+- Ignore .resin-sync.yml
+- Implemented check if a systemd unit exists function
+- Refactored connman and added extra functionality
+- Removed pre-start connman setup check
+- Included fs-extra
+- Implemented copy and exists functions
+- Start and stop the passed in manager
+- Integrated versionist
+
 ## v1.0.0 - 2016-11-16
 
 - Add linting

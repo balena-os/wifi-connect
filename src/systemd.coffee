@@ -17,3 +17,12 @@ exports.stop = (unit, mode = 'fail') ->
 	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
 	.then (manager) ->
 		manager.StopUnitAsync(unit, mode)
+
+exports.exists = (unit, mode = 'fail') ->
+	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
+	.call('ListUnitsAsync')
+	.then (units) ->
+		for obj in units
+			if unit of obj
+				return true
+		return false
