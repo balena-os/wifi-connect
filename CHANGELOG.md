@@ -1,13 +1,134 @@
-* Removed bind and udhcpd and used dnsmasq instead
-* Removed all iptable logic, dnsmasq replies to DNS requests properly
-* Removed wireless-tools npm module
-* Use DBus to talk to connman and systemd on the host
-* Switched to ip instead of ifconfig
-* Made everything Promise based
-* Correctly handle `rfkill`ed interfaces
-* Allow scanning for networks even while in AP mode
-* Maked configuration purely environment variable based
-* Persist configuration files atomically and durably
-* Only start node process if setup hasn't completed
-* Use connman API to find out if connection succeeded
-* Make wifi interface configurable
+## v1.0.0 - 2016-11-16
+
+- Add linting
+- Document new connection behaviour
+- Upgrade nodejs to v6
+- Scan for SSIDs before entering access point mode
+- Fix DBUS_SYSTEM_BUS_ADDRESS being ignored
+- Add todo item
+- Ignore errors while setting the gateway ip
+- Re-architect project for robustness
+- Always use the /host_run dbus socket
+- Call bodyParser methods separately
+- Make sure we use latest connman-simplified
+- Provide extended option
+- Ops, remove those semicolons
+- Call bodyParser methods separately
+- Make sure we use latest connman-simplified
+- Use the more generic 0.10 tag on the Dockerfile
+- Add Apache 2.0 license
+- Use promisify
+- Retry join 3 times
+- Use node 0.10
+- For rpi3, use hostapd but without the bcm stuff we used for edison
+- Fix systemd.callMethod for undefined args
+- Correctly use joinAsync (we're on a newer connman-simplified)
+- Specify interface for hostapd.disable and udhcpd.disable
+- Correctly use the bcm firmware
+- Add bcm firmware
+- Promise in systemd
+- Use hostapd and udhcpd
+- Use brctl to add wlan0 to tether
+- Use shell to open hotspot
+- Redirect ALL the outputs!
+- Log to file for debug
+- Reboot for connecting...
+- Longer delays
+- Modprobe before opening/closing hotspot
+- Update readme
+- Fix typo in config key
+- Retry 3 times when joining a new network
+- Disable connman service and pass correct dbus socket for when systemd is enabled
+- Update package.json
+- Quickfix for quickfix: use connman-simplified-resin
+- Change docker image to <machine-name>-node
+- Quickfix: use our own connman-simplified-resin until the problem with dbus is fixed
+- Longer retry to get the tether interface's IP
+- Add responsive meta tag and load style first
+- Update connman-simplified to 0.1.3
+- Ensure closeHotspot is closed at start up
+- Use Buffer for fs.write
+- Use empty array for no networks
+- Don't crash if no networks are found in scan, show message in index.html
+- Don't joinFavorite
+- ConnectionsFromFile is always an array
+- Try/catch for connectionsFromFile
+- Clean up saveToFile
+- Use json file to keep connections
+- Back to official connman simplified (after our changes have been accepted in upstream)
+- Markdown details
+- Document board and dongle support
+- Use connman-simplified-resin
+- Use tag for connman-simplified
+- Lock connman-simplified version
+- 0.10.38 for rpi
+- Reflect change in README
+- Rename config.json to wifi.json
+- Also allow env vars
+- Config.json instead of env vars
+- Document the existence of the Python example
+- Exit after joining
+- Freeze coffee-script version, remove netfilter
+- More verbose output in infinite loop
+- Clean bower cache
+- Markdown detail
+- Doc the dockerfile template thing
+- Switch to dockerfile template
+- Nicer use of promises
+- Lint!
+- Bower allow root
+- Promise.try
+- Dockerfile improvements
+- Add bower
+- Docs in README, plus remove some unused deps
+- Re-add start script to keep app running
+- Reorganize files, remove dropbear
+- Alphabetise dependencies
+- Promisify wifi
+- Better npm install
+- First attempt at using promises
+- Return when calling callback
+- Also log errors before retry
+- Retry on init errors
+- Actually, it's better to default to no passphrase
+- Null passphrase using a different env var
+- Null passphrase if empty
+- Use ajax for form, better post-submit message
+- Catch and Redirect all routes to /
+- Don't wait for server to close
+- Separate npm install for beter caching
+- Mor retries for getIptablesRules, plus some styling
+- Oops, fix dns conf
+- Add retry for getting tether IP
+- Fix rule deletion
+- Fix DNS conf and better iptables management
+- UDP for DNS
+- Oops, syntax error
+- And on builder again
+- Back to npm install on device for now
+- Use own module for iptables
+- Let's try npm install in builder
+- Add DNS server and iptables for real captive portal
+- Comment iptables for now
+- Temporary fix for unresponsive device
+- Don't masquerade
+- Specify --to-destination in target_options
+- Oops...
+- Add iptables modifications for captive portal
+- Add connman package for debugging
+- Use joinWithAgent
+- Add nano for debug, fix VOLUME decl
+- For now npm install on device
+- Connect
+- Use armv7hf-node
+- Use pcarranzav/connman-simplified
+- Oops
+- Connman is a function
+- Async
+- Force node 0.11
+- Blah
+- Deps
+- Deps
+- Public files, coffee, etc
+- First attempt at running connman from node
+- Initial commit
