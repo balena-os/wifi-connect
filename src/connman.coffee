@@ -1,12 +1,11 @@
 Promise = require 'bluebird'
 DBus = require './dbus-promise'
-
+fs = Promise.promisifyAll(require('fs'))
 dbus = new DBus()
-
 bus = dbus.getBus('system')
+_ = require 'lodash'
 
 config = require './config'
-fs = Promise.promisifyAll(require('fs'))
 systemd = require './systemd'
 utils = require './utils'
 
@@ -24,9 +23,8 @@ exports.isSetup = ->
 	fs.statAsync(config.persistentConfig)
 	.then ->
 		utils.copyFile(config.persistentConfig, config.connmanConfig)
-		.return(true)
-	.catch (e) ->
-		return false
+	.return(true)
+	.catchReturn(false)
 
 exports.setCredentials = (ssid, passphrase) ->
 	connection = """
@@ -49,8 +47,7 @@ exports.setCredentials = (ssid, passphrase) ->
 
 exports.clearCredentials = ->
 	fs.unlinkAsync(config.persistentConfig)
-	.catch code: 'ENOENT', (e) ->
-		return
+	.catch(code: 'ENOENT', _.noop)
 
 exports.connect  = (timeout) ->
 	bus.getInterfaceAsync(SERVICE, WIFI_OBJECT, TECHNOLOGY_INTERFACE)
@@ -74,5 +71,5 @@ exports.connect  = (timeout) ->
 
 			setTimeout ->
 				manager.removeListener('PropertyChanged', handler)
-				reject('Timed out')
+				reject(new Error('Timed out'))
 			, timeout

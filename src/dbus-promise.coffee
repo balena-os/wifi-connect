@@ -1,6 +1,5 @@
 Promise = require 'bluebird'
 DBus = require 'dbus'
-
 Bus = require 'dbus/lib/bus'
 Interface = require 'dbus/lib/interface'
 

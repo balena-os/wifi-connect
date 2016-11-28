@@ -1,9 +1,10 @@
 Promise = require 'bluebird'
+{ spawn, exec } = require 'child_process'
+execAsync = Promise.promisify(exec)
 DBus = require './dbus-promise'
 _ = require 'lodash'
 
 dbus = new DBus()
-
 bus = dbus.getBus('system')
 
 systemd = require './systemd'
@@ -26,7 +27,7 @@ exports.stop = ->
 
 exports.isSetup = ->
 	getConnections()
-	.map(validateConnection)
+	.map(isConnectionValid)
 	.then (results) ->
 		return true in results
 
@@ -52,6 +53,8 @@ exports.setCredentials = (ssid, passphrase) ->
 	bus.getInterfaceAsync(SERVICE, '/org/freedesktop/NetworkManager/Settings', 'org.freedesktop.NetworkManager.Settings')
 	.then (settings) ->
 		settings.AddConnectionAsync(connection)
+	.then ->
+		execAsync('sync')
 
 exports.clearCredentials = ->
 	getConnections()
@@ -59,15 +62,15 @@ exports.clearCredentials = ->
 
 exports.connect  = (timeout) ->
 	getDevices()
-	.filter(validateDevice)
+	.filter(isDeviceValid)
 	.then (validDevices) ->
 		if validDevices.length is 0
-			throw ('No valid devices found.')
+			throw new Error('No valid devices found.')
 		getConnections()
-		.filter(validateConnection)
+		.filter(isConnectionValid)
 		.then (validConnections) ->
 			if validConnections.length is 0
-				throw ('No valid connections found.')
+				throw new Error('No valid connections found.')
 			bus.getInterfaceAsync(SERVICE, '/org/freedesktop/NetworkManager', 'org.freedesktop.NetworkManager')
 			.delay(1000) # Delay needed to avoid "Error: org.freedesktop.NetworkManager.UnknownConnection at Error (native)" when activating the connection
 			.then (manager) ->
@@ -92,7 +95,7 @@ exports.connect  = (timeout) ->
 
 						setTimeout ->
 							manager.removeListener('StateChanged', handler)
-							reject('Timed out')
+							reject(new Error('Timed out'))
 						, timeout
 
 getConnections = ->
@@ -110,7 +113,7 @@ deleteConnection = (connection) ->
 			if settings.connection.id not in WHITE_LIST
 				connection.DeleteAsync()
 
-validateConnection = (connection) ->
+isConnectionValid = (connection) ->
 	getConnection(connection)
 	.call('GetSettingsAsync')
 	.then (settings) ->
@@ -123,7 +126,7 @@ getDevices = ->
 getDevice = (device) ->
 	bus.getInterfaceAsync(SERVICE, device, 'org.freedesktop.NetworkManager.Device')
 
-validateDevice = (device) ->
+isDeviceValid = (device) ->
 	getDevice(device)
 	.call('getPropertyAsync', 'DeviceType')
 	.then (property) ->

@@ -1,7 +1,5 @@
 Promise = require 'bluebird'
 child_process = Promise.promisifyAll require 'child_process'
-# { exec } = require 'child_process'
-# execAsync = Promise.promisify(exec)
 
 config = require './config'
 

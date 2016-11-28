@@ -21,10 +21,8 @@ error = (e) ->
 		console.log('Retrying')
 		console.log('Clearing credentials')
 		manager.clearCredentials()
-		.then ->
-			run()
-		.catch (e) ->
-			error(e)
+		.then(run)
+		.catch(error)
 	else
 		console.log('Not retrying')
 		console.log('Exiting')
@@ -42,10 +40,8 @@ app.post '/connect', (req, res) ->
 	hotspot.stop(manager)
 	.then ->
 		manager.setCredentials(req.body.ssid, req.body.passphrase)
-	.then ->
-		run()
-	.catch (e) ->
-		error(e)
+	.then(run)
+	.catch(error)
 
 app.use (req, res) ->
 	res.redirect('/')
@@ -58,13 +54,12 @@ run = ->
 			hotspot.stop(manager)
 			.then ->
 				console.log('Connecting')
-				manager.connect(15000) # Delay needed to allow manager to connect
+				manager.connect(15000)
 			.then ->
 				console.log('Connected')
 				console.log('Exiting')
 				process.exit()
-			.catch (e) ->
-				error(e)
+			.catch(error)
 		else
 			console.log('Credentials not found')
 			hotspot.stop(manager)
@@ -73,8 +68,7 @@ run = ->
 			.then (results) ->
 				ssids = results
 				hotspot.start(manager)
-			.catch (e) ->
-				error(e)
+			.catch(error)
 
 app.listen(80)
 
@@ -113,8 +107,7 @@ systemd.exists('NetworkManager.service')
 	.then (setup) ->
 		if setup
 			retry = false
-.then ->
-	run()
+.then(run)
 .catch (e) ->
 	console.log(e)
 	console.log('Exiting')
