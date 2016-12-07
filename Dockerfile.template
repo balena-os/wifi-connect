@@ -1,0 +1,40 @@
+FROM resin/%%RESIN_MACHINE_NAME%%-node:6
+
+# Note we added the python dependencies after resin-wifi-connect's deps.
+RUN apt-get update \
+	&& apt-get install -y \
+		dnsmasq \
+		hostapd \
+		iproute2 \
+		iw \
+		libdbus-1-dev \
+		libexpat-dev \
+		rfkill \
+		python \
+		python-dev \
+		python-dbus \
+		python-pip \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /usr/src/app/
+
+WORKDIR /usr/src/app
+
+COPY package.json /usr/src/app/
+
+RUN JOBS=MAX npm install --unsafe-perm --production \
+	&& npm cache clean
+
+COPY bower.json .bowerrc /usr/src/app/
+
+RUN ./node_modules/.bin/bower --allow-root install \
+	&& ./node_modules/.bin/bower --allow-root cache clean
+
+COPY . /usr/src/app/
+
+RUN ./node_modules/.bin/coffee -c ./src
+
+# Here we add the pip Flask package
+RUN pip install flask
+
+CMD bash start
