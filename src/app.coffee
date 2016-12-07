@@ -1,13 +1,10 @@
-Promise = require 'bluebird'
-fs = Promise.promisifyAll(require('fs'))
 express = require 'express'
 bodyParser = require 'body-parser'
 
-config = require './config'
-
-utils = require './utils'
 connman = require './connman'
 hotspot = require './hotspot'
+networkManager = require './networkManager'
+systemd = require './systemd'
 wifiScan = require './wifi-scan'
 
 app = express()
@@ -18,6 +15,19 @@ app.use(express.static(__dirname + '/public'))
 
 ssids = []
 
+error = (e) ->
+	console.log(e)
+	if retry
+		console.log('Retrying')
+		console.log('Clearing credentials')
+		manager.clearCredentials()
+		.then(run)
+		.catch(error)
+	else
+		console.log('Not retrying')
+		console.log('Exiting')
+		process.exit()
+
 app.get '/ssids', (req, res) ->
 	res.json(ssids)
 
@@ -25,45 +35,80 @@ app.post '/connect', (req, res) ->
 	if not (req.body.ssid? and req.body.passphrase?)
 		return res.sendStatus(400)
 
-	console.log('Selected ' + req.body.ssid)
-
 	res.send('OK')
 
-	data = """
-		[service_home_ethernet]
-		Type = ethernet
-		Nameservers = 8.8.8.8,8.8.4.4
-
-		[service_home_wifi]
-		Type = wifi
-		Name = #{req.body.ssid}
-		Passphrase = #{req.body.passphrase}
-		Nameservers = 8.8.8.8,8.8.4.4
-
-	"""
-
-	Promise.all [
-		utils.durableWriteFile(config.connmanConfig, data)
-		hotspot.stop()
-	]
-	# XXX: make it so this delay isn't needed
-	.delay(1000)
+	hotspot.stop(manager)
 	.then ->
-		connman.waitForConnection(15000)
-	.then ->
-		utils.durableWriteFile(config.persistentConfig, data)
-	.then ->
-		process.exit()
-	.catch (e) ->
-		hotspot.start()
+		manager.setCredentials(req.body.ssid, req.body.passphrase)
+	.then(run)
+	.catch(error)
 
 app.use (req, res) ->
 	res.redirect('/')
 
-wifiScan.scanAsync()
-.then (results) ->
-	ssids = results
-
-	hotspot.start()
+run = ->
+	manager.isSetup()
+	.then (setup) ->
+		if setup
+			console.log('Credentials found')
+			hotspot.stop(manager)
+			.then ->
+				console.log('Connecting')
+				manager.connect(15000)
+			.then ->
+				console.log('Connected')
+				console.log('Exiting')
+				process.exit()
+			.catch(error)
+		else
+			console.log('Credentials not found')
+			hotspot.stop(manager)
+			.then ->
+				wifiScan.scanAsync()
+			.then (results) ->
+				ssids = results
+				hotspot.start(manager)
+			.catch(error)
 
 app.listen(80)
+
+retry = true
+clear = true
+manager = null
+
+if process.argv[2] == '--clear=true'
+	console.log('Clear enabled')
+	clear = true
+else if process.argv[2] == '--clear=false'
+	console.log('Clear disabled')
+	clear = false
+else if not process.argv[2]?
+	console.log('No clear flag passed')
+	console.log('Clear enabled')
+else
+	console.log('Invalid clear flag passed')
+	console.log('Exiting')
+	process.exit()
+
+systemd.exists('NetworkManager.service')
+.then (result) ->
+	if result
+		console.log('Using NetworkManager.service')
+		manager = networkManager
+	else
+		console.log('Using connman.service')
+		manager = connman
+.then ->
+	if clear
+		console.log('Clearing credentials')
+		manager.clearCredentials()
+.then ->
+	manager.isSetup()
+	.then (setup) ->
+		if setup
+			retry = false
+.then(run)
+.catch (e) ->
+	console.log(e)
+	console.log('Exiting')
+	process.exit()

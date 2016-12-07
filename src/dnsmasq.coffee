@@ -30,6 +30,8 @@ exports.stop = ->
 		return Promise.resolve()
 
 	new Promise (resolve, reject) ->
+		console.log('Stopping dnsmasq..')
+
 		ps.kill('SIGTERM')
 
 		timeout = setTimeout ->

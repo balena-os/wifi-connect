@@ -37,6 +37,8 @@ exports.stop = ->
 		return Promise.resolve()
 
 	new Promise (resolve, reject) ->
+		console.log('Stopping hostapd..')
+
 		ps.kill('SIGTERM')
 
 		timeout = setTimeout ->

@@ -15,3 +15,8 @@ exports.durableWriteFile = (file, data) ->
 		fs.openAsync(path.dirname(file), 'r', constants.O_DIRECTORY)
 	.tap(fs.fsyncAsync)
 	.then(fs.closeAsync)
+
+exports.copyFile = (source, target) ->
+	fs.readFileAsync(source)
+	.then (rf) ->
+		fs.writeFileAsync(target, rf)
