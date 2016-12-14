@@ -5,7 +5,7 @@ An app to allow WiFi configuration to be set via a captive portal. First it chec
 ## How to use this
 This is a [resin.io](http://resin.io) application. Check out our [Getting Started](http://docs.resin.io/#/pages/installing/gettingStarted.md) guide if it's your first time using Resin.
 
-This project is meant to be integrated as part of a larger application (that is, _your_ application). An example on how to use this on a Python project can be found [here](https://github.com/resin-io-projects/resin-wifi-connect-python-example).
+This project is meant to be integrated as part of a larger application (that is, _your_ application). An example on how to use this on a Python project can be found [here](https://github.com/resin-io-projects/resin-wifi-connect-example).
 
 If you need to add dependencies, add the corresponding statements in the [Dockerfile](./Dockerfile.template) template. You can add the commands that run your app in the [start](./start) script. resin-wifi-connect only exits after a WiFi connection has been correctly configured, so if you add your app after [line 7](./start#L7) you ensure that everything happens after WiFi is correctly configured.
 
