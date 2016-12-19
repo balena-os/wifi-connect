@@ -8,6 +8,10 @@
     "test": "npm run lint"
   },
   "author": "Pablo Carranza Vélez <pablo@resin.io>",
+  "contributors": [{
+    "name": "Joseph Roberts",
+    "email": "joe@resin.io"
+  }],
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.4.1",
