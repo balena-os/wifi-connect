@@ -3,7 +3,7 @@ An app to allow WiFi configuration to be set via a captive portal. First it chec
 
 
 ## How to use this
-This is a [resin.io](http://resin.io) application. Check out our [Getting Started](http://docs.resin.io/#/pages/installing/gettingStarted.md) guide if it's your first time using Resin.
+This is a [resin.io](http://resin.io) application. Check out our [Getting Started](http://docs.resin.io/#/pages/installing/gettingStarted.md) guide if it's your first time using resin.io
 
 This project is meant to be integrated as part of a larger application (that is, _your_ application). An example on how to use this on a Python project can be found [here](https://github.com/resin-io-projects/resin-wifi-connect-example).
 
@@ -52,6 +52,8 @@ This app is expected to work with other Resin supported boards as long as you us
 Please [contact us](https://resin.io/community/) or raise [an issue](https://github.com/resin-io/resin-wifi-connect/issues) if you hit any trouble.
 
 ## FAQ
-* What is the state of Linux networking before the start script is executed? If the device is plugged in over Ethernet it will have an internet connection, if the device is using WiFi only it will not have an internet connection until the start script has completed.
+* *What is the state of Linux networking before the start script is executed?*
+If the device is plugged in over Ethernet it will have an internet connection, if the device is using WiFi only it will not have an internet connection until the start script has completed.
 
-* How long will this app attempt to connect to a configured connection for? The connection timeout is set to 15 seconds.
+* *How long will this app attempt to connect to a configured connection for?*
+The connection timeout is set to 15 seconds.
