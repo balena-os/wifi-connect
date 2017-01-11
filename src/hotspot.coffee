@@ -5,18 +5,21 @@ execAsync = Promise.promisify(exec)
 config = require './config'
 hostapd = require './hostapd'
 dnsmasq = require './dnsmasq'
+modprobe = require './modprobe'
 
 started = false
 
-exports.start = (manager) ->
+exports.start = (manager, device) ->
 	if started
 		return Promise.resolve()
 
 	started = true
 
-	console.log('Stopping service, starting hotspot')
+	console.log('Starting hotspot')
 
-	manager.stop()
+	modprobe.hotspot(device)
+	.then ->
+		manager.stop()
 	.then ->
 		execAsync('rfkill unblock wifi')
 	.then ->
@@ -26,18 +29,23 @@ exports.start = (manager) ->
 		hostapd.start()
 	.then ->
 		dnsmasq.start()
+	.then ->
+		console.log('Started hotspot')
 
-exports.stop = (manager) ->
+exports.stop = (manager, device) ->
 	if not started
 		return Promise.resolve()
 
-	console.log('Starting service, stopping hotspot')
-
 	started = false
 
-	Promise.all [
+	console.log('Stopping hotspot')
+
+	modprobe.normal(device)
+	.then ->
 		hostapd.stop()
+	.then ->
 		dnsmasq.stop()
-	]
 	.then ->
 		manager.start()
+	.then ->
+		console.log('Stopped hotspot')

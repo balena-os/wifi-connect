@@ -17,7 +17,7 @@ This app interacts with either Connman or Network Manager in Resin's base OS. Fi
 The Access Points's name (SSID) is, by default, "ResinAP". You can change this by setting the `PORTAL_SSID` environment variable. By default, the network is unprotected, but you can add a WPA2 passphrase by setting the `PORTAL_PASSPHRASE` environment variable.
 
 When you connect to the Access Point, any web page you open will be redirected to our captive portal page, where you can select the SSID and passphrase of the WiFi network to connect to. After this, the app will disable the Access Point and try to connect. If the connection fails, it will enable the Access Point for you to try again. If it succeeds, the configuration will be saved by Connman or Network Manager.
-         
+
 An important detail is that by default, the project will not attempt to enter Access Point mode if a successful configuration has happened in the past. This means that if you go through the process and then move the device to a different network, it will be trying to connect forever. It is left to the user application to decide which is the appropriate condition to re-enter Access Point mode. This can be "been offline for more than 1 day" or "user pushed the reset button" or something else. To re-enter access point mode, simply run `node src/app.js --clear=true`.
 
 ## State flow diagram
@@ -25,8 +25,6 @@ An important detail is that by default, the project will not attempt to enter Ac
 
 
 ## Supported boards / dongles
-**For the Intel Edison version of this app, check the [edison branch](https://github.com/resin-io/resin-wifi-connect/tree/edison) in this repository.**
-
 This app has been successfully tested using the following WiFi dongles:
 
 Dongle                                     | Chip
