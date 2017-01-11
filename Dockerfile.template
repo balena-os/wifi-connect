@@ -1,5 +1,7 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-node:6
 
+ENV DEVICE_TYPE=%%RESIN_MACHINE_NAME%%
+
 RUN apt-get update \
 	&& apt-get install -y \
 		dnsmasq \

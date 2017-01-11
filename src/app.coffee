@@ -37,7 +37,7 @@ app.post '/connect', (req, res) ->
 
 	res.send('OK')
 
-	hotspot.stop(manager)
+	hotspot.stop(manager, device)
 	.then ->
 		manager.setCredentials(req.body.ssid, req.body.passphrase)
 	.then(run)
@@ -51,7 +51,7 @@ run = ->
 	.then (setup) ->
 		if setup
 			console.log('Credentials found')
-			hotspot.stop(manager)
+			hotspot.stop(manager, device)
 			.then ->
 				console.log('Connecting')
 				manager.connect(15000)
@@ -62,33 +62,43 @@ run = ->
 			.catch(error)
 		else
 			console.log('Credentials not found')
-			hotspot.stop(manager)
+			hotspot.stop(manager, device)
 			.then ->
 				wifiScan.scanAsync()
 			.then (results) ->
 				ssids = results
-				hotspot.start(manager)
+				hotspot.start(manager, device)
 			.catch(error)
 
 app.listen(80)
 
 retry = true
 clear = true
+device = null
 manager = null
 
 if process.argv[2] == '--clear=true'
-	console.log('Clear enabled')
+	console.log('Clear is enabled')
 	clear = true
 else if process.argv[2] == '--clear=false'
-	console.log('Clear disabled')
+	console.log('Clear is disabled')
 	clear = false
 else if not process.argv[2]?
 	console.log('No clear flag passed')
-	console.log('Clear enabled')
+	console.log('Clear is enabled')
 else
 	console.log('Invalid clear flag passed')
 	console.log('Exiting')
 	process.exit()
+
+device = process.env.RESIN_DEVICE_TYPE
+if !device
+	device = process.env.DEVICE_TYPE
+	if !device
+		console.log('Device type not found - did you set the DEVICE_TYPE environment variable?')
+		console.log('Exiting')
+		process.exit()
+console.log('Device type is ' + device)
 
 systemd.exists('NetworkManager.service')
 .then (result) ->

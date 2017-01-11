@@ -10,18 +10,20 @@ MANAGER_INTERFACE = 'org.freedesktop.systemd1.Manager'
 UNIT_INTERFACE = 'org.freedesktop.systemd1.Unit'
 
 exports.start = (unit, mode = 'fail') ->
+	console.log('Starting ' + unit)
 	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
 	.then (manager) ->
 		manager.StartUnitAsync(unit, mode)
 	.then ->
-		waitUntilState(unit, 'active') 
+		waitUntilState(unit, 'active')
 
 exports.stop = (unit, mode = 'fail') ->
+	console.log('Stopping ' + unit)
 	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
 	.then (manager) ->
 		manager.StopUnitAsync(unit, mode)
 	.then ->
-		waitUntilState(unit, 'inactive') 
+		waitUntilState(unit, 'inactive')
 
 exports.exists = (unit, mode = 'fail') ->
 	bus.getInterfaceAsync(SERVICE, MANAGER_OBJECT, MANAGER_INTERFACE)
@@ -31,9 +33,9 @@ exports.exists = (unit, mode = 'fail') ->
 
 waitUntilState = (unit, targetState) ->
 	currentState = null
-	condition = -> 
+	condition = ->
 		currentState != targetState
-	action = -> 
+	action = ->
 		getState(unit)
 		.then (state) ->
 			currentState = state
