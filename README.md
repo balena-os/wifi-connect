@@ -9,7 +9,7 @@ This project is meant to be integrated as part of a larger application (that is,
 
 If you need to add dependencies, add the corresponding statements in the [Dockerfile](./Dockerfile.template) template. You can add the commands that run your app in the [start](./start) script. resin-wifi-connect only exits after a WiFi connection has been correctly configured, so if you add your app after [line 7](./start#L7) you ensure that everything happens after WiFi is correctly configured.
 
-This is a node.js application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](http://docs.resin.io/#/pages/using/dockerfile.md). This project uses a Resin feature called "Dockerfile template", this means that the base image is chosen depending on the architecture, specified by the `%%RESIN_MACHINE_NAME%%` variable (see [line 1](./Dockerfile.template#L1) in the template).
+This is a node.js application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](https://docs.resin.io/deployment/dockerfile/). This project uses a Resin feature called "Dockerfile template", this means that the base image is chosen depending on the architecture, specified by the `%%RESIN_MACHINE_NAME%%` variable (see [line 1](./Dockerfile.template#L1) in the template).
 
 ## How it works
 This app interacts with either Connman or Network Manager in Resin's base OS. First it checks whether WiFi has been previously configured, if it has it attempts to connect to the configured network, if it hasn't it opens an Access Point to which you can connect using a laptop or mobile phone and input new WiFi credentials.
