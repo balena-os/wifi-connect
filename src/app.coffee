@@ -6,6 +6,7 @@ hotspot = require './hotspot'
 networkManager = require './networkManager'
 systemd = require './systemd'
 wifiScan = require './wifi-scan'
+config = require './config'
 
 app = express()
 
@@ -54,7 +55,7 @@ run = ->
 			hotspot.stop(manager, device)
 			.then ->
 				console.log('Connecting')
-				manager.connect(30000)
+				manager.connect(config.connectTimeout)
 			.then ->
 				console.log('Connected')
 				console.log('Exiting')
