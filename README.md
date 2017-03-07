@@ -54,4 +54,4 @@ Please [contact us](https://resin.io/community/) or raise [an issue](https://git
 If the device is plugged in over Ethernet it will have an internet connection, if the device is using WiFi only it will not have an internet connection until the start script has completed.
 
 * *How long will this app attempt to connect to a configured connection for?*
-The connection timeout is set to 30 seconds.
+The connection timeout is set to 15 seconds.

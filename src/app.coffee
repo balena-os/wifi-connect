@@ -118,6 +118,7 @@ systemd.exists('NetworkManager.service')
 	.then (setup) ->
 		if setup
 			retry = false
+.then(manager.ready())
 .then(run)
 .catch (e) ->
 	console.log(e)
