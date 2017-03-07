@@ -25,6 +25,9 @@ exports.start = ->
 exports.stop = ->
 	systemd.stop('NetworkManager.service')
 
+exports.ready = ->
+	systemd.waitUntilState('NetworkManager.service', 'active')
+
 exports.isSetup = ->
 	getConnections()
 	.map(isConnectionValid)

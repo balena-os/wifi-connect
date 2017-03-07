@@ -19,6 +19,9 @@ exports.start = ->
 exports.stop = ->
 	systemd.stop('connman.service')
 
+exports.ready = ->
+	systemd.waitUntilState('connman.service', 'active')
+
 exports.isSetup = ->
 	fs.statAsync(config.persistentConfig)
 	.then ->

@@ -31,7 +31,7 @@ exports.exists = (unit, mode = 'fail') ->
 	.then (units) ->
 		_.has(units[0], unit)
 
-waitUntilState = (unit, targetState) ->
+exports.waitUntilState = (unit, targetState) ->
 	currentState = null
 	condition = ->
 		currentState != targetState
