@@ -54,7 +54,7 @@ run = ->
 			hotspot.stop(manager, device)
 			.then ->
 				console.log('Connecting')
-				manager.connect(15000)
+				manager.connect(30000)
 			.then ->
 				console.log('Connected')
 				console.log('Exiting')
