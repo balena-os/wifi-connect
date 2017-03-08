@@ -6,3 +6,4 @@ module.exports =
 	dhcpRange: process.env.PORTAL_DHCP_RANGE or '192.168.42.2,192.168.42.254'
 	connmanConfig: process.env.PORTAL_CONNMAN_CONFIG or '/host/var/lib/connman/network.config'
 	persistentConfig: process.env.PORTAL_PERSISTENT_CONFIG or '/data/network.config'
+	connectTimeout: process.env.CONNECT_TIMEOUT or 15000
