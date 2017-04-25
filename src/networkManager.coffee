@@ -16,8 +16,8 @@ WHITE_LIST = ['resin-sample', 'Wired connection 1']
 
 NM_STATE_CONNECTED_GLOBAL = 70
 NM_DEVICE_TYPE_WIFI = 2
-NM_CONNECTIVITY_LIMITED = 4
-NM_CONNECTIVITY_FULL = 5
+NM_CONNECTIVITY_LIMITED = 3
+NM_CONNECTIVITY_FULL = 4
 
 exports.start = ->
 	systemd.start('NetworkManager.service')

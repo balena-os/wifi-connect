@@ -1,6 +1,6 @@
 {
   "name": "resin-wifi-connect",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "repository": "https://github.com/resin-io/resin-wifi-connect",
   "description": "A tool to allow wifi configuration to be set via a captive portal",
   "scripts": {
@@ -8,10 +8,12 @@
     "test": "npm run lint"
   },
   "author": "Pablo Carranza Vélez <pablo@resin.io>",
-  "contributors": [{
-    "name": "Joseph Roberts",
-    "email": "joe@resin.io"
-  }],
+  "contributors": [
+    {
+      "name": "Joseph Roberts",
+      "email": "joe@resin.io"
+    }
+  ],
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.4.1",
