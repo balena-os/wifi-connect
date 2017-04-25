@@ -1,7 +1,7 @@
 {
   "name": "resin-wifi-connect",
-  "version": "2.0.0",
-  "repository": "https://github.com/pcarranzav/resin-wifi-connect",
+  "version": "2.0.5",
+  "repository": "https://github.com/resin-io/resin-wifi-connect",
   "description": "A tool to allow wifi configuration to be set via a captive portal",
   "scripts": {
     "lint": "resin-lint src",
