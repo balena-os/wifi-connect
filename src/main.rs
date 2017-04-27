@@ -4,6 +4,9 @@ use std::process;
 extern crate clap;
 use clap::{Arg, App};
 
+extern crate network_manager;
+use network_manager::{manager, wifi, device};
+
 fn main() {
     let matches = App::new("resin-wifi-connect")
         .version("0.1.0")
@@ -39,7 +42,7 @@ fn main() {
             .help("Enable verbose output"))
         .get_matches();
 
-    let interface = matches.value_of("interface").unwrap_or("default");
+    let interface: Option<&str> = matches.value_of("interface");
     let ssid = matches.value_of("ssid").unwrap_or("resin-hotspot");
     let password = matches.value_of("password").unwrap_or("resin-hotspot");
     let timeout = matches.value_of("timeout").map_or(600, |v| v.parse::<i32>().unwrap());
@@ -47,13 +50,18 @@ fn main() {
 
     if verbose {
         println!("Interface: {}, SSID: {}, Password: {}, Timeout: {}",
-                 interface,
+                 interface.unwrap_or("not set"),
                  ssid,
                  password,
                  timeout);
     }
 
-    // Scan for access points
+    let manager = manager::new();
+
+    let access_points = scan(&manager, interface).unwrap();
+    if verbose {
+        println!("Access points: {:?}", access_points)
+    }
 
     // Start hotspot
 
@@ -73,4 +81,24 @@ fn main() {
 
     // Exit, 0 for success, 1 for failure
     process::exit(0)
+}
+
+fn scan(manager: &manager::NetworkManager,
+        interface: Option<&str>)
+        -> Result<Vec<wifi::AccessPoint>, String> {
+    let mut devices = device::list(&manager).unwrap();
+    let device_index = find_device(&devices, interface).unwrap();
+    let device_ref = &mut devices[device_index];
+
+    wifi::scan(&manager, device_ref)
+}
+
+fn find_device(devices: &Vec<device::Device>, interface: Option<&str>) -> Option<usize> {
+    if let Some(interface) = interface {
+        devices.iter()
+            .position(|ref d| d.device_type == device::DeviceType::WiFi && d.interface == interface)
+    } else {
+        devices.iter()
+            .position(|ref d| d.device_type == device::DeviceType::WiFi)
+    }
 }
