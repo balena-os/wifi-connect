@@ -5,7 +5,7 @@ extern crate clap;
 use clap::{Arg, App};
 
 extern crate network_manager;
-use network_manager::{manager, wifi, device};
+use network_manager::{manager, wifi, device, connection};
 
 fn main() {
     let matches = App::new("resin-wifi-connect")
@@ -44,7 +44,7 @@ fn main() {
 
     let interface: Option<&str> = matches.value_of("interface");
     let ssid = matches.value_of("ssid").unwrap_or("resin-hotspot");
-    let password = matches.value_of("password").unwrap_or("resin-hotspot");
+    let password: Option<&str> = matches.value_of("password");
     let timeout = matches.value_of("timeout").map_or(600, |v| v.parse::<i32>().unwrap());
     let verbose = matches.is_present("verbose");
 
@@ -52,18 +52,35 @@ fn main() {
         println!("Interface: {}, SSID: {}, Password: {}, Timeout: {}",
                  interface.unwrap_or("not set"),
                  ssid,
-                 password,
+                 password.unwrap_or("not set"),
                  timeout);
     }
 
     let manager = manager::new();
 
-    let access_points = scan(&manager, interface).unwrap();
+    let mut devices = device::list(&manager).unwrap();
+    let device_index = find_device(&devices, interface).unwrap();
+    let device_ref = &mut devices[device_index];
+
+    let access_points = wifi::scan(&manager, &device_ref).unwrap();
     if verbose {
         println!("Access points: {:?}", access_points)
     }
 
-    // Start hotspot
+    let mut connections = connection::list(&manager).unwrap();
+    match find_connection(&connections, ssid) {
+        Some(connection_index) => {
+            connection::enable(&manager, &mut connections[connection_index], 10).unwrap();
+        }
+        None => {
+            connection::create_hotspot(&manager,
+                                       &device_ref,
+                                       ssid,
+                                       password.map(|p| p.to_owned()),
+                                       10)
+                .unwrap();
+        }
+    }
 
     // Start server
 
@@ -83,16 +100,6 @@ fn main() {
     process::exit(0)
 }
 
-fn scan(manager: &manager::NetworkManager,
-        interface: Option<&str>)
-        -> Result<Vec<wifi::AccessPoint>, String> {
-    let mut devices = device::list(&manager).unwrap();
-    let device_index = find_device(&devices, interface).unwrap();
-    let device_ref = &mut devices[device_index];
-
-    wifi::scan(&manager, device_ref)
-}
-
 fn find_device(devices: &Vec<device::Device>, interface: Option<&str>) -> Option<usize> {
     if let Some(interface) = interface {
         devices.iter()
@@ -101,4 +108,9 @@ fn find_device(devices: &Vec<device::Device>, interface: Option<&str>) -> Option
         devices.iter()
             .position(|ref d| d.device_type == device::DeviceType::WiFi)
     }
+}
+
+fn find_connection(connections: &Vec<connection::Connection>, ssid: &str) -> Option<usize> {
+    connections.iter()
+        .position(|ref c| c.settings.ssid == ssid.to_owned())
 }
