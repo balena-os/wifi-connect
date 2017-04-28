@@ -1,4 +1,4 @@
-use std::process;
+use std::{fs, process, path};
 
 #[macro_use]
 extern crate clap;
@@ -7,7 +7,24 @@ use clap::{Arg, App};
 extern crate network_manager;
 use network_manager::{manager, wifi, device, connection};
 
+extern crate iron;
+use iron::{Iron, Request, Response, IronResult, status};
+
+extern crate router;
+use router::Router;
+
+extern crate staticfile;
+use staticfile::Static;
+
+extern crate mount;
+use mount::Mount;
+
+extern crate serde_json;
+
 fn main() {
+    // TODO error handling
+
+    // Define command line flags
     let matches = App::new("resin-wifi-connect")
         .version("0.1.0")
         .author("Joe Roberts <joe@resin.io>")
@@ -42,6 +59,7 @@ fn main() {
             .help("Enable verbose output"))
         .get_matches();
 
+    // Parse command line flags
     let interface: Option<&str> = matches.value_of("interface");
     let ssid = matches.value_of("ssid").unwrap_or("resin-hotspot");
     let password: Option<&str> = matches.value_of("password");
@@ -56,17 +74,22 @@ fn main() {
                  timeout);
     }
 
+    // Network manager object
     let manager = manager::new();
 
+    // Get device
     let mut devices = device::list(&manager).unwrap();
     let device_index = find_device(&devices, interface).unwrap();
     let device_ref = &mut devices[device_index];
 
+    // Get list of access points
     let access_points = wifi::scan(&manager, &device_ref).unwrap();
+    let access_points = access_points.iter().map(|access_point| access_point.ssid.clone()).collect::<String>();
     if verbose {
-        println!("Access points: {:?}", access_points)
+        println!("Access points: {:?}", access_points);
     }
 
+    // Start the hotspot - only create the connection if it does not exist
     let mut connections = connection::list(&manager).unwrap();
     match find_connection(&connections, ssid) {
         Some(connection_index) => {
@@ -82,7 +105,20 @@ fn main() {
         }
     }
 
+    // Routing
+    let mut router = router::Router::new();
+    router.get("/", Static::new(path::Path::new("public")), "index");
+    router.get("/ssids", ssids, "ssids");
+    router.post("/connect", connect, "connect");
+
+    // Static
+    let mut assets = Mount::new();
+    assets.mount("/", router);
+    assets.mount("/img", Static::new(path::Path::new("public/img")));
+    assets.mount("/js", Static::new(path::Path::new("public/js")));
+
     // Start server
+    Iron::new(assets).http("localhost:3000").unwrap();
 
     // Wait for credentials or timeout to elapse
 
@@ -113,4 +149,15 @@ fn find_device(devices: &Vec<device::Device>, interface: Option<&str>) -> Option
 fn find_connection(connections: &Vec<connection::Connection>, ssid: &str) -> Option<usize> {
     connections.iter()
         .position(|ref c| c.settings.ssid == ssid.to_owned())
+}
+
+fn ssids(req: &mut Request) -> IronResult<Response> {
+    println!("ssids");
+    let payload = serde_json::to_string(&access_points).unwrap();
+    Ok(Response::with((status::Ok, payload)))
+}
+
+fn connect(req: &mut Request) -> IronResult<Response> {
+    println!("connect");
+    Ok(Response::with(status::Ok))
 }

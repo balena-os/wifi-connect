@@ -6,3 +6,8 @@ authors = ["Joe Roberts <joe@resin.io>"]
 [dependencies]
 clap = "*"
 network_manager = { git = "https://github.com/resin-io-modules/network_manager", branch = "master" }
+iron = "*"
+staticfile = "*"
+mount = "*"
+router = "*"
+serde_json = "*"
