@@ -1,4 +1,5 @@
-use std::process;
+use std::{process, path};
+use path::Path;
 
 #[macro_use]
 extern crate clap;
@@ -7,7 +8,55 @@ use clap::{Arg, App};
 extern crate network_manager;
 use network_manager::{manager, wifi, device, connection};
 
+extern crate iron;
+use iron::{Iron, Request, Response, IronResult, status, typemap, error, Listening};
+use iron::prelude::*;
+
+extern crate router;
+use router::Router;
+
+extern crate staticfile;
+use staticfile::Static;
+
+extern crate mount;
+use mount::Mount;
+
+extern crate serde_json;
+
+extern crate persistent;
+use persistent::{State, Read, Write};
+
+extern crate params;
+use params::Params;
+
+struct Manager_ref<'a> {
+    manager: &'a manager::NetworkManager
+}
+
+pub struct Manager<'a>;
+impl<'a> typemap::Key<'a> for Manager<'a> {
+    type Value = Manager_ref<'a>;
+}
+
+pub struct Device;
+impl typemap::Key for Device {
+    type Value = device::Device;
+}
+
+pub struct AccessPoints;
+impl typemap::Key for AccessPoints {
+    type Value = Vec<wifi::AccessPoint>;
+}
+
+pub struct AccessPoint;
+impl typemap::Key for AccessPoint {
+    type Value = wifi::AccessPoint;
+}
+
 fn main() {
+    // TODO error handling
+
+    // Define command line flags
     let matches = App::new("resin-wifi-connect")
         .version("0.1.0")
         .author("Joe Roberts <joe@resin.io>")
@@ -36,81 +85,134 @@ fn main() {
             .value_name("TIMEOUT")
             .help("Hotspot timeout (seconds)")
             .takes_value(true))
-        .arg(Arg::with_name("verbose")
-            .short("v")
-            .long("verbose")
-            .help("Enable verbose output"))
         .get_matches();
 
+    // Parse command line flags
     let interface: Option<&str> = matches.value_of("interface");
     let ssid = matches.value_of("ssid").unwrap_or("resin-hotspot");
     let password: Option<&str> = matches.value_of("password");
     let timeout = matches.value_of("timeout").map_or(600, |v| v.parse::<i32>().unwrap());
-    let verbose = matches.is_present("verbose");
 
-    if verbose {
-        println!("Interface: {}, SSID: {}, Password: {}, Timeout: {}",
-                 interface.unwrap_or("not set"),
-                 ssid,
-                 password.unwrap_or("not set"),
-                 timeout);
-    }
-
+    // Get manager
     let manager = manager::new();
 
-    let mut devices = device::list(&manager).unwrap();
-    let device_index = find_device(&devices, interface).unwrap();
-    let device_ref = &mut devices[device_index];
+    // Get device
+    let device = get_device(&manager, interface).unwrap();
 
-    let access_points = wifi::scan(&manager, &device_ref).unwrap();
-    if verbose {
-        println!("Access points: {:?}", access_points)
-    }
+    // Start the hotspot
+    let hotspot_connection = start_hotspot(&manager, &device, ssid, password).unwrap();
 
-    let mut connections = connection::list(&manager).unwrap();
-    match find_connection(&connections, ssid) {
-        Some(connection_index) => {
-            connection::enable(&manager, &mut connections[connection_index], 10).unwrap();
-        }
-        None => {
-            connection::create_hotspot(&manager,
-                                       &device_ref,
-                                       ssid,
-                                       password.map(|p| p.to_owned()),
-                                       10)
-                .unwrap();
-        }
-    }
-
-    // Start server
+    // Start the server
+    // TODO: handle result
+    let mut access_points;
+    let mut access_point;
+    // pass by value
+    start_server(&manager, &device, &access_points, &access_point);
 
     // Wait for credentials or timeout to elapse
+    //
+    // Stop_server + grab back values
 
     // Stop hotspot
-
-    // Stop server
+    stop_hotspot(&manager, &hotspot_connection).unwrap();
 
     // Add and activate credentials
-
-    // Check connection
-
-    // If not connected, delete credentials
-
-    // Exit, 0 for success, 1 for failure
-    process::exit(0)
-}
-
-fn find_device(devices: &Vec<device::Device>, interface: Option<&str>) -> Option<usize> {
-    if let Some(interface) = interface {
-        devices.iter()
-            .position(|ref d| d.device_type == device::DeviceType::WiFi && d.interface == interface)
-    } else {
-        devices.iter()
-            .position(|ref d| d.device_type == device::DeviceType::WiFi)
+    let access_point_password = "hel";
+    match connection::create(&manager, &device, &access_point, &access_point_password, 10) {
+        Ok(connection) => process::exit(0),
+        Err(error) => {
+            // delete creds
+            process::exit(1);
+        }
     }
 }
 
-fn find_connection(connections: &Vec<connection::Connection>, ssid: &str) -> Option<usize> {
-    connections.iter()
-        .position(|ref c| c.settings.ssid == ssid.to_owned())
+fn get_device(manager: &manager::NetworkManager,
+              interface: Option<&str>)
+              -> Result<device::Device, String> {
+    let mut devices = device::list(&manager).unwrap();
+
+    let index;
+    if let Some(interface) = interface {
+        index = devices.iter()
+            .position(|ref d| d.device_type == device::DeviceType::WiFi && d.interface == interface)
+            .unwrap();
+    } else {
+        index = devices.iter()
+            .position(|ref d| d.device_type == device::DeviceType::WiFi)
+            .unwrap();
+    }
+
+    Ok(devices[index].clone())
+}
+
+fn get_access_points(manager: &manager::NetworkManager,
+                     device: &device::Device)
+                     -> Result<Vec<wifi::AccessPoint>, String> {
+    let mut access_points = wifi::scan(&manager, &device).unwrap();
+    access_points.retain(|ap| ap.ssid != "");
+    Ok(access_points)
+}
+
+fn start_hotspot(manager: &manager::NetworkManager,
+                 device: &device::Device,
+                 ssid: &str,
+                 password: Option<&str>)
+                 -> Result<connection::Connection, String> {
+    connection::create_hotspot(&manager, &device, ssid, password.map(|p| p.to_owned()), 10)
+}
+
+fn stop_hotspot(manager: &manager::NetworkManager,
+                connection: &connection::Connection)
+                -> Result<(), String> {
+    connection::disable(&manager, &mut connection.to_owned(), 10).unwrap();
+    connection::delete(&manager, &connection)
+}
+
+fn start_server(manager: &manager::NetworkManager,
+                device: &device::Device,
+                access_points: &AccessPoints,
+                access_point: &AccessPoint)
+                -> () {
+    let mut chain = Chain::new(ssids);
+    chain.link(Read::<Manager>::both(manager));
+    chain.link(Read::<Device>::both(device));
+    chain.link(State::<AccessPoints>::both(access_points));
+    chain.link(Write::<AccessPoint>::both(access_point));
+
+    let mut router = Router::new();
+    router.get("/", Static::new(Path::new("public")), "index");
+    router.get("/ssids", chain, "ssids");
+    router.post("/connect", connect, "connect");
+
+    let mut assets = Mount::new();
+    assets.mount("/", router);
+    assets.mount("/css", Static::new(Path::new("public/css")));
+    assets.mount("/img", Static::new(Path::new("public/img")));
+    assets.mount("/js", Static::new(Path::new("public/js")));
+
+    // TODO: return this result
+    Iron::new(assets).http("localhost:3000").unwrap();
+}
+
+fn ssids(req: &mut Request) -> IronResult<Response> {
+    let mutex = req.get::<Write<AccessPoints>>().unwrap();
+    let mut access_points = mutex.lock().unwrap();
+    let manager = req.get::<Read<Manager>>().unwrap();
+    let device = req.get::<Read<Device>>().unwrap();
+    *access_points = get_access_points(&manager, &device).unwrap();
+
+    let payload =
+        serde_json::to_string(&access_points.iter().map(|ap| ap.ssid).collect::<Vec<String>>())
+            .unwrap();
+
+    Ok(Response::with((status::Ok, payload)))
+}
+
+fn connect(req: &mut Request) -> IronResult<Response> {
+    let access_points = req.get::<Read<AccessPoints>>().unwrap();
+
+    println!("{:?}", req.get_ref::<Params>());
+    // write access point
+    Ok(Response::with(status::Ok))
 }
