@@ -1,5 +1,5 @@
 $(function(){
-	$.get("/ssids", function(data){
+	$.get("/ssid", function(data){
 		if(data.length === 0){
 			$('.before-submit').hide();
 			$('#no-networks-message').removeClass('hidden');

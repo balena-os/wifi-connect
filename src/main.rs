@@ -1,4 +1,4 @@
-use std::{process, path};
+use std::{process, path, thread, time};
 use path::Path;
 
 #[macro_use]
@@ -9,8 +9,8 @@ extern crate network_manager;
 use network_manager::{manager, wifi, device, connection};
 
 extern crate iron;
-use iron::{Iron, Request, Response, IronResult, status, typemap, error, Listening};
 use iron::prelude::*;
+use iron::{Iron, Request, Response, IronResult, status, typemap};
 
 extern crate router;
 use router::Router;
@@ -24,17 +24,15 @@ use mount::Mount;
 extern crate serde_json;
 
 extern crate persistent;
-use persistent::{State, Read, Write};
+use persistent::State;
 
 extern crate params;
-use params::Params;
-
+use params::{Params, FromValue};
 
 pub struct WiFiState {
     manager: manager::NetworkManager,
     device: device::Device,
     access_points: Vec<wifi::AccessPoint>,
-    access_point: Option<wifi::AccessPoint>,
     hotspot_connection: connection::Connection,
 }
 
@@ -45,11 +43,8 @@ impl typemap::Key for WiFiState {
 unsafe impl Send for WiFiState {}
 unsafe impl Sync for WiFiState {}
 
-
 fn main() {
-    // TODO error handling
-
-    // Define command line flags
+    // TODO: error handling
     let matches = App::new("resin-wifi-connect")
         .version("0.1.0")
         .author("Joe Roberts <joe@resin.io>")
@@ -80,53 +75,30 @@ fn main() {
             .takes_value(true))
         .get_matches();
 
-    // Parse command line flags
     let interface: Option<&str> = matches.value_of("interface");
     let ssid = matches.value_of("ssid").unwrap_or("resin-hotspot");
     let password: Option<&str> = matches.value_of("password");
-    let timeout = matches.value_of("timeout").map_or(600, |v| v.parse::<i32>().unwrap());
+    let timeout = matches.value_of("timeout").map_or(600, |v| v.parse::<u64>().unwrap());
 
-    // Get manager
     let manager = manager::new();
-
-    // Get device
     let device = get_device(&manager, interface).unwrap();
-
-    // Start the hotspot
+    let access_points = get_access_points(&manager, &device).unwrap();
     let hotspot_connection = start_hotspot(&manager, &device, ssid, password).unwrap();
 
     let wifi_state = WiFiState {
         manager: manager,
         device: device,
-        access_points: Vec::new(),
-        access_point: None,
+        access_points: access_points,
         hotspot_connection: hotspot_connection,
     };
 
-    // Start the server
-    // TODO: handle result
-    start_server(wifi_state);
+    // TODO: is this the best way to implement a timeout?
+    thread::spawn(move || {
+        start_server(wifi_state);
+    });
 
-    // NO MODIFICATIONS AFTER start_server, everything to be done in request handlers
-
-/*
-    // Wait for credentials or timeout to elapse
-    //
-    // Stop_server + grab back values
-
-    // Stop hotspot
-    stop_hotspot(&manager, &hotspot_connection).unwrap();
-
-    // Add and activate credentials
-    let access_point_password = "hel";
-    match connection::create(&manager, &device, &access_point, &access_point_password, 10) {
-        Ok(connection) => process::exit(0),
-        Err(error) => {
-            // delete creds
-            process::exit(1);
-        }
-    }
-*/
+    thread::sleep(time::Duration::new(timeout, 0));
+    process::exit(1)
 }
 
 fn get_device(manager: &manager::NetworkManager,
@@ -153,6 +125,7 @@ fn get_access_points(manager: &manager::NetworkManager,
                      -> Result<Vec<wifi::AccessPoint>, String> {
     let mut access_points = wifi::scan(&manager, &device).unwrap();
     access_points.retain(|ap| ap.ssid != "");
+
     Ok(access_points)
 }
 
@@ -172,12 +145,9 @@ fn stop_hotspot(manager: &manager::NetworkManager,
 }
 
 fn start_server(wifi_state: WiFiState) {
-    let mut chain = Chain::new(ssids);
-    chain.link(Write::<WiFiState>::both(wifi_state));
-
     let mut router = Router::new();
     router.get("/", Static::new(Path::new("public")), "index");
-    router.get("/ssids", chain, "ssids");
+    router.get("/ssid", ssid, "ssid");
     router.post("/connect", connect, "connect");
 
     let mut assets = Mount::new();
@@ -186,25 +156,54 @@ fn start_server(wifi_state: WiFiState) {
     assets.mount("/img", Static::new(Path::new("public/img")));
     assets.mount("/js", Static::new(Path::new("public/js")));
 
-    // TODO: return this result
-    Iron::new(assets).http("localhost:3000").unwrap();
+    let mut chain = Chain::new(assets);
+    chain.link(State::<WiFiState>::both(wifi_state));
+
+    Iron::new(chain).http("localhost:3000").unwrap();
 }
 
-fn ssids(req: &mut Request) -> IronResult<Response> {
-    let mutex = req.get::<Write<WiFiState>>().unwrap();
-    let mut wifi_state = mutex.lock().unwrap();
-    wifi_state.access_points = get_access_points(&wifi_state.manager, &wifi_state.device).unwrap();
-
-    let payload =
-        serde_json::to_string(&wifi_state.access_points.iter().map(|ap| ap.ssid.clone()).collect::<Vec<String>>())
-            .unwrap();
+fn ssid(req: &mut Request) -> IronResult<Response> {
+    let lock = req.get_ref::<State<WiFiState>>().unwrap();
+    let wifi_state = lock.read().unwrap();
+    let payload = serde_json::to_string(&wifi_state.access_points
+            .iter()
+            .map(|ap| ap.ssid.clone())
+            .collect::<Vec<String>>())
+        .unwrap();
 
     Ok(Response::with((status::Ok, payload)))
 }
 
 fn connect(req: &mut Request) -> IronResult<Response> {
+    let ssid;
+    let password;
+    {
+        let map = req.get_ref::<Params>().unwrap();
+        // TODO: is the best way to get the string from the value?
+        ssid = <String as FromValue>::from_value(map.get("ssid").unwrap()).unwrap();
+        password = <String as FromValue>::from_value(map.get("password").unwrap()).unwrap();
+    }
 
-    println!("{:?}", req.get_ref::<Params>());
-    // write access point
-    Ok(Response::with(status::Ok))
+    let lock = req.get_ref::<State<WiFiState>>().unwrap();
+    let wifi_state = lock.read().unwrap();
+    stop_hotspot(&wifi_state.manager, &wifi_state.hotspot_connection).unwrap();
+
+    let index = wifi_state.access_points.iter().position(|ref ap| ap.ssid == ssid).unwrap();
+    match connection::create(&wifi_state.manager,
+                             &wifi_state.device,
+                             &wifi_state.access_points[index],
+                             &password,
+                             10) {
+        Ok(connection) => {
+            // TODO: how do we respond and exit?
+            Ok(Response::with(status::Ok))
+            process::exit(0);
+        }
+        Err(error) => {
+            // TODO: Delete connection - need connection::create to return connection object on
+            // error
+            // Ok(Response::with(status::
+            process::exit(1);
+        }
+    }
 }
