@@ -42,13 +42,16 @@ exports.setCredentials = (ssid, passphrase) ->
 		connection: {
 			id: ssid,
 			type: '802-11-wireless',
-		},
-		'802-11-wireless-security': {
-			'auth-alg': 'open',
-			'key-mgmt': 'wpa-psk',
-			'psk': passphrase,
 		}
 	}
+
+	if passphrase != ""
+		connection = _.merge connection,
+			'802-11-wireless-security': {
+				'auth-alg': 'open',
+				'key-mgmt': 'wpa-psk',
+				'psk': passphrase,
+			}
 
 	console.log('Saving connection')
 	console.log(connection)
