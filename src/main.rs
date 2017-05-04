@@ -29,29 +29,22 @@ use persistent::{State, Read, Write};
 extern crate params;
 use params::Params;
 
-struct Manager_ref<'a> {
-    manager: &'a manager::NetworkManager
+
+pub struct WiFiState {
+    manager: manager::NetworkManager,
+    device: device::Device,
+    access_points: Vec<wifi::AccessPoint>,
+    access_point: Option<wifi::AccessPoint>,
+    hotspot_connection: connection::Connection,
 }
 
-pub struct Manager<'a>;
-impl<'a> typemap::Key<'a> for Manager<'a> {
-    type Value = Manager_ref<'a>;
+impl typemap::Key for WiFiState {
+    type Value = WiFiState;
 }
 
-pub struct Device;
-impl typemap::Key for Device {
-    type Value = device::Device;
-}
+unsafe impl Send for WiFiState {}
+unsafe impl Sync for WiFiState {}
 
-pub struct AccessPoints;
-impl typemap::Key for AccessPoints {
-    type Value = Vec<wifi::AccessPoint>;
-}
-
-pub struct AccessPoint;
-impl typemap::Key for AccessPoint {
-    type Value = wifi::AccessPoint;
-}
 
 fn main() {
     // TODO error handling
@@ -102,13 +95,21 @@ fn main() {
     // Start the hotspot
     let hotspot_connection = start_hotspot(&manager, &device, ssid, password).unwrap();
 
+    let wifi_state = WiFiState {
+        manager: manager,
+        device: device,
+        access_points: Vec::new(),
+        access_point: None,
+        hotspot_connection: hotspot_connection,
+    };
+
     // Start the server
     // TODO: handle result
-    let mut access_points;
-    let mut access_point;
-    // pass by value
-    start_server(&manager, &device, &access_points, &access_point);
+    start_server(wifi_state);
 
+    // NO MODIFICATIONS AFTER start_server, everything to be done in request handlers
+
+/*
     // Wait for credentials or timeout to elapse
     //
     // Stop_server + grab back values
@@ -125,6 +126,7 @@ fn main() {
             process::exit(1);
         }
     }
+*/
 }
 
 fn get_device(manager: &manager::NetworkManager,
@@ -143,7 +145,7 @@ fn get_device(manager: &manager::NetworkManager,
             .unwrap();
     }
 
-    Ok(devices[index].clone())
+    Ok(devices.remove(index))
 }
 
 fn get_access_points(manager: &manager::NetworkManager,
@@ -169,16 +171,9 @@ fn stop_hotspot(manager: &manager::NetworkManager,
     connection::delete(&manager, &connection)
 }
 
-fn start_server(manager: &manager::NetworkManager,
-                device: &device::Device,
-                access_points: &AccessPoints,
-                access_point: &AccessPoint)
-                -> () {
+fn start_server(wifi_state: WiFiState) {
     let mut chain = Chain::new(ssids);
-    chain.link(Read::<Manager>::both(manager));
-    chain.link(Read::<Device>::both(device));
-    chain.link(State::<AccessPoints>::both(access_points));
-    chain.link(Write::<AccessPoint>::both(access_point));
+    chain.link(Write::<WiFiState>::both(wifi_state));
 
     let mut router = Router::new();
     router.get("/", Static::new(Path::new("public")), "index");
@@ -196,21 +191,18 @@ fn start_server(manager: &manager::NetworkManager,
 }
 
 fn ssids(req: &mut Request) -> IronResult<Response> {
-    let mutex = req.get::<Write<AccessPoints>>().unwrap();
-    let mut access_points = mutex.lock().unwrap();
-    let manager = req.get::<Read<Manager>>().unwrap();
-    let device = req.get::<Read<Device>>().unwrap();
-    *access_points = get_access_points(&manager, &device).unwrap();
+    let mutex = req.get::<Write<WiFiState>>().unwrap();
+    let mut wifi_state = mutex.lock().unwrap();
+    wifi_state.access_points = get_access_points(&wifi_state.manager, &wifi_state.device).unwrap();
 
     let payload =
-        serde_json::to_string(&access_points.iter().map(|ap| ap.ssid).collect::<Vec<String>>())
+        serde_json::to_string(&wifi_state.access_points.iter().map(|ap| ap.ssid.clone()).collect::<Vec<String>>())
             .unwrap();
 
     Ok(Response::with((status::Ok, payload)))
 }
 
 fn connect(req: &mut Request) -> IronResult<Response> {
-    let access_points = req.get::<Read<AccessPoints>>().unwrap();
 
     println!("{:?}", req.get_ref::<Params>());
     // write access point
