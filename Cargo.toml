@@ -13,3 +13,6 @@ router = "*"
 serde_json = "*"
 persistent = "*"
 params = "*"
+
+[profile.release]
+lto = true
