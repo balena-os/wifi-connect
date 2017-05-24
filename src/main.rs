@@ -1,45 +1,47 @@
-use std::{process, path, thread, time};
-use path::Path;
-
 extern crate clap;
-use clap::{Arg, App};
-
 extern crate network_manager;
-use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
-
 extern crate iron;
+extern crate router;
+extern crate staticfile;
+extern crate mount;
+extern crate serde_json;
+extern crate persistent;
+extern crate params;
+
+use std::path;
+use std::thread;
+use std::time::Duration;
+use std::sync::mpsc::{channel, Sender, Receiver};
+
+use path::Path;
+use clap::{Arg, App};
 use iron::prelude::*;
 use iron::{Iron, Request, Response, IronResult, status, typemap};
-
-extern crate router;
 use router::Router;
-
-extern crate staticfile;
 use staticfile::Static;
-
-extern crate mount;
 use mount::Mount;
-
-extern crate serde_json;
-
-extern crate persistent;
 use persistent::State;
-
-extern crate params;
 use params::{Params, FromValue};
 
-pub struct WiFiState {
-    device: Device,
-    access_points: Vec<AccessPoint>,
-    hotspot_connection: Connection,
+use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
+
+
+enum NetworkCommand {
+    Activate,
+    Connect { ssid: String, password: String },
 }
 
-impl typemap::Key for WiFiState {
-    type Value = WiFiState;
+struct RequestSharedState {
+    server_rx: Receiver<Vec<String>>,
+    network_tx: Sender<NetworkCommand>,
 }
 
-unsafe impl Send for WiFiState {}
-unsafe impl Sync for WiFiState {}
+impl typemap::Key for RequestSharedState {
+    type Value = RequestSharedState;
+}
+
+unsafe impl Send for RequestSharedState {}
+unsafe impl Sync for RequestSharedState {}
 
 fn main() {
     // TODO: error handling
@@ -73,38 +75,49 @@ fn main() {
                  .takes_value(true))
         .get_matches();
 
-    let interface: Option<&str> = matches.value_of("interface");
-    let ssid = matches.value_of("ssid").unwrap_or("resin-hotspot");
-    let password: Option<&str> = matches.value_of("password");
+    let interface: Option<String> = matches.value_of("interface").map(String::from);
+    let ssid: String = matches
+        .value_of("ssid")
+        .unwrap_or("resin-hotspot")
+        .to_string();
+    let password: Option<String> = matches.value_of("password").map(String::from);
     let timeout = matches
         .value_of("timeout")
         .map_or(600, |v| v.parse::<u64>().unwrap());
 
-    let manager = NetworkManager::new();
-    let device = find_device(&manager, interface).unwrap();
-    let (hotspot_connection, access_points) = {
-        let wifi_device = device.as_wifi_device().unwrap();
-        let access_points = wifi_device.get_access_points().unwrap();
-        let (hotspot_connection, _) = wifi_device.create_hotspot(ssid, password).unwrap();
-        (hotspot_connection, access_points)
+    let (shutdown_tx, shutdown_rx) = channel();
+    let (server_tx, server_rx) = channel();
+    let (network_tx, network_rx) = channel();
+
+    let request_state = RequestSharedState {
+        server_rx: server_rx,
+        network_tx: network_tx,
     };
 
-    let wifi_state = WiFiState {
-        device: device,
-        access_points: access_points,
-        hotspot_connection: hotspot_connection,
-    };
+    let shutdown_tx_clone = shutdown_tx.clone();
 
-    // TODO: is this the best way to implement a timeout?
-    thread::spawn(move || { start_server(wifi_state); });
+    thread::spawn(move || {
+                      process_network_commands(interface,
+                                               ssid,
+                                               password,
+                                               network_rx,
+                                               server_tx,
+                                               shutdown_tx_clone);
+                  });
 
-    thread::sleep(time::Duration::new(timeout, 0));
-    process::exit(1)
+    thread::spawn(move || {
+                      thread::sleep(Duration::from_secs(timeout));
+                      shutdown_tx.send(()).unwrap();
+                  });
+
+    thread::spawn(move || { start_server(request_state); });
+
+    shutdown_rx.recv().unwrap();
 }
 
-fn find_device(manager: &NetworkManager, interface: Option<&str>) -> Result<Device, String> {
+fn find_device(manager: &NetworkManager, interface: Option<String>) -> Result<Device, String> {
     if let Some(interface) = interface {
-        let device = manager.get_device_by_interface(interface)?;
+        let device = manager.get_device_by_interface(&interface)?;
 
         if *device.device_type() == DeviceType::WiFi {
             Ok(device)
@@ -126,12 +139,30 @@ fn find_device(manager: &NetworkManager, interface: Option<&str>) -> Result<Devi
     }
 }
 
-fn stop_hotspot(connection: &Connection) -> Result<(), String> {
-    connection.deactivate()?;
-    connection.delete()
+fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>, String> {
+    let wifi_device = device.as_wifi_device().unwrap();
+    let mut access_points = wifi_device.get_access_points()?;
+    access_points.retain(|ap| ap.ssid().as_str().is_ok());
+    Ok(access_points)
 }
 
-fn start_server(wifi_state: WiFiState) {
+fn create_hotspot(device: &Device,
+                  ssid: &str,
+                  password: &Option<&str>)
+                  -> Result<Connection, String> {
+    let wifi_device = device.as_wifi_device().unwrap();
+    let (hotspot_connection, _) = wifi_device.create_hotspot(&ssid as &str, *password)?;
+    Ok(hotspot_connection)
+}
+
+fn stop_hotspot(connection: &Connection) -> Result<(), String> {
+    connection.deactivate()?;
+    connection.delete()?;
+    thread::sleep(Duration::from_secs(1));
+    Ok(())
+}
+
+fn start_server(request_state: RequestSharedState) {
     let mut router = Router::new();
     router.get("/", Static::new(Path::new("public")), "index");
     router.get("/ssid", ssid, "ssid");
@@ -144,56 +175,110 @@ fn start_server(wifi_state: WiFiState) {
     assets.mount("/js", Static::new(Path::new("public/js")));
 
     let mut chain = Chain::new(assets);
-    chain.link(State::<WiFiState>::both(wifi_state));
+    chain.link(State::<RequestSharedState>::both(request_state));
 
     Iron::new(chain).http("localhost:3000").unwrap();
 }
 
 fn ssid(req: &mut Request) -> IronResult<Response> {
-    let lock = req.get_ref::<State<WiFiState>>().unwrap();
-    let wifi_state = lock.read().unwrap();
-    let payload =
-        serde_json::to_string(&wifi_state
-                                   .access_points
-                                   .iter()
-                                   .map(|ap| ap.ssid().as_str().unwrap().to_string())
-                                   .collect::<Vec<String>>())
-                .unwrap();
+    let lock = req.get_ref::<State<RequestSharedState>>().unwrap();
+    let request_state = lock.read().unwrap();
 
-    Ok(Response::with((status::Ok, payload)))
+    request_state
+        .network_tx
+        .send(NetworkCommand::Activate)
+        .unwrap();
+
+    let access_points_ssids = request_state.server_rx.recv().unwrap();
+
+    let access_points_json = serde_json::to_string(&access_points_ssids).unwrap();
+
+    Ok(Response::with((status::Ok, access_points_json)))
 }
 
 fn connect(req: &mut Request) -> IronResult<Response> {
-    let ssid;
-    let password;
-    {
+    let (ssid, password) = {
         let map = req.get_ref::<Params>().unwrap();
-        // TODO: is the best way to get the string from the value?
-        ssid = <String as FromValue>::from_value(map.get("ssid").unwrap()).unwrap();
-        password = <String as FromValue>::from_value(map.get("password").unwrap()).unwrap();
-    }
+        let ssid = <String as FromValue>::from_value(map.get("ssid").unwrap()).unwrap();
+        let password = <String as FromValue>::from_value(map.get("password").unwrap()).unwrap();
+        (ssid, password)
+    };
 
-    let lock = req.get_ref::<State<WiFiState>>().unwrap();
-    let wifi_state = lock.read().unwrap();
-    stop_hotspot(&wifi_state.hotspot_connection).unwrap();
+    let lock = req.get_ref::<State<RequestSharedState>>().unwrap();
+    let request_state = lock.read().unwrap();
 
-    let index = wifi_state
-        .access_points
-        .iter()
-        .position(|ref ap| ap.ssid().as_str().unwrap() == ssid)
-        .unwrap();
-    let wifi_device = wifi_state.device.as_wifi_device().unwrap();
-    match wifi_device.connect(&wifi_state.access_points[index], &password as &str) {
-        Ok(_) => {
-            // TODO: how do we respond and exit?
-            process::exit(0);
-            //            Ok(Response::with(status::Ok));
-        }
-        Err(_) => {
-            // TODO: Delete connection - need connection::create to return connection object on
-            // error
-            // Ok(Response::with(status::
-            process::exit(1);
+    let command = NetworkCommand::Connect {
+        ssid: ssid,
+        password: password,
+    };
+    request_state.network_tx.send(command).unwrap();
+
+    Ok(Response::with(status::Ok))
+}
+
+fn process_network_commands(interface: Option<String>,
+                            hotspot_ssid: String,
+                            hotspot_password: Option<String>,
+                            network_rx: Receiver<NetworkCommand>,
+                            server_tx: Sender<Vec<String>>,
+                            shutdown_tx: Sender<()>) {
+    let manager = NetworkManager::new();
+    let device = find_device(&manager, interface).unwrap();
+
+    let mut access_points_option = Some(get_access_points(&device).unwrap());
+
+    let hotspot_password = hotspot_password.as_ref().map(|p| p as &str);
+    let mut hotspot_connection = None;
+
+    loop {
+        let command = network_rx.recv().unwrap();
+
+        match command {
+            NetworkCommand::Activate => {
+                if let Some(ref connection) = hotspot_connection {
+                    stop_hotspot(connection).unwrap();
+                }
+
+                let access_points = if let Some(access_points) = access_points_option {
+                    access_points
+                } else {
+                    get_access_points(&device).unwrap()
+                };
+
+                let access_points_ssids = access_points
+                    .iter()
+                    .map(|ap| ap.ssid().as_str().unwrap().to_string())
+                    .collect::<Vec<String>>();
+
+                hotspot_connection =
+                    Some(create_hotspot(&device, &hotspot_ssid, &hotspot_password).unwrap());
+
+                access_points_option = None;
+
+                server_tx.send(access_points_ssids).unwrap();
+            }
+            NetworkCommand::Connect { ssid, password } => {
+                if let Some(ref connection) = hotspot_connection {
+                    stop_hotspot(connection).unwrap();
+                }
+                hotspot_connection = None;
+
+                let access_points = get_access_points(&device).unwrap();
+
+                for access_point in access_points {
+                    if let Ok(access_point_ssid) = access_point.ssid().as_str() {
+                        if access_point_ssid == &ssid {
+                            let wifi_device = device.as_wifi_device().unwrap();
+
+                            wifi_device
+                                .connect(&access_point, &password as &str)
+                                .unwrap();
+
+                            shutdown_tx.send(()).unwrap();
+                        }
+                    }
+                }
+            }
         }
     }
 }
