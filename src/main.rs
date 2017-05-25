@@ -8,13 +8,14 @@ extern crate serde_json;
 extern crate persistent;
 extern crate params;
 
+mod cli;
+
 use std::path;
 use std::thread;
 use std::time::Duration;
 use std::sync::mpsc::{channel, Sender, Receiver};
 
 use path::Path;
-use clap::{Arg, App};
 use iron::prelude::*;
 use iron::{Iron, Request, Response, IronResult, status, typemap};
 use router::Router;
@@ -25,6 +26,7 @@ use params::{Params, FromValue};
 
 use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
 
+use cli::{CliOptions, parse_cli_options};
 
 enum NetworkCommand {
     Activate,
@@ -45,45 +47,12 @@ unsafe impl Sync for RequestSharedState {}
 
 fn main() {
     // TODO: error handling
-    let matches = App::new("resin-wifi-connect")
-        .version("0.1.0")
-        .author("Joe Roberts <joe@resin.io>")
-        .about("Wi-Fi credentials configuration tool")
-        .arg(Arg::with_name("interface")
-                 .short("i")
-                 .long("interface")
-                 .value_name("INTERFACE")
-                 .help("Hotspot interface")
-                 .takes_value(true))
-        .arg(Arg::with_name("ssid")
-                 .short("s")
-                 .long("ssid")
-                 .value_name("SSID")
-                 .help("Hotspot SSID")
-                 .takes_value(true))
-        .arg(Arg::with_name("password")
-                 .short("p")
-                 .long("password")
-                 .value_name("PASSWORD")
-                 .help("Hotspot password ")
-                 .takes_value(true))
-        .arg(Arg::with_name("timeout")
-                 .short("t")
-                 .long("timeout")
-                 .value_name("TIMEOUT")
-                 .help("Hotspot timeout (seconds)")
-                 .takes_value(true))
-        .get_matches();
-
-    let interface: Option<String> = matches.value_of("interface").map(String::from);
-    let ssid: String = matches
-        .value_of("ssid")
-        .unwrap_or("resin-hotspot")
-        .to_string();
-    let password: Option<String> = matches.value_of("password").map(String::from);
-    let timeout = matches
-        .value_of("timeout")
-        .map_or(600, |v| v.parse::<u64>().unwrap());
+    let CliOptions {
+        interface,
+        ssid,
+        password,
+        timeout,
+    } = parse_cli_options();
 
     let (shutdown_tx, shutdown_rx) = channel();
     let (server_tx, server_rx) = channel();
