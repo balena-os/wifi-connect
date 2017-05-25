@@ -52,8 +52,8 @@ pub fn process_network_commands(cli_options: CliOptions,
                 server_tx.send(access_points_ssids).unwrap();
             }
             NetworkCommand::Connect { ssid, password } => {
-                if let Some(ref connection) = hotspot_connection {
-                    stop_hotspot(connection).unwrap();
+                if hotspot_connection.is_some() {
+                    stop_hotspot(&hotspot_connection.unwrap()).unwrap();
                     hotspot_connection = None;
                 }
 
