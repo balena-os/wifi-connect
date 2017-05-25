@@ -9,6 +9,7 @@ extern crate persistent;
 extern crate params;
 
 mod cli;
+mod network;
 
 use std::path;
 use std::thread;
@@ -24,14 +25,8 @@ use mount::Mount;
 use persistent::State;
 use params::{Params, FromValue};
 
-use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
-
-use cli::{CliOptions, parse_cli_options};
-
-enum NetworkCommand {
-    Activate,
-    Connect { ssid: String, password: String },
-}
+use cli::parse_cli_options;
+use network::{process_network_commands, NetworkCommand};
 
 struct RequestSharedState {
     server_rx: Receiver<Vec<String>>,
@@ -47,12 +42,8 @@ unsafe impl Sync for RequestSharedState {}
 
 fn main() {
     // TODO: error handling
-    let CliOptions {
-        interface,
-        ssid,
-        password,
-        timeout,
-    } = parse_cli_options();
+    let cli_options = parse_cli_options();
+    let timeout = cli_options.timeout;
 
     let (shutdown_tx, shutdown_rx) = channel();
     let (server_tx, server_rx) = channel();
@@ -66,9 +57,7 @@ fn main() {
     let shutdown_tx_clone = shutdown_tx.clone();
 
     thread::spawn(move || {
-                      process_network_commands(interface,
-                                               ssid,
-                                               password,
+                      process_network_commands(cli_options,
                                                network_rx,
                                                server_tx,
                                                shutdown_tx_clone);
@@ -82,53 +71,6 @@ fn main() {
     thread::spawn(move || { start_server(request_state); });
 
     shutdown_rx.recv().unwrap();
-}
-
-fn find_device(manager: &NetworkManager, interface: Option<String>) -> Result<Device, String> {
-    if let Some(interface) = interface {
-        let device = manager.get_device_by_interface(&interface)?;
-
-        if *device.device_type() == DeviceType::WiFi {
-            Ok(device)
-        } else {
-            Err(format!("Not a Wi-Fi device: {}", interface))
-        }
-    } else {
-        let devices = manager.get_devices()?;
-
-        let index = devices
-            .iter()
-            .position(|ref d| *d.device_type() == DeviceType::WiFi);
-
-        if let Some(index) = index {
-            Ok(devices[index].clone())
-        } else {
-            Err("Cannot find a Wi-Fi device".to_string())
-        }
-    }
-}
-
-fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>, String> {
-    let wifi_device = device.as_wifi_device().unwrap();
-    let mut access_points = wifi_device.get_access_points()?;
-    access_points.retain(|ap| ap.ssid().as_str().is_ok());
-    Ok(access_points)
-}
-
-fn create_hotspot(device: &Device,
-                  ssid: &str,
-                  password: &Option<&str>)
-                  -> Result<Connection, String> {
-    let wifi_device = device.as_wifi_device().unwrap();
-    let (hotspot_connection, _) = wifi_device.create_hotspot(&ssid as &str, *password)?;
-    Ok(hotspot_connection)
-}
-
-fn stop_hotspot(connection: &Connection) -> Result<(), String> {
-    connection.deactivate()?;
-    connection.delete()?;
-    thread::sleep(Duration::from_secs(1));
-    Ok(())
 }
 
 fn start_server(request_state: RequestSharedState) {
@@ -183,71 +125,4 @@ fn connect(req: &mut Request) -> IronResult<Response> {
     request_state.network_tx.send(command).unwrap();
 
     Ok(Response::with(status::Ok))
-}
-
-fn process_network_commands(interface: Option<String>,
-                            hotspot_ssid: String,
-                            hotspot_password: Option<String>,
-                            network_rx: Receiver<NetworkCommand>,
-                            server_tx: Sender<Vec<String>>,
-                            shutdown_tx: Sender<()>) {
-    let manager = NetworkManager::new();
-    let device = find_device(&manager, interface).unwrap();
-
-    let mut access_points_option = Some(get_access_points(&device).unwrap());
-
-    let hotspot_password = hotspot_password.as_ref().map(|p| p as &str);
-    let mut hotspot_connection = None;
-
-    loop {
-        let command = network_rx.recv().unwrap();
-
-        match command {
-            NetworkCommand::Activate => {
-                if let Some(ref connection) = hotspot_connection {
-                    stop_hotspot(connection).unwrap();
-                }
-
-                let access_points = if let Some(access_points) = access_points_option {
-                    access_points
-                } else {
-                    get_access_points(&device).unwrap()
-                };
-
-                let access_points_ssids = access_points
-                    .iter()
-                    .map(|ap| ap.ssid().as_str().unwrap().to_string())
-                    .collect::<Vec<String>>();
-
-                hotspot_connection =
-                    Some(create_hotspot(&device, &hotspot_ssid, &hotspot_password).unwrap());
-
-                access_points_option = None;
-
-                server_tx.send(access_points_ssids).unwrap();
-            }
-            NetworkCommand::Connect { ssid, password } => {
-                if let Some(ref connection) = hotspot_connection {
-                    stop_hotspot(connection).unwrap();
-                }
-                hotspot_connection = None;
-
-                let access_points = get_access_points(&device).unwrap();
-
-                for access_point in access_points {
-                    if let Ok(access_point_ssid) = access_point.ssid().as_str() {
-                        if access_point_ssid == &ssid {
-                            let wifi_device = device.as_wifi_device().unwrap();
-
-                            wifi_device
-                                .connect(&access_point, &password as &str)
-                                .unwrap();
-
-                            shutdown_tx.send(()).unwrap();
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
