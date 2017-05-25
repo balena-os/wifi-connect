@@ -44,7 +44,7 @@ pub fn start_server(server_rx: Receiver<Vec<String>>, network_tx: Sender<Network
     let mut chain = Chain::new(assets);
     chain.link(State::<RequestSharedState>::both(request_state));
 
-    Iron::new(chain).http("localhost:3000").unwrap();
+    Iron::new(chain).http(":::80").unwrap();
 }
 
 fn ssid(req: &mut Request) -> IronResult<Response> {
