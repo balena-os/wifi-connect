@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+extern crate env_logger;
 extern crate clap;
 extern crate network_manager;
 extern crate iron;
@@ -23,6 +26,8 @@ use network::process_network_commands;
 use server::start_server;
 
 fn main() {
+    env_logger::init().unwrap();
+
     let cli_options = parse_cli_options();
     let timeout = cli_options.timeout;
 
@@ -50,10 +55,10 @@ fn main() {
     match shutdown_rx.recv() {
         Ok(result) => {
             match result {
-                Some(reason) => println!("{}", reason),
-                None => println!("Connection successfully established"),
+                Some(reason) => error!("{}", reason),
+                None => info!("Connection successfully established"),
             }
         },
-        Err(e) => println!("{}", e.description()),
+        Err(e) => error!("Shutdown receiver error: {}", e.description()),
     }
 }

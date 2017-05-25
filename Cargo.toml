@@ -13,6 +13,8 @@ router = "*"
 serde_json = "*"
 persistent = "*"
 params = "*"
+log = "*"
+env_logger = "*"
 
 [profile.release]
 lto = true
