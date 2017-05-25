@@ -48,7 +48,7 @@ fn main() {
     let matches = App::new("resin-wifi-connect")
         .version("0.1.0")
         .author("Joe Roberts <joe@resin.io>")
-        .about("WiFi credentials configuration tool")
+        .about("Wi-Fi credentials configuration tool")
         .arg(Arg::with_name("interface")
                  .short("i")
                  .long("interface")
