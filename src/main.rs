@@ -16,13 +16,13 @@ use std::path;
 use std::thread;
 use std::time::Duration;
 use std::sync::mpsc::channel;
+use std::error::Error;
 
 use cli::parse_cli_options;
 use network::process_network_commands;
 use server::start_server;
 
 fn main() {
-    // TODO: error handling
     let cli_options = parse_cli_options();
     let timeout = cli_options.timeout;
 
@@ -30,21 +30,30 @@ fn main() {
     let (server_tx, server_rx) = channel();
     let (network_tx, network_rx) = channel();
 
-    let shutdown_tx_clone = shutdown_tx.clone();
+    let shutdown_tx_network = shutdown_tx.clone();
+    let shutdown_tx_server = shutdown_tx.clone();
 
     thread::spawn(move || {
                       process_network_commands(cli_options,
                                                network_rx,
                                                server_tx,
-                                               shutdown_tx_clone);
+                                               shutdown_tx_network);
                   });
 
     thread::spawn(move || {
                       thread::sleep(Duration::from_secs(timeout));
-                      shutdown_tx.send(()).unwrap();
+                      shutdown_tx.send(Some(format!("Hotspot timeout reached: {} seconds", timeout))).unwrap();
                   });
 
-    thread::spawn(move || { start_server(server_rx, network_tx); });
+    thread::spawn(move || { start_server(server_rx, network_tx, shutdown_tx_server); });
 
-    shutdown_rx.recv().unwrap();
+    match shutdown_rx.recv() {
+        Ok(result) => {
+            match result {
+                Some(reason) => println!("{}", reason),
+                None => println!("Connection successfully established"),
+            }
+        },
+        Err(e) => println!("{}", e.description()),
+    }
 }

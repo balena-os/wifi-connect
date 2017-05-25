@@ -14,7 +14,7 @@ pub enum NetworkCommand {
 pub fn process_network_commands(cli_options: CliOptions,
                                 network_rx: Receiver<NetworkCommand>,
                                 server_tx: Sender<Vec<String>>,
-                                shutdown_tx: Sender<()>) {
+                                shutdown_tx: Sender<Option<String>>) {
     let manager = NetworkManager::new();
     let device = find_device(&manager, &cli_options.interface).unwrap();
 
@@ -54,8 +54,8 @@ pub fn process_network_commands(cli_options: CliOptions,
             NetworkCommand::Connect { ssid, password } => {
                 if let Some(ref connection) = hotspot_connection {
                     stop_hotspot(connection).unwrap();
+                    hotspot_connection = None;
                 }
-                hotspot_connection = None;
 
                 let access_points = get_access_points(&device).unwrap();
 
@@ -68,7 +68,7 @@ pub fn process_network_commands(cli_options: CliOptions,
                                 .connect(&access_point, &password as &str)
                                 .unwrap();
 
-                            shutdown_tx.send(()).unwrap();
+                            shutdown_tx.send(None).unwrap();
                         }
                     }
                 }

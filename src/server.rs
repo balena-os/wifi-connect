@@ -1,4 +1,5 @@
 use std::sync::mpsc::{Sender, Receiver};
+use std::error::Error;
 
 use serde_json;
 use path::Path;
@@ -24,7 +25,7 @@ impl typemap::Key for RequestSharedState {
 unsafe impl Send for RequestSharedState {}
 unsafe impl Sync for RequestSharedState {}
 
-pub fn start_server(server_rx: Receiver<Vec<String>>, network_tx: Sender<NetworkCommand>) {
+pub fn start_server(server_rx: Receiver<Vec<String>>, network_tx: Sender<NetworkCommand>, shutdown_tx: Sender<Option<String>>) {
     let request_state = RequestSharedState {
         server_rx: server_rx,
         network_tx: network_tx,
@@ -44,7 +45,12 @@ pub fn start_server(server_rx: Receiver<Vec<String>>, network_tx: Sender<Network
     let mut chain = Chain::new(assets);
     chain.link(State::<RequestSharedState>::both(request_state));
 
-    Iron::new(chain).http(":::80").unwrap();
+    let address = ":::80";
+
+    if let Err(e) = Iron::new(chain).http(address) {
+        let description = format!("Cannot start the web server on '{}': {}", address, e.description());
+        let _ = shutdown_tx.send(Some(description));
+    }
 }
 
 fn ssid(req: &mut Request) -> IronResult<Response> {
