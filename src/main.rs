@@ -47,7 +47,9 @@ fn main() {
 
     thread::spawn(move || {
                       thread::sleep(Duration::from_secs(timeout));
-                      shutdown_tx.send(Some(format!("Hotspot timeout reached: {} seconds", timeout))).unwrap();
+                      let _ =
+                          shutdown_tx.send(Some(format!("Hotspot timeout reached: {} seconds",
+                                                        timeout)));
                   });
 
     thread::spawn(move || { start_server(server_rx, network_tx, shutdown_tx_server); });
@@ -58,7 +60,7 @@ fn main() {
                 Some(reason) => error!("{}", reason),
                 None => info!("Connection successfully established"),
             }
-        },
+        }
         Err(e) => error!("Shutdown receiver error: {}", e.description()),
     }
 }

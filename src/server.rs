@@ -25,7 +25,9 @@ impl typemap::Key for RequestSharedState {
 unsafe impl Send for RequestSharedState {}
 unsafe impl Sync for RequestSharedState {}
 
-pub fn start_server(server_rx: Receiver<Vec<String>>, network_tx: Sender<NetworkCommand>, shutdown_tx: Sender<Option<String>>) {
+pub fn start_server(server_rx: Receiver<Vec<String>>,
+                    network_tx: Sender<NetworkCommand>,
+                    shutdown_tx: Sender<Option<String>>) {
     let request_state = RequestSharedState {
         server_rx: server_rx,
         network_tx: network_tx,
@@ -48,7 +50,9 @@ pub fn start_server(server_rx: Receiver<Vec<String>>, network_tx: Sender<Network
     let address = ":::80";
 
     if let Err(e) = Iron::new(chain).http(address) {
-        let description = format!("Cannot start the web server on '{}': {}", address, e.description());
+        let description = format!("Cannot start the web server on '{}': {}",
+                                  address,
+                                  e.description());
         let _ = shutdown_tx.send(Some(description));
     }
 }
