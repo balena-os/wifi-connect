@@ -50,7 +50,7 @@ pub fn start_server(
     let mut chain = Chain::new(assets);
     chain.link(State::<RequestSharedState>::both(request_state));
 
-    let address = ":::80";
+    let address = "0.0.0.0:80";
 
     if let Err(e) = Iron::new(chain).http(address) {
         shutdown(
