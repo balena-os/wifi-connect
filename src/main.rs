@@ -25,6 +25,12 @@ use cli::parse_cli_options;
 use network::process_network_commands;
 use server::start_server;
 
+pub type ShutdownResult = Result<(), String>;
+
+pub fn shutdown(shutdown_tx: &Sender<ShutdownResult>, error: String) {
+    let _ = shutdown_tx.send(Err(error));
+}
+
 fn main() {
     env_logger::init().unwrap();
 
@@ -65,8 +71,4 @@ fn main() {
         }
         Err(e) => error!("Shutdown receiver error: {}", e.description()),
     }
-}
-
-pub fn shutdown(shutdown_tx: &Sender<Result<(), String>>, error: String) {
-    let _ = shutdown_tx.send(Err(error));
 }

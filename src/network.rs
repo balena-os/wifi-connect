@@ -6,7 +6,7 @@ use std::error::Error;
 use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
 
 use cli::CliOptions;
-use shutdown;
+use {shutdown, ShutdownResult};
 
 pub enum NetworkCommand {
     Activate,
@@ -17,7 +17,7 @@ pub fn process_network_commands(
     cli_options: CliOptions,
     network_rx: Receiver<NetworkCommand>,
     server_tx: Sender<Vec<String>>,
-    shutdown_tx: Sender<Result<(), String>>,
+    shutdown_tx: Sender<ShutdownResult>,
 ) {
     let manager = NetworkManager::new();
     debug!("Network Manager connection initialized");
