@@ -15,11 +15,11 @@ mod cli;
 mod network;
 mod server;
 
+use std::error::Error;
 use std::path;
 use std::thread;
 use std::time::Duration;
-use std::sync::mpsc::channel;
-use std::error::Error;
+use std::sync::mpsc::{channel, Sender};
 
 use cli::parse_cli_options;
 use network::process_network_commands;
@@ -47,7 +47,10 @@ fn main() {
     thread::spawn(
         move || {
             thread::sleep(Duration::from_secs(timeout));
-            let _ = shutdown_tx.send(Some(format!("Hotspot timeout reached: {} seconds", timeout)));
+            shutdown(
+                &shutdown_tx,
+                format!("Hotspot timeout reached: {} seconds", timeout),
+            );
         }
     );
 
@@ -56,10 +59,14 @@ fn main() {
     match shutdown_rx.recv() {
         Ok(result) => {
             match result {
-                Some(reason) => error!("{}", reason),
-                None => info!("Connection successfully established"),
+                Err(reason) => error!("{}", reason),
+                Ok(_) => info!("Connection successfully established"),
             }
         }
         Err(e) => error!("Shutdown receiver error: {}", e.description()),
     }
+}
+
+pub fn shutdown(shutdown_tx: &Sender<Result<(), String>>, error: String) {
+    let _ = shutdown_tx.send(Err(error));
 }

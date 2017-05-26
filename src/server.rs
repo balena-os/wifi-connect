@@ -12,6 +12,7 @@ use persistent::State;
 use params::{Params, FromValue};
 
 use network::NetworkCommand;
+use shutdown;
 
 struct RequestSharedState {
     server_rx: Receiver<Vec<String>>,
@@ -28,7 +29,7 @@ unsafe impl Sync for RequestSharedState {}
 pub fn start_server(
     server_rx: Receiver<Vec<String>>,
     network_tx: Sender<NetworkCommand>,
-    shutdown_tx: Sender<Option<String>>,
+    shutdown_tx: Sender<Result<(), String>>,
 ) {
     let request_state = RequestSharedState {
         server_rx: server_rx,
@@ -52,12 +53,14 @@ pub fn start_server(
     let address = ":::80";
 
     if let Err(e) = Iron::new(chain).http(address) {
-        let description = format!(
-            "Cannot start the web server on '{}': {}",
-            address,
-            e.description()
+        shutdown(
+            &shutdown_tx,
+            format!(
+                "Cannot start the web server on '{}': {}",
+                address,
+                e.description()
+            ),
         );
-        let _ = shutdown_tx.send(Some(description));
     }
 }
 

@@ -6,6 +6,7 @@ use std::error::Error;
 use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
 
 use cli::CliOptions;
+use shutdown;
 
 pub enum NetworkCommand {
     Activate,
@@ -16,17 +17,15 @@ pub fn process_network_commands(
     cli_options: CliOptions,
     network_rx: Receiver<NetworkCommand>,
     server_tx: Sender<Vec<String>>,
-    shutdown_tx: Sender<Option<String>>,
+    shutdown_tx: Sender<Result<(), String>>,
 ) {
     let manager = NetworkManager::new();
-
     debug!("Network Manager connection initialized");
 
     let device = match find_device(&manager, &cli_options.interface) {
         Ok(device) => device,
         Err(e) => {
-            shutdown(&shutdown_tx, e);
-            return;
+            return shutdown(&shutdown_tx, e);
         }
     };
 
@@ -35,8 +34,7 @@ pub fn process_network_commands(
     let mut access_points = match get_access_points(&device) {
         Ok(access_points) => access_points,
         Err(e) => {
-            shutdown(&shutdown_tx, format!("Getting access points failed: {}", e));
-            return;
+            return shutdown(&shutdown_tx, format!("Getting access points failed: {}", e));
         }
     };
 
@@ -46,8 +44,7 @@ pub fn process_network_commands(
         match create_hotspot(&device, &cli_options.ssid, &hotspot_password) {
             Ok(connection) => Some(connection),
             Err(e) => {
-                shutdown(&shutdown_tx, format!("Creating the hotspot failed: {}", e));
-                return;
+                return shutdown(&shutdown_tx, format!("Creating the hotspot failed: {}", e));
             }
         };
 
@@ -55,48 +52,50 @@ pub fn process_network_commands(
         let command = match network_rx.recv() {
             Ok(command) => command,
             Err(e) => {
-                shutdown(
+                return shutdown(
                     &shutdown_tx,
                     format!("Receiving network command failed: {}", e.description()),
                 );
-                return;
             }
         };
 
         match command {
             NetworkCommand::Activate => {
-                // First time the access points are retrieved and hotspot is started
-                // before the first command arrives
+                // Access points are retrieved and hotspot is started before
+                // the first command arrives.
                 if activated {
                     if hotspot_connection.is_some() {
                         if let Err(e) = stop_hotspot(
                             &hotspot_connection.unwrap(),
                             &cli_options.ssid,
                         ) {
-                            shutdown(&shutdown_tx, format!("Stopping the hotspot failed: {}", e));
-                            return;
+                            return shutdown(
+                                &shutdown_tx,
+                                format!("Stopping the hotspot failed: {}", e),
+                            );
                         }
                     }
 
                     access_points = match get_access_points(&device) {
                         Ok(access_points) => access_points,
                         Err(e) => {
-                            shutdown(&shutdown_tx, format!("Getting access points failed: {}", e));
-                            return;
+                            return shutdown(
+                                &shutdown_tx,
+                                format!("Getting access points failed: {}", e),
+                            );
                         }
                     };
 
-                    hotspot_connection = match create_hotspot(
-                        &device,
-                        &cli_options.ssid,
-                        &hotspot_password,
-                    ) {
-                        Ok(connection) => Some(connection),
-                        Err(e) => {
-                            shutdown(&shutdown_tx, format!("Creating the hotspot failed: {}", e));
-                            return;
-                        }
-                    };
+                    hotspot_connection =
+                        match create_hotspot(&device, &cli_options.ssid, &hotspot_password) {
+                            Ok(connection) => Some(connection),
+                            Err(e) => {
+                                return shutdown(
+                                    &shutdown_tx,
+                                    format!("Creating the hotspot failed: {}", e),
+                                );
+                            }
+                        };
                 };
 
                 let access_points_ssids = get_access_points_ssids_owned(&access_points);
@@ -104,21 +103,22 @@ pub fn process_network_commands(
                 activated = true;
 
                 if let Err(e) = server_tx.send(access_points_ssids) {
-                    shutdown(
+                    return shutdown(
                         &shutdown_tx,
                         format!(
                             "Sending access point ssids results failed: {}",
                             e.description()
                         ),
                     );
-                    return;
                 }
             }
             NetworkCommand::Connect { ssid, password } => {
                 if hotspot_connection.is_some() {
                     if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(), &cli_options.ssid) {
-                        shutdown(&shutdown_tx, format!("Stopping the hotspot failed: {}", e));
-                        return;
+                        return shutdown(
+                            &shutdown_tx,
+                            format!("Stopping the hotspot failed: {}", e),
+                        );
                     }
                     hotspot_connection = None;
                 }
@@ -126,8 +126,10 @@ pub fn process_network_commands(
                 let access_points = match get_access_points(&device) {
                     Ok(access_points) => access_points,
                     Err(e) => {
-                        shutdown(&shutdown_tx, format!("Getting access points failed: {}", e));
-                        return;
+                        return shutdown(
+                            &shutdown_tx,
+                            format!("Getting access points failed: {}", e),
+                        );
                     }
                 };
 
@@ -140,7 +142,7 @@ pub fn process_network_commands(
 
                             match wifi_device.connect(&access_point, &password as &str) {
                                 Ok(_) => {
-                                    let _ = shutdown_tx.send(None);
+                                    let _ = shutdown_tx.send(Ok(()));
 
                                     return;
                                 }
@@ -160,10 +162,6 @@ pub fn process_network_commands(
             }
         }
     }
-}
-
-fn shutdown(shutdown_tx: &Sender<Option<String>>, error: String) {
-    let _ = shutdown_tx.send(Some(error));
 }
 
 fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Result<Device, String> {
