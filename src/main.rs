@@ -38,19 +38,18 @@ fn main() {
     let shutdown_tx_network = shutdown_tx.clone();
     let shutdown_tx_server = shutdown_tx.clone();
 
-    thread::spawn(move || {
-                      process_network_commands(cli_options,
-                                               network_rx,
-                                               server_tx,
-                                               shutdown_tx_network);
-                  });
+    thread::spawn(
+        move || {
+            process_network_commands(cli_options, network_rx, server_tx, shutdown_tx_network);
+        }
+    );
 
-    thread::spawn(move || {
-                      thread::sleep(Duration::from_secs(timeout));
-                      let _ =
-                          shutdown_tx.send(Some(format!("Hotspot timeout reached: {} seconds",
-                                                        timeout)));
-                  });
+    thread::spawn(
+        move || {
+            thread::sleep(Duration::from_secs(timeout));
+            let _ = shutdown_tx.send(Some(format!("Hotspot timeout reached: {} seconds", timeout)));
+        }
+    );
 
     thread::spawn(move || { start_server(server_rx, network_tx, shutdown_tx_server); });
 

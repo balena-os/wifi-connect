@@ -12,10 +12,12 @@ pub enum NetworkCommand {
     Connect { ssid: String, password: String },
 }
 
-pub fn process_network_commands(cli_options: CliOptions,
-                                network_rx: Receiver<NetworkCommand>,
-                                server_tx: Sender<Vec<String>>,
-                                shutdown_tx: Sender<Option<String>>) {
+pub fn process_network_commands(
+    cli_options: CliOptions,
+    network_rx: Receiver<NetworkCommand>,
+    server_tx: Sender<Vec<String>>,
+    shutdown_tx: Sender<Option<String>>,
+) {
     let manager = NetworkManager::new();
 
     debug!("Network Manager connection initialized");
@@ -53,8 +55,10 @@ pub fn process_network_commands(cli_options: CliOptions,
         let command = match network_rx.recv() {
             Ok(command) => command,
             Err(e) => {
-                shutdown(&shutdown_tx,
-                         format!("Receiving network command failed: {}", e.description()));
+                shutdown(
+                    &shutdown_tx,
+                    format!("Receiving network command failed: {}", e.description()),
+                );
                 return;
             }
         };
@@ -65,8 +69,10 @@ pub fn process_network_commands(cli_options: CliOptions,
                 // before the first command arrives
                 if activated {
                     if hotspot_connection.is_some() {
-                        if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(),
-                                                     &cli_options.ssid) {
+                        if let Err(e) = stop_hotspot(
+                            &hotspot_connection.unwrap(),
+                            &cli_options.ssid,
+                        ) {
                             shutdown(&shutdown_tx, format!("Stopping the hotspot failed: {}", e));
                             return;
                         }
@@ -80,9 +86,11 @@ pub fn process_network_commands(cli_options: CliOptions,
                         }
                     };
 
-                    hotspot_connection = match create_hotspot(&device,
-                                                              &cli_options.ssid,
-                                                              &hotspot_password) {
+                    hotspot_connection = match create_hotspot(
+                        &device,
+                        &cli_options.ssid,
+                        &hotspot_password,
+                    ) {
                         Ok(connection) => Some(connection),
                         Err(e) => {
                             shutdown(&shutdown_tx, format!("Creating the hotspot failed: {}", e));
@@ -96,9 +104,13 @@ pub fn process_network_commands(cli_options: CliOptions,
                 activated = true;
 
                 if let Err(e) = server_tx.send(access_points_ssids) {
-                    shutdown(&shutdown_tx,
-                             format!("Sending access point ssids results failed: {}",
-                                     e.description()));
+                    shutdown(
+                        &shutdown_tx,
+                        format!(
+                            "Sending access point ssids results failed: {}",
+                            e.description()
+                        ),
+                    );
                     return;
                 }
             }
@@ -133,9 +145,11 @@ pub fn process_network_commands(cli_options: CliOptions,
                                     return;
                                 }
                                 Err(e) => {
-                                    warn!("Cannot connect to access point '{}': {}",
-                                          access_point_ssid,
-                                          e);
+                                    warn!(
+                                        "Cannot connect to access point '{}': {}",
+                                        access_point_ssid,
+                                        e
+                                    );
 
                                     continue 'main_loop;
                                 }
@@ -191,8 +205,10 @@ fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>, String> {
         access_points.retain(|ap| ap.ssid().as_str().is_ok());
 
         if access_points.len() != 0 {
-            debug!("Access points: {:?}",
-                   get_access_points_ssids(&access_points));
+            debug!(
+                "Access points: {:?}",
+                get_access_points_ssids(&access_points)
+            );
             return Ok(access_points);
         }
 
@@ -219,10 +235,11 @@ fn get_access_points_ssids_owned(access_points: &Vec<AccessPoint>) -> Vec<String
         .collect()
 }
 
-fn create_hotspot(device: &Device,
-                  ssid: &str,
-                  password: &Option<&str>)
-                  -> Result<Connection, String> {
+fn create_hotspot(
+    device: &Device,
+    ssid: &str,
+    password: &Option<&str>,
+) -> Result<Connection, String> {
     info!("Creating hotspot...");
     let wifi_device = device.as_wifi_device().unwrap();
     let (hotspot_connection, _) = wifi_device.create_hotspot(&ssid as &str, *password)?;
