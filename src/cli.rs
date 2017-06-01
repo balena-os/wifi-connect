@@ -8,10 +8,10 @@ pub struct CliOptions {
 }
 
 pub fn parse_cli_options() -> CliOptions {
-    let matches = App::new("resin-wifi-connect")
-        .version("0.1.0")
-        .author("Joe Roberts <joe@resin.io>")
-        .about("Wi-Fi credentials configuration tool")
+    let matches = App::new(env!("CARGO_PKG_NAME"))
+        .version(env!("CARGO_PKG_VERSION"))
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .about(env!("CARGO_PKG_DESCRIPTION"))
         .arg(
             Arg::with_name("interface")
                 .short("i")
