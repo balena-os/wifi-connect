@@ -3,7 +3,7 @@ use std::time::Duration;
 use std::sync::mpsc::{Sender, Receiver};
 use std::error::Error;
 
-use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint};
+use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint, ConnectionState};
 
 use cli::CliOptions;
 use {shutdown, ShutdownResult};
@@ -26,7 +26,7 @@ pub fn process_network_commands(
         Ok(device) => device,
         Err(e) => {
             return shutdown(&shutdown_tx, e);
-        }
+        },
     };
 
     let mut activated = false;
@@ -35,7 +35,7 @@ pub fn process_network_commands(
         Ok(access_points) => access_points,
         Err(e) => {
             return shutdown(&shutdown_tx, format!("Getting access points failed: {}", e));
-        }
+        },
     };
 
     let hotspot_password = cli_options.password.as_ref().map(|p| p as &str);
@@ -45,7 +45,7 @@ pub fn process_network_commands(
             Ok(connection) => Some(connection),
             Err(e) => {
                 return shutdown(&shutdown_tx, format!("Creating the hotspot failed: {}", e));
-            }
+            },
         };
 
     'main_loop: loop {
@@ -56,7 +56,7 @@ pub fn process_network_commands(
                     &shutdown_tx,
                     format!("Receiving network command failed: {}", e.description()),
                 );
-            }
+            },
         };
 
         match command {
@@ -65,10 +65,8 @@ pub fn process_network_commands(
                 // the first command arrives.
                 if activated {
                     if hotspot_connection.is_some() {
-                        if let Err(e) = stop_hotspot(
-                            &hotspot_connection.unwrap(),
-                            &cli_options.ssid,
-                        ) {
+                        let result = stop_hotspot(&hotspot_connection.unwrap(), &cli_options.ssid);
+                        if let Err(e) = result {
                             return shutdown(
                                 &shutdown_tx,
                                 format!("Stopping the hotspot failed: {}", e),
@@ -83,7 +81,7 @@ pub fn process_network_commands(
                                 &shutdown_tx,
                                 format!("Getting access points failed: {}", e),
                             );
-                        }
+                        },
                     };
 
                     hotspot_connection =
@@ -94,7 +92,7 @@ pub fn process_network_commands(
                                     &shutdown_tx,
                                     format!("Creating the hotspot failed: {}", e),
                                 );
-                            }
+                            },
                         };
                 };
 
@@ -111,8 +109,11 @@ pub fn process_network_commands(
                         ),
                     );
                 }
-            }
-            NetworkCommand::Connect { ssid, password } => {
+            },
+            NetworkCommand::Connect {
+                ssid,
+                password,
+            } => {
                 if hotspot_connection.is_some() {
                     if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(), &cli_options.ssid) {
                         return shutdown(
@@ -130,7 +131,7 @@ pub fn process_network_commands(
                             &shutdown_tx,
                             format!("Getting access points failed: {}", e),
                         );
-                    }
+                    },
                 };
 
                 for access_point in access_points {
@@ -141,25 +142,39 @@ pub fn process_network_commands(
                             debug!("Connecting to access point '{}'...", access_point_ssid);
 
                             match wifi_device.connect(&access_point, &password as &str) {
-                                Ok(_) => {
-                                    let _ = shutdown_tx.send(Ok(()));
+                                Ok((connection, state)) => {
+                                    if state == ConnectionState::Activated {
+                                        let _ = shutdown_tx.send(Ok(()));
 
-                                    return;
-                                }
+                                        return;
+                                    } else {
+                                        if let Err(err) = connection.delete() {
+                                            error!("Deleting connection object failed: {}", err)
+                                        }
+
+                                        warn!(
+                                            "Connection to access point not activated '{}': {:?}",
+                                            access_point_ssid,
+                                            state
+                                        );
+
+                                        continue 'main_loop;
+                                    }
+                                },
                                 Err(e) => {
                                     warn!(
-                                        "Cannot connect to access point '{}': {}",
+                                        "Error connecting to access point '{}': {}",
                                         access_point_ssid,
                                         e
                                     );
 
                                     continue 'main_loop;
-                                }
+                                },
                             }
                         }
                     }
                 }
-            }
+            },
         }
     }
 }
@@ -203,10 +218,7 @@ fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>, String> {
         access_points.retain(|ap| ap.ssid().as_str().is_ok());
 
         if access_points.len() != 0 {
-            debug!(
-                "Access points: {:?}",
-                get_access_points_ssids(&access_points)
-            );
+            debug!("Access points: {:?}", get_access_points_ssids(&access_points));
             return Ok(access_points);
         }
 

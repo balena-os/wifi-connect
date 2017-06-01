@@ -128,11 +128,7 @@ pub fn start_server(
     if let Err(e) = Iron::new(chain).http(address) {
         shutdown(
             &shutdown_tx,
-            format!(
-                "Cannot start HTTP server on '{}': {}",
-                address,
-                e.description()
-            ),
+            format!("Cannot start HTTP server on '{}': {}", address, e.description()),
         );
     }
 }
@@ -145,10 +141,7 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
     if let Err(err) = request_state.network_tx.send(NetworkCommand::Activate) {
         shutdown_with_error!(
             request_state,
-            format!(
-                "Sending NetworkCommand::Activate failed: {}",
-                err.description()
-            )
+            format!("Sending NetworkCommand::Activate failed: {}", err.description())
         );
     }
 
@@ -157,12 +150,9 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
         Err(err) => {
             shutdown_with_error!(
                 request_state,
-                format!(
-                    "Receiving access points ssids failed: {}",
-                    err.description()
-                )
+                format!("Receiving access points ssids failed: {}", err.description())
             )
-        }
+        },
     };
 
     let access_points_json = match serde_json::to_string(&access_points_ssids) {
@@ -170,12 +160,9 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
         Err(err) => {
             shutdown_with_error!(
                 request_state,
-                format!(
-                    "Receiving access points ssids failed: {}",
-                    err.description()
-                )
+                format!("Receiving access points ssids failed: {}", err.description())
             )
-        }
+        },
     };
 
     Ok(Response::with((status::Ok, access_points_json)))
@@ -201,10 +188,7 @@ fn connect(req: &mut Request) -> IronResult<Response> {
     if let Err(err) = request_state.network_tx.send(command) {
         shutdown_with_error!(
             request_state,
-            format!(
-                "Sending NetworkCommand::Connect failed: {}",
-                err.description()
-            )
+            format!("Sending NetworkCommand::Connect failed: {}", err.description())
         );
     }
 
