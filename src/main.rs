@@ -1,3 +1,6 @@
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+
 #[macro_use]
 extern crate log;
 extern crate env_logger;
@@ -46,7 +49,7 @@ fn main() {
 
     thread::spawn(
         move || {
-            process_network_commands(cli_options, network_rx, server_tx, shutdown_tx_network);
+            process_network_commands(&cli_options, &network_rx, &server_tx, &shutdown_tx_network);
         }
     );
 

@@ -5,8 +5,9 @@ authors = ["Joe Roberts <joe@resin.io>"]
 description = "Wi-Fi credentials configuration tool"
 
 [dependencies]
-clap = "*"
+clippy = {version = "*", optional = true}
 network_manager = { git = "https://github.com/resin-io-modules/network_manager", branch = "master" }
+clap = "*"
 iron = "*"
 staticfile = "*"
 mount = "*"

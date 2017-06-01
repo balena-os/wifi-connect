@@ -101,10 +101,11 @@ pub fn start_server(
     network_tx: Sender<NetworkCommand>,
     shutdown_tx: Sender<ShutdownResult>,
 ) {
+    let shutdown_tx_clone = shutdown_tx.clone();
     let request_state = RequestSharedState {
         server_rx: server_rx,
         network_tx: network_tx,
-        shutdown_tx: shutdown_tx.clone(),
+        shutdown_tx: shutdown_tx,
     };
 
     let mut router = Router::new();
@@ -127,7 +128,7 @@ pub fn start_server(
 
     if let Err(e) = Iron::new(chain).http(address) {
         shutdown(
-            &shutdown_tx,
+            &shutdown_tx_clone,
             format!("Cannot start HTTP server on '{}': {}", address, e.description()),
         );
     }
