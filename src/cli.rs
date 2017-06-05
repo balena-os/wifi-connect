@@ -51,7 +51,10 @@ pub fn parse_cli_options() -> CliOptions {
             String::from,
         );
 
-    let password: Option<String> = matches.value_of("password").map(String::from);
+    let password: Option<String> =
+        matches
+            .value_of("password")
+            .map_or_else(|| env::var("PORTAL_PASSPHRASE").ok(), |v| Some(v.to_string()));
 
     CliOptions {
         interface: interface,
