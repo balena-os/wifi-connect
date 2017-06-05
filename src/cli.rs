@@ -4,7 +4,6 @@ pub struct CliOptions {
     pub interface: Option<String>,
     pub ssid: String,
     pub password: Option<String>,
-    pub timeout: u64,
 }
 
 pub fn parse_cli_options() -> CliOptions {
@@ -36,14 +35,6 @@ pub fn parse_cli_options() -> CliOptions {
                 .help("Hotspot password ")
                 .takes_value(true)
         )
-        .arg(
-            Arg::with_name("timeout")
-                .short("t")
-                .long("timeout")
-                .value_name("TIMEOUT")
-                .help("Hotspot timeout (seconds)")
-                .takes_value(true)
-        )
         .get_matches();
 
     let interface: Option<String> = matches.value_of("interface").map(String::from);
@@ -55,14 +46,9 @@ pub fn parse_cli_options() -> CliOptions {
 
     let password: Option<String> = matches.value_of("password").map(String::from);
 
-    let timeout = matches
-        .value_of("timeout")
-        .map_or(600, |v| v.parse::<u64>().unwrap());
-
     CliOptions {
         interface: interface,
         ssid: ssid,
         password: password,
-        timeout: timeout,
     }
 }
