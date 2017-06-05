@@ -46,8 +46,10 @@ pub fn parse_cli_options() -> CliOptions {
 
     let ssid: String = matches
         .value_of("ssid")
-        .unwrap_or("resin-hotspot")
-        .to_string();
+        .map_or_else(
+            || env::var("PORTAL_SSID").unwrap_or_else(|_| "ResinAP".to_string()),
+            String::from,
+        );
 
     let password: Option<String> = matches.value_of("password").map(String::from);
 
