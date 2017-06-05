@@ -1,5 +1,7 @@
 use clap::{Arg, App};
 
+use std::env;
+
 pub struct CliOptions {
     pub interface: Option<String>,
     pub ssid: String,
@@ -37,7 +39,10 @@ pub fn parse_cli_options() -> CliOptions {
         )
         .get_matches();
 
-    let interface: Option<String> = matches.value_of("interface").map(String::from);
+    let interface: Option<String> =
+        matches
+            .value_of("interface")
+            .map_or_else(|| env::var("PORTAL_INTERFACE").ok(), |v| Some(v.to_string()));
 
     let ssid: String = matches
         .value_of("ssid")
