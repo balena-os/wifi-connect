@@ -40,13 +40,12 @@ pub fn process_network_commands(
 
     let hotspot_password = config.password.as_ref().map(|p| p as &str);
 
-    let mut hotspot_connection =
-        match create_hotspot(&device, &config.ssid, &hotspot_password) {
-            Ok(connection) => Some(connection),
-            Err(e) => {
-                return shutdown(shutdown_tx, format!("Creating the hotspot failed: {}", e));
-            },
-        };
+    let mut hotspot_connection = match create_hotspot(&device, &config.ssid, &hotspot_password) {
+        Ok(connection) => Some(connection),
+        Err(e) => {
+            return shutdown(shutdown_tx, format!("Creating the hotspot failed: {}", e));
+        },
+    };
 
     'main_loop: loop {
         let command = match network_rx.recv() {
