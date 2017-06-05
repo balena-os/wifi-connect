@@ -5,7 +5,7 @@ use std::error::Error;
 
 use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoint, ConnectionState};
 
-use cli::CliOptions;
+use config::Config;
 use {shutdown, ShutdownResult};
 
 pub enum NetworkCommand {
@@ -14,7 +14,7 @@ pub enum NetworkCommand {
 }
 
 pub fn process_network_commands(
-    cli_options: &CliOptions,
+    config: &Config,
     network_rx: &Receiver<NetworkCommand>,
     server_tx: &Sender<Vec<String>>,
     shutdown_tx: &Sender<ShutdownResult>,
@@ -22,7 +22,7 @@ pub fn process_network_commands(
     let manager = NetworkManager::new();
     debug!("Network Manager connection initialized");
 
-    let device = match find_device(&manager, &cli_options.interface) {
+    let device = match find_device(&manager, &config.interface) {
         Ok(device) => device,
         Err(e) => {
             return shutdown(shutdown_tx, e);
@@ -38,10 +38,10 @@ pub fn process_network_commands(
         },
     };
 
-    let hotspot_password = cli_options.password.as_ref().map(|p| p as &str);
+    let hotspot_password = config.password.as_ref().map(|p| p as &str);
 
     let mut hotspot_connection =
-        match create_hotspot(&device, &cli_options.ssid, &hotspot_password) {
+        match create_hotspot(&device, &config.ssid, &hotspot_password) {
             Ok(connection) => Some(connection),
             Err(e) => {
                 return shutdown(shutdown_tx, format!("Creating the hotspot failed: {}", e));
@@ -65,7 +65,7 @@ pub fn process_network_commands(
                 // the first command arrives.
                 if activated {
                     if hotspot_connection.is_some() {
-                        let result = stop_hotspot(&hotspot_connection.unwrap(), &cli_options.ssid);
+                        let result = stop_hotspot(&hotspot_connection.unwrap(), &config.ssid);
                         if let Err(e) = result {
                             return shutdown(
                                 shutdown_tx,
@@ -85,7 +85,7 @@ pub fn process_network_commands(
                     };
 
                     hotspot_connection =
-                        match create_hotspot(&device, &cli_options.ssid, &hotspot_password) {
+                        match create_hotspot(&device, &config.ssid, &hotspot_password) {
                             Ok(connection) => Some(connection),
                             Err(e) => {
                                 return shutdown(
@@ -115,7 +115,7 @@ pub fn process_network_commands(
                 password,
             } => {
                 if hotspot_connection.is_some() {
-                    if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(), &cli_options.ssid) {
+                    if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(), &config.ssid) {
                         return shutdown(shutdown_tx, format!("Stopping the hotspot failed: {}", e));
                     }
                     hotspot_connection = None;

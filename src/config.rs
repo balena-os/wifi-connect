@@ -2,13 +2,13 @@ use clap::{Arg, App};
 
 use std::env;
 
-pub struct CliOptions {
+pub struct Config {
     pub interface: Option<String>,
     pub ssid: String,
     pub password: Option<String>,
 }
 
-pub fn parse_cli_options() -> CliOptions {
+pub fn get_config() -> Config {
     let matches = App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
@@ -56,7 +56,7 @@ pub fn parse_cli_options() -> CliOptions {
             .value_of("password")
             .map_or_else(|| env::var("PORTAL_PASSPHRASE").ok(), |v| Some(v.to_string()));
 
-    CliOptions {
+    Config {
         interface: interface,
         ssid: ssid,
         password: password,

@@ -14,7 +14,7 @@ extern crate serde_json;
 extern crate persistent;
 extern crate params;
 
-mod cli;
+mod config;
 mod network;
 mod server;
 
@@ -23,7 +23,7 @@ use std::path;
 use std::thread;
 use std::sync::mpsc::{channel, Sender};
 
-use cli::parse_cli_options;
+use config::get_config;
 use network::process_network_commands;
 use server::start_server;
 
@@ -36,7 +36,7 @@ pub fn shutdown(shutdown_tx: &Sender<ShutdownResult>, error: String) {
 fn main() {
     env_logger::init().unwrap();
 
-    let cli_options = parse_cli_options();
+    let config = get_config();
 
     let (shutdown_tx, shutdown_rx) = channel();
     let (server_tx, server_rx) = channel();
@@ -46,7 +46,7 @@ fn main() {
 
     thread::spawn(
         move || {
-            process_network_commands(&cli_options, &network_rx, &server_tx, &shutdown_tx_network);
+            process_network_commands(&config, &network_rx, &server_tx, &shutdown_tx_network);
         }
     );
 
