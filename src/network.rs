@@ -1,4 +1,5 @@
 use std::thread;
+use std::process;
 use std::time::Duration;
 use std::sync::mpsc::{Sender, Receiver};
 use std::error::Error;
@@ -13,10 +14,14 @@ pub enum NetworkCommand {
     Connect { ssid: String, password: String },
 }
 
+pub enum NetworkCommandResponse {
+    AccessPointsSsids(Vec<String>),
+}
+
 pub fn process_network_commands(
     config: &Config,
     network_rx: &Receiver<NetworkCommand>,
-    server_tx: &Sender<Vec<String>>,
+    server_tx: &Sender<NetworkCommandResponse>,
     shutdown_tx: &Sender<ShutdownResult>,
 ) {
     let manager = NetworkManager::new();
@@ -99,7 +104,9 @@ pub fn process_network_commands(
 
                 activated = true;
 
-                if let Err(e) = server_tx.send(access_points_ssids) {
+                if let Err(e) =
+                    server_tx.send(NetworkCommandResponse::AccessPointsSsids(access_points_ssids))
+                {
                     return shutdown(
                         shutdown_tx,
                         format!(
@@ -173,6 +180,99 @@ pub fn process_network_commands(
             },
         }
     }
+}
+
+pub fn handle_existing_wifi_connections(clear: bool) {
+    let manager = NetworkManager::new();
+
+    if clear {
+        if let Err(err) = clear_wifi_connections(&manager) {
+            error!("Clearing Wi-Fi connections failed: {}", err);
+            process::exit(1);
+        }
+    } else {
+        match find_and_activate_wifi_connection(&manager) {
+            Err(err) => {
+                error!("Finding and activating Wi-Fi connection failed: {}", err);
+                process::exit(1);
+            },
+            Ok(activated) => {
+                match activated {
+                    ConnectionActivated::Yes(connection) => {
+                        match connection.settings().ssid.as_str() {
+                            Ok(ssid) => {
+                                info!("Existing Wi-Fi connection found and activated: {}", ssid)
+                            },
+                            Err(_) => {
+                                info!(
+                                    "Existing Wi-Fi connection found and activated: {:?}",
+                                    connection.settings().ssid.as_bytes()
+                                )
+                            },
+                        }
+                        process::exit(0);
+                    },
+                    ConnectionActivated::No => {
+                        info!("Cannot find and activate an existing Wi-Fi connection");
+                    },
+                }
+            },
+        }
+    }
+}
+
+fn clear_wifi_connections(manager: &NetworkManager) -> Result<(), String> {
+    let connections = manager.get_connections()?;
+
+    for connection in connections {
+        if &connection.settings().kind == "802-11-wireless" {
+            debug!(
+                "Deleting Wi-Fi connection profile to {:?}: [{}] {}",
+                connection.settings().ssid,
+                connection.settings().id,
+                connection.settings().uuid
+            );
+            connection.delete()?;
+        }
+    }
+
+    Ok(())
+}
+
+enum ConnectionActivated {
+    Yes(Connection),
+    No,
+}
+
+fn find_and_activate_wifi_connection(manager: &NetworkManager)
+    -> Result<ConnectionActivated, String> {
+    let connections = manager.get_connections()?;
+
+    for connection in connections {
+        if &connection.settings().kind == "802-11-wireless" {
+            let state = connection.activate()?;
+
+            if state == ConnectionState::Activated {
+                debug!(
+                    "Activated Wi-Fi connection to {:?}: [{}] {}",
+                    connection.settings().ssid,
+                    connection.settings().id,
+                    connection.settings().uuid
+                );
+                return Ok(ConnectionActivated::Yes(connection));
+            } else {
+                debug!(
+                    "Cannot activate Wi-Fi connection to {:?}: [{}] {}",
+                    connection.settings().ssid,
+                    connection.settings().id,
+                    connection.settings().uuid
+                );
+            }
+        }
+    }
+
+    debug!("No connection activated");
+    Ok(ConnectionActivated::No)
 }
 
 fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Result<Device, String> {

@@ -24,7 +24,7 @@ use std::thread;
 use std::sync::mpsc::{channel, Sender};
 
 use config::get_config;
-use network::process_network_commands;
+use network::{process_network_commands, handle_existing_wifi_connections};
 use server::start_server;
 
 pub type ShutdownResult = Result<(), String>;
@@ -43,6 +43,8 @@ fn main() {
     let (network_tx, network_rx) = channel();
 
     let shutdown_tx_network = shutdown_tx.clone();
+
+    handle_existing_wifi_connections(config.clear);
 
     thread::spawn(
         move || {

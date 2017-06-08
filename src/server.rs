@@ -12,11 +12,11 @@ use mount::Mount;
 use persistent::State;
 use params::{Params, FromValue};
 
-use network::NetworkCommand;
+use network::{NetworkCommand, NetworkCommandResponse};
 use {shutdown, ShutdownResult};
 
 struct RequestSharedState {
-    server_rx: Receiver<Vec<String>>,
+    server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
     shutdown_tx: Sender<ShutdownResult>,
 }
@@ -97,7 +97,7 @@ macro_rules! shutdown_with_error {
 }
 
 pub fn start_server(
-    server_rx: Receiver<Vec<String>>,
+    server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
     shutdown_tx: Sender<ShutdownResult>,
 ) {
@@ -147,7 +147,11 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
     }
 
     let access_points_ssids = match request_state.server_rx.recv() {
-        Ok(ssids) => ssids,
+        Ok(result) => {
+            match result {
+                NetworkCommandResponse::AccessPointsSsids(ssids) => ssids,
+            }
+        },
         Err(err) => {
             shutdown_with_error!(
                 request_state,

@@ -6,6 +6,7 @@ pub struct Config {
     pub interface: Option<String>,
     pub ssid: String,
     pub password: Option<String>,
+    pub clear: bool,
 }
 
 pub fn get_config() -> Config {
@@ -37,6 +38,14 @@ pub fn get_config() -> Config {
                 .help("Hotspot password ")
                 .takes_value(true)
         )
+        .arg(
+            Arg::with_name("clear")
+                .short("c")
+                .long("clear")
+                .value_name("CLEAR")
+                .help("Clear saved Wi-Fi credentials")
+                .takes_value(true)
+        )
         .get_matches();
 
     let interface: Option<String> =
@@ -56,9 +65,12 @@ pub fn get_config() -> Config {
             .value_of("password")
             .map_or_else(|| env::var("PORTAL_PASSPHRASE").ok(), |v| Some(v.to_string()));
 
+    let clear = matches.value_of("clear").map_or(true, |v| !(v == "false"));
+
     Config {
         interface: interface,
         ssid: ssid,
         password: password,
+        clear: clear,
     }
 }
