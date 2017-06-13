@@ -55,3 +55,6 @@ If the device is plugged in over Ethernet it will have an internet connection, i
 
 * *How long will this app attempt to connect to a configured connection for?*
 The connection timeout is set to 15 seconds.
+
+* *I receive "Error: No introspectable" in my application log on deployment.*
+You can fix this by setting the `START_SLEEP` environment variable to `30`.
