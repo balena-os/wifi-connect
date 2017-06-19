@@ -20,7 +20,7 @@ pub fn get_config() -> Config {
                 .long("interface")
                 .value_name("INTERFACE")
                 .help("Hotspot interface")
-                .takes_value(true)
+                .takes_value(true),
         )
         .arg(
             Arg::with_name("ssid")
@@ -28,7 +28,7 @@ pub fn get_config() -> Config {
                 .long("ssid")
                 .value_name("SSID")
                 .help("Hotspot SSID")
-                .takes_value(true)
+                .takes_value(true),
         )
         .arg(
             Arg::with_name("password")
@@ -36,7 +36,7 @@ pub fn get_config() -> Config {
                 .long("password")
                 .value_name("PASSWORD")
                 .help("Hotspot password ")
-                .takes_value(true)
+                .takes_value(true),
         )
         .arg(
             Arg::with_name("clear")
@@ -44,26 +44,30 @@ pub fn get_config() -> Config {
                 .long("clear")
                 .value_name("CLEAR")
                 .help("Clear saved Wi-Fi credentials")
-                .takes_value(true)
+                .takes_value(true),
         )
         .get_matches();
 
-    let interface: Option<String> =
-        matches
-            .value_of("interface")
-            .map_or_else(|| env::var("PORTAL_INTERFACE").ok(), |v| Some(v.to_string()));
+    let interface: Option<String> = matches.value_of("interface").map_or_else(
+        || {
+            env::var("PORTAL_INTERFACE").ok()
+        },
+        |v| Some(v.to_string()),
+    );
 
-    let ssid: String = matches
-        .value_of("ssid")
-        .map_or_else(
-            || env::var("PORTAL_SSID").unwrap_or_else(|_| "ResinAP".to_string()),
-            String::from,
-        );
+    let ssid: String = matches.value_of("ssid").map_or_else(
+        || {
+            env::var("PORTAL_SSID").unwrap_or_else(|_| "ResinAP".to_string())
+        },
+        String::from,
+    );
 
-    let password: Option<String> =
-        matches
-            .value_of("password")
-            .map_or_else(|| env::var("PORTAL_PASSPHRASE").ok(), |v| Some(v.to_string()));
+    let password: Option<String> = matches.value_of("password").map_or_else(
+        || {
+            env::var("PORTAL_PASSPHRASE").ok()
+        },
+        |v| Some(v.to_string()),
+    );
 
     let clear = matches.value_of("clear").map_or(true, |v| !(v == "false"));
 

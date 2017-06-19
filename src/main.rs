@@ -46,11 +46,9 @@ fn main() {
 
     handle_existing_wifi_connections(config.clear);
 
-    thread::spawn(
-        move || {
-            process_network_commands(&config, &network_rx, &server_tx, &shutdown_tx_network);
-        }
-    );
+    thread::spawn(move || {
+        process_network_commands(&config, &network_rx, &server_tx, &shutdown_tx_network);
+    });
 
     thread::spawn(move || { start_server(server_rx, network_tx, shutdown_tx); });
 

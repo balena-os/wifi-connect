@@ -104,8 +104,9 @@ pub fn process_network_commands(
 
                 activated = true;
 
-                if let Err(e) =
-                    server_tx.send(NetworkCommandResponse::AccessPointsSsids(access_points_ssids))
+                if let Err(e) = server_tx.send(NetworkCommandResponse::AccessPointsSsids(
+                    access_points_ssids,
+                ))
                 {
                     return shutdown(
                         shutdown_tx,
@@ -244,8 +245,9 @@ enum ConnectionActivated {
     No,
 }
 
-fn find_and_activate_wifi_connection(manager: &NetworkManager)
-    -> Result<ConnectionActivated, String> {
+fn find_and_activate_wifi_connection(
+    manager: &NetworkManager,
+) -> Result<ConnectionActivated, String> {
     let connections = manager.get_connections()?;
 
     for connection in connections {
@@ -288,9 +290,9 @@ fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Result<D
     } else {
         let devices = manager.get_devices()?;
 
-        let index = devices
-            .iter()
-            .position(|d| *d.device_type() == DeviceType::WiFi);
+        let index = devices.iter().position(
+            |d| *d.device_type() == DeviceType::WiFi,
+        );
 
         if let Some(index) = index {
             info!("Wi-Fi device found: {}", devices[index].interface());
