@@ -23,11 +23,9 @@ use std::error::Error;
 use std::path;
 use std::thread;
 use std::sync::mpsc::{channel, Sender};
-use std::time::Duration;
 
 use config::get_config;
 use network::{process_network_commands, handle_existing_wifi_connections};
-use server::start_server;
 
 pub type ExitResult = Result<(), String>;
 
@@ -44,17 +42,11 @@ fn main() {
     let (server_tx, server_rx) = channel();
     let (network_tx, network_rx) = channel();
 
-    let exit_tx_network = exit_tx.clone();
-
     handle_existing_wifi_connections(config.clear);
-
+    
     thread::spawn(move || {
-        process_network_commands(&config, &network_rx, &server_tx, &exit_tx_network);
+        process_network_commands(&config, network_tx, network_rx, server_tx, server_rx, exit_tx);
     });
-
-    thread::sleep(Duration::from_secs(10));
-
-    thread::spawn(move || { start_server(server_rx, network_tx, exit_tx); });
 
     match exit_rx.recv() {
         Ok(result) => {

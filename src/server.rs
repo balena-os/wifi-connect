@@ -1,6 +1,7 @@
 use std::sync::mpsc::{Sender, Receiver};
 use std::error::Error;
 use std::fmt;
+use std::net::Ipv4Addr;
 
 use serde_json;
 use path::Path;
@@ -17,6 +18,7 @@ use network::{NetworkCommand, NetworkCommandResponse};
 use {exit, ExitResult};
 
 struct RequestSharedState {
+    gateway: Ipv4Addr,
     server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
     exit_tx: Sender<ExitResult>,
@@ -41,21 +43,6 @@ impl fmt::Display for StringError {
 impl Error for StringError {
     fn description(&self) -> &str {
         &*self.0
-    }
-}
-
-struct RedirectMiddleware;
-
-impl AfterMiddleware for RedirectMiddleware {
-    fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
-        let host = req.headers.get::<headers::Host>().unwrap();
-
-        if host.hostname != "192.168.42.1" {
-            let url = Url::parse("http://192.168.42.1/").unwrap();
-            Ok(Response::with((status::Found, Redirect(url))))
-        } else {
-            Err(err)
-        }
     }
 }
 
@@ -112,13 +99,36 @@ macro_rules! exit_with_error {
     )
 }
 
+struct RedirectMiddleware;
+
+impl AfterMiddleware for RedirectMiddleware {
+    fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
+        let gateway = {
+            let request_state = get_request_state!(req);
+            format!("{}", request_state.gateway)
+        };
+        
+        let host = req.headers.get::<headers::Host>().unwrap();
+
+        if host.hostname != gateway {
+            let url = Url::parse(&format!("http://{}/", gateway)).unwrap();
+            Ok(Response::with((status::Found, Redirect(url))))
+        } else {
+            Err(err)
+        }
+    }
+}
+
 pub fn start_server(
+    gateway: Ipv4Addr,
     server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
     exit_tx: Sender<ExitResult>,
 ) {
     let exit_tx_clone = exit_tx.clone();
+    let gateway_clone = gateway.clone();
     let request_state = RequestSharedState {
+        gateway: gateway,
         server_rx: server_rx,
         network_tx: network_tx,
         exit_tx: exit_tx,
@@ -139,14 +149,14 @@ pub fn start_server(
     chain.link(State::<RequestSharedState>::both(request_state));
     chain.link_after(RedirectMiddleware);
 
-    let address = "192.168.42.1:80";
+    let address = format!("{}:80", gateway_clone);
 
-    info!("Starting HTTP server on {}", address);
+    info!("Starting HTTP server on {}", &address);
 
-    if let Err(e) = Iron::new(chain).http(address) {
+    if let Err(e) = Iron::new(chain).http(&address) {
         exit(
             &exit_tx_clone,
-            format!("Cannot start HTTP server on '{}': {}", address, e.description()),
+            format!("Cannot start HTTP server on '{}': {}", &address, e.description()),
         );
     }
 }

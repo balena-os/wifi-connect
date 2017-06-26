@@ -10,6 +10,7 @@ use network_manager::{NetworkManager, Device, DeviceType, Connection, AccessPoin
 use {exit, ExitResult};
 use config::Config;
 use dnsmasq::start_dnsmasq;
+use server::start_server;
 
 pub enum NetworkCommand {
     Activate,
@@ -22,9 +23,11 @@ pub enum NetworkCommandResponse {
 
 pub fn process_network_commands(
     config: &Config,
-    network_rx: &Receiver<NetworkCommand>,
-    server_tx: &Sender<NetworkCommandResponse>,
-    exit_tx: &Sender<ExitResult>,
+    network_tx: Sender<NetworkCommand>,
+    network_rx: Receiver<NetworkCommand>,
+    server_tx: Sender<NetworkCommandResponse>,
+    server_rx: Receiver<NetworkCommandResponse>,
+    exit_tx: Sender<ExitResult>,
 ) {
     let manager = NetworkManager::new();
     debug!("Network Manager connection initialized");
@@ -32,7 +35,7 @@ pub fn process_network_commands(
     let device = match find_device(&manager, &config.interface) {
         Ok(device) => device,
         Err(e) => {
-            return exit(exit_tx, e);
+            return exit(&exit_tx, e);
         },
     };
 
@@ -41,7 +44,7 @@ pub fn process_network_commands(
     let mut access_points = match get_access_points(&device) {
         Ok(access_points) => access_points,
         Err(e) => {
-            return exit(exit_tx, format!("Getting access points failed: {}", e));
+            return exit(&exit_tx, format!("Getting access points failed: {}", e));
         },
     };
 
@@ -50,18 +53,22 @@ pub fn process_network_commands(
     let mut hotspot_connection = match create_hotspot(&device, &config.ssid, &config.gateway, &hotspot_password) {
         Ok(connection) => Some(connection),
         Err(e) => {
-            return exit(exit_tx, format!("Creating the hotspot failed: {}", e));
+            return exit(&exit_tx, format!("Creating the hotspot failed: {}", e));
         },
     };
 
     let dnsmasq = start_dnsmasq(&config, &device).unwrap();
+
+    let exit_tx_server = exit_tx.clone();
+    let gateway = config.gateway.clone();
+    thread::spawn(move || { start_server(gateway, server_rx, network_tx, exit_tx_server); });
 
     'main_loop: loop {
         let command = match network_rx.recv() {
             Ok(command) => command,
             Err(e) => {
                 return exit_with_error(
-                    exit_tx,
+                    &exit_tx,
                     dnsmasq,
                     format!("Receiving network command failed: {}", e.description()),
                 );
@@ -77,7 +84,7 @@ pub fn process_network_commands(
                         let result = stop_hotspot(&hotspot_connection.unwrap(), &config.ssid);
                         if let Err(e) = result {
                             return exit_with_error(
-                                exit_tx,
+                                &exit_tx,
                                 dnsmasq,
                                 format!("Stopping the hotspot failed: {}", e),
                             );
@@ -88,7 +95,7 @@ pub fn process_network_commands(
                         Ok(access_points) => access_points,
                         Err(e) => {
                             return exit_with_error(
-                                exit_tx,
+                                &exit_tx,
                                 dnsmasq,
                                 format!("Getting access points failed: {}", e),
                             );
@@ -100,7 +107,7 @@ pub fn process_network_commands(
                             Ok(connection) => Some(connection),
                             Err(e) => {
                                 return exit_with_error(
-                                    exit_tx,
+                                    &exit_tx,
                                     dnsmasq,
                                     format!("Creating the hotspot failed: {}", e),
                                 );
@@ -117,7 +124,7 @@ pub fn process_network_commands(
                 ))
                 {
                     return exit_with_error(
-                        exit_tx,
+                        &exit_tx,
                         dnsmasq,
                         format!(
                             "Sending access point ssids results failed: {}",
@@ -132,7 +139,7 @@ pub fn process_network_commands(
             } => {
                 if hotspot_connection.is_some() {
                     if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(), &config.ssid) {
-                        return exit_with_error(exit_tx, dnsmasq, format!("Stopping the hotspot failed: {}", e));
+                        return exit_with_error(&exit_tx, dnsmasq, format!("Stopping the hotspot failed: {}", e));
                     }
                     hotspot_connection = None;
                 }
@@ -141,7 +148,7 @@ pub fn process_network_commands(
                     Ok(access_points) => access_points,
                     Err(e) => {
                         return exit_with_error(
-                            exit_tx,
+                            &exit_tx,
                             dnsmasq,
                             format!("Getting access points failed: {}", e),
                         );
