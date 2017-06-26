@@ -45,7 +45,7 @@ fn main() {
     handle_existing_wifi_connections(config.clear);
 
     thread::spawn(move || {
-        process_network_commands(&config, network_tx, network_rx, server_tx, server_rx, exit_tx);
+        process_network_commands(&config, network_tx, &network_rx, &server_tx, server_rx, &exit_tx);
     });
 
     match exit_rx.recv() {

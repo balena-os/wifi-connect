@@ -127,7 +127,7 @@ pub fn start_server(
     exit_tx: Sender<ExitResult>,
 ) {
     let exit_tx_clone = exit_tx.clone();
-    let gateway_clone = gateway.clone();
+    let gateway_clone = gateway;
     let request_state = RequestSharedState {
         gateway: gateway,
         server_rx: server_rx,
