@@ -5,7 +5,8 @@ use std::fmt;
 use serde_json;
 use path::Path;
 use iron::prelude::*;
-use iron::{Iron, Request, Response, IronResult, status, typemap, IronError};
+use iron::{Iron, Request, Response, IronResult, status, typemap, IronError, Url, AfterMiddleware, headers};
+use iron::modifiers::Redirect;
 use router::Router;
 use staticfile::Static;
 use mount::Mount;
@@ -13,12 +14,12 @@ use persistent::State;
 use params::{Params, FromValue};
 
 use network::{NetworkCommand, NetworkCommandResponse};
-use {shutdown, ShutdownResult};
+use {exit, ExitResult};
 
 struct RequestSharedState {
     server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
-    shutdown_tx: Sender<ShutdownResult>,
+    exit_tx: Sender<ExitResult>,
 }
 
 impl typemap::Key for RequestSharedState {
@@ -40,6 +41,21 @@ impl fmt::Display for StringError {
 impl Error for StringError {
     fn description(&self) -> &str {
         &*self.0
+    }
+}
+
+struct RedirectMiddleware;
+
+impl AfterMiddleware for RedirectMiddleware {
+    fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
+        let host = req.headers.get::<headers::Host>().unwrap();
+
+        if host.hostname != "192.168.42.1" {
+            let url = Url::parse("http://192.168.42.1/").unwrap();
+            Ok(Response::with((status::Found, Redirect(url))))
+        } else {
+            Err(err)
+        }
     }
 }
 
@@ -87,10 +103,10 @@ macro_rules! get_request_state {
     )
 }
 
-macro_rules! shutdown_with_error {
+macro_rules! exit_with_error {
     ($state:ident, $desc:expr) => (
         {
-            shutdown(&$state.shutdown_tx, $desc.clone());
+            exit(&$state.exit_tx, $desc.clone());
             return Err(IronError::new(StringError($desc), status::InternalServerError));
         }
     )
@@ -99,13 +115,13 @@ macro_rules! shutdown_with_error {
 pub fn start_server(
     server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
-    shutdown_tx: Sender<ShutdownResult>,
+    exit_tx: Sender<ExitResult>,
 ) {
-    let shutdown_tx_clone = shutdown_tx.clone();
+    let exit_tx_clone = exit_tx.clone();
     let request_state = RequestSharedState {
         server_rx: server_rx,
         network_tx: network_tx,
-        shutdown_tx: shutdown_tx,
+        exit_tx: exit_tx,
     };
 
     let mut router = Router::new();
@@ -121,14 +137,15 @@ pub fn start_server(
 
     let mut chain = Chain::new(assets);
     chain.link(State::<RequestSharedState>::both(request_state));
+    chain.link_after(RedirectMiddleware);
 
-    let address = "0.0.0.0:80";
+    let address = "192.168.42.1:80";
 
     info!("Starting HTTP server on {}", address);
 
     if let Err(e) = Iron::new(chain).http(address) {
-        shutdown(
-            &shutdown_tx_clone,
+        exit(
+            &exit_tx_clone,
             format!("Cannot start HTTP server on '{}': {}", address, e.description()),
         );
     }
@@ -140,7 +157,7 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
     let request_state = get_request_state!(req);
 
     if let Err(err) = request_state.network_tx.send(NetworkCommand::Activate) {
-        shutdown_with_error!(
+        exit_with_error!(
             request_state,
             format!("Sending NetworkCommand::Activate failed: {}", err.description())
         );
@@ -153,7 +170,7 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
             }
         },
         Err(err) => {
-            shutdown_with_error!(
+            exit_with_error!(
                 request_state,
                 format!("Receiving access points ssids failed: {}", err.description())
             )
@@ -163,7 +180,7 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
     let access_points_json = match serde_json::to_string(&access_points_ssids) {
         Ok(json) => json,
         Err(err) => {
-            shutdown_with_error!(
+            exit_with_error!(
                 request_state,
                 format!("Receiving access points ssids failed: {}", err.description())
             )
@@ -191,7 +208,7 @@ fn connect(req: &mut Request) -> IronResult<Response> {
     };
 
     if let Err(err) = request_state.network_tx.send(command) {
-        shutdown_with_error!(
+        exit_with_error!(
             request_state,
             format!("Sending NetworkCommand::Connect failed: {}", err.description())
         );

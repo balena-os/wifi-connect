@@ -1,12 +1,20 @@
 use clap::{Arg, App};
 
 use std::env;
+use std::net::Ipv4Addr;
+use std::str::FromStr;
+
+const DEFAULT_GATEWAY: &str = "192.168.42.1";
+const DEFAULT_DHCP_RANGE: &str = "192.168.42.2,192.168.42.254";
+const DEFAULT_SSID: &str = "ResinAP";
 
 pub struct Config {
     pub interface: Option<String>,
     pub ssid: String,
     pub password: Option<String>,
     pub clear: bool,
+    pub gateway: Ipv4Addr,
+    pub dhcp_range: String,
 }
 
 pub fn get_config() -> Config {
@@ -57,7 +65,7 @@ pub fn get_config() -> Config {
 
     let ssid: String = matches.value_of("ssid").map_or_else(
         || {
-            env::var("PORTAL_SSID").unwrap_or_else(|_| "ResinAP".to_string())
+            env::var("PORTAL_SSID").unwrap_or_else(|_| DEFAULT_SSID.to_string())
         },
         String::from,
     );
@@ -71,10 +79,27 @@ pub fn get_config() -> Config {
 
     let clear = matches.value_of("clear").map_or(true, |v| !(v == "false"));
 
+    let gateway = Ipv4Addr::from_str(&matches.value_of("gateway").map_or_else(
+        || {
+
+            env::var("PORTAL_GATEWAY").unwrap_or_else(|_| DEFAULT_GATEWAY.to_string())
+        },
+        String::from,
+    )).expect("Cannot parse gateway address");
+
+    let dhcp_range = matches.value_of("dhcp-range").map_or_else(
+        || {
+            env::var("PORTAL_DHCP_RANGE").unwrap_or_else(|_| DEFAULT_DHCP_RANGE.to_string())
+        },
+        String::from,
+    );
+
     Config {
         interface: interface,
         ssid: ssid,
         password: password,
         clear: clear,
+        gateway: gateway,
+        dhcp_range: dhcp_range,
     }
 }
