@@ -50,12 +50,13 @@ pub fn process_network_commands(
 
     let hotspot_password = config.password.as_ref().map(|p| p as &str);
 
-    let mut hotspot_connection = match create_hotspot(&device, &config.ssid, &config.gateway, &hotspot_password) {
-        Ok(connection) => Some(connection),
-        Err(e) => {
-            return exit(&exit_tx, format!("Creating the hotspot failed: {}", e));
-        },
-    };
+    let mut hotspot_connection =
+        match create_hotspot(&device, &config.ssid, &config.gateway, &hotspot_password) {
+            Ok(connection) => Some(connection),
+            Err(e) => {
+                return exit(&exit_tx, format!("Creating the hotspot failed: {}", e));
+            },
+        };
 
     let dnsmasq = start_dnsmasq(&config, &device).unwrap();
 
@@ -102,17 +103,21 @@ pub fn process_network_commands(
                         },
                     };
 
-                    hotspot_connection =
-                        match create_hotspot(&device, &config.ssid, &config.gateway, &hotspot_password) {
-                            Ok(connection) => Some(connection),
-                            Err(e) => {
-                                return exit_with_error(
-                                    &exit_tx,
-                                    dnsmasq,
-                                    format!("Creating the hotspot failed: {}", e),
-                                );
-                            },
-                        };
+                    hotspot_connection = match create_hotspot(
+                        &device,
+                        &config.ssid,
+                        &config.gateway,
+                        &hotspot_password,
+                    ) {
+                        Ok(connection) => Some(connection),
+                        Err(e) => {
+                            return exit_with_error(
+                                &exit_tx,
+                                dnsmasq,
+                                format!("Creating the hotspot failed: {}", e),
+                            );
+                        },
+                    };
                 };
 
                 let access_points_ssids = get_access_points_ssids_owned(&access_points);
@@ -139,7 +144,11 @@ pub fn process_network_commands(
             } => {
                 if hotspot_connection.is_some() {
                     if let Err(e) = stop_hotspot(&hotspot_connection.unwrap(), &config.ssid) {
-                        return exit_with_error(&exit_tx, dnsmasq, format!("Stopping the hotspot failed: {}", e));
+                        return exit_with_error(
+                            &exit_tx,
+                            dnsmasq,
+                            format!("Stopping the hotspot failed: {}", e),
+                        );
                     }
                     hotspot_connection = None;
                 }
@@ -368,7 +377,11 @@ fn create_hotspot(
 ) -> Result<Connection, String> {
     info!("Creating hotspot...");
     let wifi_device = device.as_wifi_device().unwrap();
-    let (hotspot_connection, _) = wifi_device.create_hotspot(ssid, *password, Some(gateway.clone()))?;
+    let (hotspot_connection, _) = wifi_device.create_hotspot(
+        ssid,
+        *password,
+        Some(gateway.clone()),
+    )?;
     info!("Hotspot '{}' created", ssid);
     Ok(hotspot_connection)
 }

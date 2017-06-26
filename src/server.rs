@@ -6,7 +6,8 @@ use std::net::Ipv4Addr;
 use serde_json;
 use path::Path;
 use iron::prelude::*;
-use iron::{Iron, Request, Response, IronResult, status, typemap, IronError, Url, AfterMiddleware, headers};
+use iron::{Iron, Request, Response, IronResult, status, typemap, IronError, Url, AfterMiddleware,
+           headers};
 use iron::modifiers::Redirect;
 use router::Router;
 use staticfile::Static;
@@ -107,7 +108,7 @@ impl AfterMiddleware for RedirectMiddleware {
             let request_state = get_request_state!(req);
             format!("{}", request_state.gateway)
         };
-        
+
         let host = req.headers.get::<headers::Host>().unwrap();
 
         if host.hostname != gateway {

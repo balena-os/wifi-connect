@@ -17,5 +17,7 @@ pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child, String> 
         "--no-hosts",
     ];
 
-    Command::new("dnsmasq").args(&args).spawn().map_err(|_| "Error spawning dnsmasq".to_string())
+    Command::new("dnsmasq").args(&args).spawn().map_err(|_| {
+        "Error spawning dnsmasq".to_string()
+    })
 }

@@ -43,7 +43,7 @@ fn main() {
     let (network_tx, network_rx) = channel();
 
     handle_existing_wifi_connections(config.clear);
-    
+
     thread::spawn(move || {
         process_network_commands(&config, network_tx, network_rx, server_tx, server_rx, exit_tx);
     });
