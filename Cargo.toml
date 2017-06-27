@@ -18,7 +18,7 @@ env_logger = "0.4"
 
 [dependencies.network_manager]
 git = "https://github.com/resin-io-modules/network_manager"
-version = "0.5"
+version = "0.6"
 
 [dependencies.clippy]
 version = "*"
