@@ -1,0 +1,24 @@
+dist: trusty
+sudo: required
+language: rust
+cache: cargo
+rust:
+  - nightly
+  - beta
+  - stable
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -yq --no-install-recommends libdbus-1-dev
+install:
+  - type -p cargo-install-update || cargo install cargo-update
+  - cargo install-update -i cargo-update
+  - cargo install-update -i rustfmt
+  - if [ $TRAVIS_RUST_VERSION == nightly ]; then
+      cargo install-update -i clippy;
+    fi
+script:
+  - cargo fmt -- --write-mode=diff
+  - if [ $TRAVIS_RUST_VERSION == nightly ]; then
+      cargo clippy -- -D warnings;
+    fi
+  - cargo build
