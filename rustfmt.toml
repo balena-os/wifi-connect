@@ -1,0 +1,11 @@
+array_layout = "Block"
+chain_indent = "Block"
+control_style = "Rfc"
+fn_args_layout = "Block"
+fn_args_paren_newline = false
+fn_call_style = "Block"
+fn_call_width = 80
+match_block_trailing_comma = true
+struct_lit_multiline_style = "ForceMulti"
+struct_lit_style = "Block"
+use_try_shorthand = true
