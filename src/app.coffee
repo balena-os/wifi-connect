@@ -8,7 +8,7 @@ systemd = require './systemd'
 wifiScan = require './wifi-scan'
 config = require './config'
 
-console.warn("resin-wifi-conect@<3.0.0 is no longer maintained. Upgrade to resin-wifi-connect@^3.0.0.")
+console.warn('resin-wifi-conect@<3.0.0 is no longer maintained. Upgrade to resin-wifi-connect@^3.0.0.')
 
 app = express()
 
