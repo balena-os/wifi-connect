@@ -31,4 +31,6 @@ COPY . /usr/src/app/
 
 RUN ./node_modules/.bin/coffee -c ./src
 
+RUN echo "resin-wifi-conect@<3.0.0 is no longer maintained. Upgrade to resin-wifi-connect@^3.0.0."
+
 CMD bash start
