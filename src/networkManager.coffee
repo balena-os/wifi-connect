@@ -45,7 +45,7 @@ exports.setCredentials = (ssid, passphrase) ->
 		}
 	}
 
-	if passphrase != ""
+	if passphrase != ''
 		connection = _.merge connection,
 			'802-11-wireless-security': {
 				'auth-alg': 'open',
