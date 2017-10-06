@@ -1,3 +1,7 @@
+```
+Version 3 of resin-wifi-connect is coming soon. Please stay tuned for more information!
+```
+
 # resin-wifi-connect
 An app to allow WiFi configuration to be set via a captive portal. First it checks whether WiFi has been previously configured, if it has it attempts to connect to the configured network, if it hasn't it opens an Access Point to which you can connect using a laptop or mobile phone and input new WiFi credentials.
 
