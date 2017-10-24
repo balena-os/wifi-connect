@@ -1,0 +1,129 @@
+defaults: &defaults
+  docker:
+    - image: majorz/$TARGET
+
+      environment:
+        BINARY: resin-wifi-connect
+        TARGET_OS: linux
+
+  steps:
+    - checkout
+
+    - run: cargo build --release --target=$TARGET
+
+    - run: cross-strip target/$TARGET/release/$BINARY
+
+    - run: |
+        VERSION=$CIRCLE_TAG
+        if [ -z "$CIRCLE_TAG" ]; then VERSION="$CIRCLE_BRANCH-$(echo $CIRCLE_SHA1 | cut -c -7)"; fi
+        echo "VERSION=$VERSION"
+        echo "export VERSION=$VERSION" >> $BASH_ENV
+
+    - run: |
+        ARCHIVE_NAME="$BINARY-$VERSION-$TARGET_OS-$CIRCLE_JOB.tar.gz"
+        echo "ARCHIVE_NAME=$ARCHIVE_NAME"
+        echo "export ARCHIVE_NAME=$ARCHIVE_NAME" >> $BASH_ENV
+
+    - run: |
+        ARCHIVE_PATH="/tmp/dist/$ARCHIVE_NAME"
+        echo "ARCHIVE_PATH=$ARCHIVE_PATH"
+        echo "export ARCHIVE_PATH=$ARCHIVE_PATH" >> $BASH_ENV
+
+    - run: mkdir -p pack /tmp/dist
+    - run: mv target/$TARGET/release/$BINARY pack/$BINARY
+    - run: cp -R public pack/public
+    - run: tar -czvf $ARCHIVE_PATH -C pack .
+    - run: rm -rdf pack
+
+    - store_artifacts:
+        path: /tmp/dist
+        destination: /
+
+version: 2
+
+jobs:
+  aarch64:
+    <<: *defaults
+    environment:
+      TARGET: aarch64-unknown-linux-gnu
+
+  rpi:
+    <<: *defaults
+    environment:
+      TARGET: arm-unknown-linux-gnueabihf
+
+  armv7hf:
+    <<: *defaults
+    environment:
+      TARGET: armv7-unknown-linux-gnueabihf
+
+  i386:
+    <<: *defaults
+    environment:
+      TARGET: i686-unknown-linux-gnu
+
+  amd64:
+    <<: *defaults
+    environment:
+      TARGET: x86_64-unknown-linux-gnu
+
+  deploy:
+    docker:
+      - image: majorz/x86_64-unknown-linux-gnu
+
+    environment:
+      GITHUB_USER: resin-io
+      GITHUB_REPO: resin-wifi-connect
+
+    steps:
+      - checkout
+
+      - deploy:
+          command: ./scripts/deploy.sh
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - aarch64:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+      - rpi:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+      - armv7hf:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+      - i386:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+      - amd64:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - aarch64
+            - rpi
+            - armv7hf
+            - i386
+            - amd64
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
