@@ -1,14 +1,14 @@
 $(function(){
-	$.get("/ssids", function(data){
-		if(data.length == 0){
+	$.get("/ssid", function(data){
+		if(data.length === 0){
 			$('.before-submit').hide();
 			$('#no-networks-message').removeClass('hidden');
 		} else {
-			$.each(data, function(i, val){
-				$("#ssid-select").append($('<option>').attr('val', val.ssid).text(val.ssid));
+			$.each(JSON.parse(data), function(i, val){
+				$("#ssid-select").append($('<option>').attr('val', val).text(val));
 			});
 		}
-	})
+	});
 
 	$('#connect-form').submit(function(ev){
 		$.post('/connect', $('#connect-form').serialize(), function(data){

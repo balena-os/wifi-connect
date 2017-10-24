@@ -1,10 +1,4 @@
-dist: trusty
-sudo: required
-language: node_js
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -yq --no-install-recommends libdbus-1-dev
-install:
-  - npm install
-script:
-  - npm test
+language: generic
+script: printf 'empty'
+notifications:
+  email: false
