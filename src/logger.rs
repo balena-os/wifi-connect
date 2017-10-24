@@ -16,7 +16,7 @@ pub fn init() {
 
         builder.format(format).filter(None, LogLevelFilter::Info);
 
-        builder.parse("resin-wifi-connect=info,iron::iron=off");
+        builder.parse("wifi-connect=info,iron::iron=off");
     }
 
     builder.init().unwrap();

@@ -1,37 +1,79 @@
-```
-Version 3 of resin-wifi-connect is now released!
-```
+WiFi Connect
+============
 
-# resin-wifi-connect
-An app to allow WiFi configuration to be set via a captive portal. First it checks whether WiFi has been previously configured, if it has it attempts to connect to the configured network, if it hasn't it opens an Access Point to which you can connect using a laptop or mobile phone and input new WiFi credentials.
+> Easy WiFi setup for Linux devices from your mobile phone or laptop
 
+WiFi Connect is a utility for dynamically setting the WiFi configuration on a Linux device via a captive portal. If the device's WiFi credentials have not been previously configured, or if the device cannot connect using the given credentials, WiFi Connect will create a wireless access point with a captive portal. New WiFi credentials can be specified by connecting to the access point with a laptop or mobile phone.
 
-## How to use this
-This is a [resin.io](http://resin.io) application. Check out our [Getting Started](http://docs.resin.io/#/pages/installing/gettingStarted.md) guide if it's your first time using resin.io
+[![Current Release](https://img.shields.io/github/release/resin-io/resin-wifi-connect.svg?style=flat-square)](https://github.com/resin-io/resin-wifi-connect/releases/latest)
+[![CircleCI status](https://img.shields.io/circleci/project/github/resin-io/resin-wifi-connect.svg?style=flat-square)](https://circleci.com/gh/resin-io/resin-wifi-connect)
+[![License](https://img.shields.io/github/license/resin-io/resin-wifi-connect.svg?style=flat-square)](https://github.com/resin-io/resin-wifi-connect/blob/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues/resin-io/resin-wifi-connect.svg?style=flat-square)](https://github.com/resin-io/resin-wifi-connect/issues)
 
-This project is meant to be integrated as part of a larger application (that is, _your_ application). An example on how to use this on a Python project can be found [here](https://github.com/resin-io-projects/resin-wifi-connect-example).
+<div align="center">
+  <sub>an open source :satellite: project by <a href="https://resin.io">resin.io</a></sub>
+</div>
 
-If you need to add dependencies, add the corresponding statements in the [Dockerfile](./Dockerfile.template) template. You can add the commands that run your app in the [start](./start) script. resin-wifi-connect only exits after a WiFi connection has been correctly configured, so if you add your app after [line 5](./start#L5) you ensure that everything happens after WiFi is correctly configured.
+***
 
-This is a Rust application, but your app can be any language/framework you want as long as you install it properly - if you need help, check out our [Dockerfile guide](https://docs.resin.io/deployment/dockerfile/). This project uses a Resin feature called "Dockerfile template", this means that the base image is chosen depending on the architecture, specified by the `%%RESIN_MACHINE_NAME%%` variable (see [line 1](./Dockerfile.template#L1) in the template).
+[**Download**][DOWNLOAD] | [**How it works**](#how-it-works) | [**How to use**](#how-to-use) | [**Support**](#support) | [**Roadmap**][MILESTONES]
 
-## How it works
-This app interacts with Network Manager in Resin's host OS. First it checks whether WiFi has been previously configured, if it has it attempts to connect to the configured network, if it hasn't it opens an Access Point to which you can connect using a laptop or mobile phone and input new WiFi credentials.
+[DOWNLOAD]: https://github.com/resin-io/resin-wifi-connect/releases/latest
+[MILESTONES]: https://github.com/resin-io/resin-wifi-connect/milestones
 
-The Access Points's name (SSID) is, by default, "ResinAP". You can change this by setting the `PORTAL_SSID` environment variable. By default, the network is unprotected, but you can add a WPA2 passphrase by setting the `PORTAL_PASSPHRASE` environment variable.
+![How it works](./docs/images/how-it-works.png?raw=true)
 
-When you connect to the Access Point, any web page you open will be redirected to our captive portal page, where you can select the SSID and passphrase of the WiFi network to connect to. After this, the app will disable the Access Point and try to connect. If the connection fails, it will enable the Access Point for you to try again. If it succeeds, the configuration will be saved by Network Manager.
+How it works
+------------
 
-An important detail is that by default, the project will not attempt to enter Access Point mode if a successful configuration has happened in the past. This means that if you go through the process and then move the device to a different network, it will be trying to connect forever. It is left to the user application to decide which is the appropriate condition to re-enter Access Point mode. This can be "been offline for more than 1 day" or "user pushed the reset button" or something else. To re-enter access point mode, simply run `resin-wifi-connect --clear=true`.
+WiFi Connect interacts with NetworkManager, which should be the active network manager on the device's host OS.
 
-For a complete list of command line arguments and environment variables check out our [Command Line Arguments](https://github.com/resin-io/resin-wifi-connect/wiki/Command-Line-Arguments) guide.
+### 1. Scan
 
-## State flow diagram
-![State flow diagram](./images/flow.png?raw=true)
+If a connection cannot be made WiFi Connect scans for available WiFi networks.
 
+### 2. Access Point
 
-## Supported boards / dongles
-This app has been successfully tested using the following WiFi dongles:
+WiFi Connect opens an access point with a captive portal. Connecting to this access point with a laptop or mobile phone allows new WiFi credentials to be configured.
+
+### 3. Connect
+
+The access point SSID is, by default, `WiFi Connect`. It can be changed by setting the `PORTAL_SSID` environment variable (see [this guide](https://docs.resin.io/management/env-vars/) for how to manage environment variables). By default, the network is unprotected, but a WPA2 passphrase can be added by setting the `PORTAL_PASSPHRASE` environment variable.
+
+Connect to the opened access point on the device from your mobile phone or laptop. After connecting to the access point from a mobile phone, it will detect the captive portal and open its web page. Opening any web page will redirect to the captive portal as well.
+
+### 4. Captive Portal
+
+After connecting to the access point, WiFi Connect will open a captive portal, which provides the option to select a WiFi SSID and passphrase for the desired network.
+
+### 5. Internet
+
+When the network credentials have been entered, WiFi Connect will disable the access point and try to connect to the network. If the connection fails, it will enable the access point for another attempt. If it succeeds, the configuration will be saved by NetworkManager.
+
+---
+
+By default, WiFi Connect will not attempt to enter access point mode if a successful network connection has been made before. If the device is moved to a new network, it will continue trying to connect to the previous network. The user application is responsible for specifying an appropriate condition for returning to access point mode. This could be "offline for more than 1 day", "user pushed the reset button", or any other actionable state. To re-enter access point mode, the application should run the command `wifi-connect --clear=true`.
+
+For a complete list of command line arguments and environment variables check out our [command line arguments](./docs/command-line-arguments.md) guide.
+
+The full application flow is illustrated in the [state flow diagram](./docs/state-flow-diagram.md).
+
+***
+
+How to use
+----------
+
+WiFi Connect is designed to be integrated with a [resin.io](http://resin.io) application. (New to resin.io? Check out the [Getting Started Guide](http://docs.resin.io/#/pages/installing/gettingStarted.md).) This integration is accomplished through the use of two shared files:
+- The [Dockerfile template](./Dockerfile.template) manages dependencies. The example included here has everything necessary for WiFi Connect. Application dependencies need to be added. For help with Dockerfiles, take a look at this [guide](https://docs.resin.io/deployment/dockerfile/).
+- The [start script](./start) should contain the commands that run the application. Adding these commands after [line 5](./start#L5) will ensure that everything kicks off after WiFi is correctly configured. 
+An example of using WiFi Connect in a Python project can be found [here](https://github.com/resin-io-projects/resin-wifi-connect-example).
+
+***
+
+Supported boards / dongles
+--------------------------
+
+WiFi Connect has been successfully tested using the following WiFi dongles:
 
 Dongle                                     | Chip
 -------------------------------------------|-------------------
@@ -39,11 +81,11 @@ Dongle                                     | Chip
 [ModMyPi](http://bit.ly/1gY3IHF)           | Ralink RT3070
 [ThePiHut](http://bit.ly/1LfkCgZ)          | Ralink RT5370
 
-The app has also been successfully tested on RaspberryPi 3 with its onboard wifi.
+It has also been successfully tested with the onboard WiFi on a Raspberry Pi 3.
 
 Given these results, it is probable that most dongles with *Atheros* or *Ralink* chipsets will work.
 
-The following dongles are known **not** to work (as the driver is not friendly with Access Point mode or Network Manager):
+The following dongles are known **not** to work (as the driver is not friendly with access point mode or NetworkManager):
 
 * Official Raspberry Pi dongle (BCM43143 chip)
 * Addon NWU276 (Mediatek MT7601 chip)
@@ -51,13 +93,19 @@ The following dongles are known **not** to work (as the driver is not friendly w
 
 Dongles with similar chipsets will probably not work.
 
-This app is expected to work with other Resin supported boards as long as you use the correct dongles.
+WiFi Connect is expected to work with all resin.io supported boards as long as they have the compatible dongles.
 
-Please [contact us](https://resin.io/community/) or raise [an issue](https://github.com/resin-io/resin-wifi-connect/issues) if you hit any trouble.
+***
 
-## FAQ
-* *What is the state of Linux networking before the start script is executed?*
-If the device is plugged in over Ethernet it will have an internet connection, if the device is using WiFi only it will not have an internet connection until the start script has completed.
+Support
+-------
 
-* *How long will this app attempt to connect to a configured connection for?*
-The connection timeout is set to 15 seconds.
+If you're having any problem, please [raise an issue](https://github.com/resin-io/resin-wifi-connect/issues/new) on GitHub or [contact us](https://resin.io/community/), and the resin.io team will be happy to help.
+
+***
+
+License
+-------
+
+WiFi Connect is free software, and may be redistributed under the terms specified in
+the [license](https://github.com/resin-io/resin-wifi-connect/blob/master/LICENSE).

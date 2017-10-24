@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 const DEFAULT_GATEWAY: &str = "192.168.42.1";
 const DEFAULT_DHCP_RANGE: &str = "192.168.42.2,192.168.42.254";
-const DEFAULT_SSID: &str = "ResinAP";
+const DEFAULT_SSID: &str = "WiFi Connect";
 const DEFAULT_TIMEOUT_MS: &str = "15000";
 const DEFAULT_UI_PATH: &str = "public";
 

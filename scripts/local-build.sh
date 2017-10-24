@@ -17,4 +17,4 @@ docker build -t $TARGET scripts/docker/$TARGET
 
 cross cargo build --release --target=$TARGET
 
-cross cross-strip target/$TARGET/release/resin-wifi-connect
+cross cross-strip target/$TARGET/release/wifi-connect
