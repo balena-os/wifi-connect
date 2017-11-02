@@ -1,6 +1,6 @@
 [root]
-name = "resin-wifi-connect"
-version = "2.1.0"
+name = "wifi-connect"
+version = "3.0.0"
 dependencies = [
  "clap 2.26.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clippy 0.0.149 (registry+https://github.com/rust-lang/crates.io-index)",

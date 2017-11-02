@@ -3,7 +3,7 @@ defaults: &defaults
     - image: majorz/$TARGET
 
       environment:
-        BINARY: resin-wifi-connect
+        BINARY: wifi-connect
         TARGET_OS: linux
 
   steps:
