@@ -4,6 +4,7 @@ use std::env;
 use std::net::Ipv4Addr;
 use std::str::FromStr;
 use std::path::PathBuf;
+use std::ffi::OsStr;
 
 const DEFAULT_GATEWAY: &str = "192.168.42.1";
 const DEFAULT_DHCP_RANGE: &str = "192.168.42.2,192.168.42.254";
@@ -124,12 +125,7 @@ pub fn get_config() -> Config {
         String::from,
     )).expect("Cannot parse connect timeout") / 1000;
 
-    let ui_path: PathBuf = matches.value_of("ui-path").map_or_else(
-        || {
-            PathBuf::from(&env::var("UI_PATH").unwrap_or_else(|_| DEFAULT_UI_PATH.to_string()))
-        },
-        PathBuf::from,
-    );
+    let ui_path = get_ui_path(matches.value_of("ui-path"));
 
     Config {
         interface: interface,
@@ -141,4 +137,53 @@ pub fn get_config() -> Config {
         timeout: timeout,
         ui_path: ui_path,
     }
+}
+
+fn get_ui_path(cmd_ui_path: Option<&str>) -> PathBuf {
+    if let Some(ui_path) = cmd_ui_path {
+        return PathBuf::from(ui_path);
+    }
+    
+    if let Ok(ui_path) = env::var("UI_PATH") {
+        return PathBuf::from(ui_path);
+    }
+
+    if let Some(install_ui_path) = get_install_ui_path() {
+        return install_ui_path;
+    }
+    
+    PathBuf::from(DEFAULT_UI_PATH)
+}
+
+
+/// Checks whether `WiFi Connect` is running from install path and whether the
+/// UI directory is present in a corresponding location
+/// e.g. /usr/local/sbin/wifi-connect -> /usr/local/share/wifi-connect/ui
+fn get_install_ui_path() -> Option<PathBuf> {
+    if let Ok(exe_path) = env::current_exe() {
+        if let Ok(mut path) = exe_path.canonicalize() {
+            path.pop();
+
+            match path.file_name() {
+                Some(file_name) => {
+                    if file_name != OsStr::new("sbin") {
+                        // not executing from `sbin` folder 
+                        return None;
+                    }
+                },
+                None => return None
+            }
+
+            path.pop();
+            path.push("share");
+            path.push(env!("CARGO_PKG_NAME"));
+            path.push("ui");
+
+            if path.is_dir() {
+                return Some(path);
+            }
+        }
+    }
+
+    None
 }
