@@ -1,6 +1,6 @@
 [package]
 name = "wifi-connect"
-version = "3.0.1"
+version = "3.0.2"
 authors = ["Zahari Petkov <zahari@resin.io>"]
 description = "Wi-Fi credentials configuration tool"
 
