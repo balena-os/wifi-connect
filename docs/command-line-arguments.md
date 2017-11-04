@@ -12,25 +12,37 @@
 
 ## Options
 
-Most command line options have environment variable counterpart. If both a command line option and its environment variable counterpart are defined, the command line option will take higher precedence.
+Command line options have environment variable counterpart. If both a command line option and its environment variable counterpart are defined, the command line option will take higher precedence.
 
 *   **-c, --clear** true|false
 
-    Clear saved Wi-Fi credentials
+    Clear saved WiFi credentials
 
     Default: _true_
 
-*   **-i, --interface** interface, **$PORTAL_INTERFACE**
+*   **-d, --portal-dhcp-range** dhcp_range, **$PORTAL_DHCP_RANGE**
+
+    Portal DHCP range
+
+    Default: _192.168.42.2,192.168.42.254_
+
+*   **-g, --portal-gateway** gateway, **$PORTAL_GATEWAY**
+
+    Portal gateway
+
+    Default: _192.168.42.1_
+
+*   **-i, --portal-interface** interface, **$PORTAL_INTERFACE**
 
     Portal interface
 
-*   **-p, --password** password, **$PORTAL_PASSPHRASE**
+*   **-p, --portal-passphrase** passphrase, **$PORTAL_PASSPHRASE**
 
-    Portal password
+    Portal passphrase
 
     Default:
 
-*   **-s, --ssid** ssid, **$PORTAL_SSID**
+*   **-s, --portal-ssid** ssid, **$PORTAL_SSID**
 
     Portal SSID
 
@@ -47,15 +59,3 @@ Most command line options have environment variable counterpart. If both a comma
     Web UI directory location
 
     Default: _public_
-
-*   **$PORTAL_GATEWAY**
-
-    Portal gateway
-
-    Default: _192.168.42.1_
-
-*   **$PORTAL_DHCP_RANGE**
-
-    Portal DHCP range
-
-    Default: _192.168.42.2,192.168.42.254_
