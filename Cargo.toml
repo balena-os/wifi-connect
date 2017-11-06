@@ -1,8 +1,8 @@
 [package]
 name = "wifi-connect"
-version = "3.0.2"
-authors = ["Zahari Petkov <zahari@resin.io>"]
-description = "Wi-Fi credentials configuration tool"
+version = "3.0.3"
+authors = ["Zahari Petkov <zahari@resin.io>", "Aaron Brodersen <aaron@resin.io>"]
+description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
 
 [dependencies]
 network-manager = "0.8"

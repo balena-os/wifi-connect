@@ -15,7 +15,7 @@ use server::start_server;
 
 pub enum NetworkCommand {
     Activate,
-    Connect { ssid: String, password: String },
+    Connect { ssid: String, passphrase: String },
 }
 
 pub enum NetworkCommandResponse {
@@ -41,14 +41,14 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
         },
     };
 
-    let hotspot_ssid = &config.ssid;
-    let hotspot_password = config.password.as_ref().map(|p| p as &str);
+    let portal_ssid = &config.ssid;
+    let portal_passphrase = config.passphrase.as_ref().map(|p| p as &str);
 
-    let mut hotspot_connection =
-        match create_hotspot(&device, &config.ssid, &config.gateway, &hotspot_password) {
+    let mut portal_connection =
+        match create_portal(&device, &config.ssid, &config.gateway, &portal_passphrase) {
             Ok(connection) => Some(connection),
             Err(e) => {
-                return exit(exit_tx, format!("Creating the hotspot failed: {}", e));
+                return exit(exit_tx, format!("Creating the access point failed: {}", e));
             },
         };
 
@@ -73,8 +73,8 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
                 return exit_with_error(
                     exit_tx,
                     dnsmasq,
-                    hotspot_connection,
-                    hotspot_ssid,
+                    portal_connection,
+                    portal_ssid,
                     format!("Receiving network command failed: {}", e.description()),
                 );
             },
@@ -91,8 +91,8 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
                     return exit_with_error(
                         exit_tx,
                         dnsmasq,
-                        hotspot_connection,
-                        hotspot_ssid,
+                        portal_connection,
+                        portal_ssid,
                         format!(
                             "Sending access point ssids results failed: {}",
                             e.description()
@@ -102,20 +102,20 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
             },
             NetworkCommand::Connect {
                 ssid,
-                password,
+                passphrase,
             } => {
-                if let Some(connection) = hotspot_connection {
-                    let result = stop_hotspot(&connection, &config.ssid);
+                if let Some(connection) = portal_connection {
+                    let result = stop_portal(&connection, &config.ssid);
                     if let Err(e) = result {
                         return exit_with_error(
                             exit_tx,
                             dnsmasq,
                             Some(connection),
-                            hotspot_ssid,
-                            format!("Stopping the hotspot failed: {}", e),
+                            portal_ssid,
+                            format!("Stopping the access point failed: {}", e),
                         );
                     }
-                    hotspot_connection = None;
+                    portal_connection = None;
                 }
 
                 access_points = match get_access_points(&device) {
@@ -124,8 +124,8 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
                         return exit_with_error(
                             exit_tx,
                             dnsmasq,
-                            hotspot_connection,
-                            hotspot_ssid,
+                            portal_connection,
+                            portal_ssid,
                             format!("Getting access points failed: {}", e),
                         );
                     },
@@ -139,7 +139,7 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
 
                     info!("Connecting to access point '{}'...", access_point_ssid);
 
-                    match wifi_device.connect(access_point, &password as &str) {
+                    match wifi_device.connect(access_point, &passphrase as &str) {
                         Ok((connection, state)) => {
                             if state == ConnectionState::Activated {
                                 match wait_for_connectivity(&manager, config.timeout) {
@@ -150,8 +150,8 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
                                             return exit_ok(
                                                 exit_tx,
                                                 dnsmasq,
-                                                hotspot_connection,
-                                                hotspot_ssid,
+                                                portal_connection,
+                                                portal_ssid,
                                             );
                                         } else {
                                             warn!("Cannot establish connectivity");
@@ -187,27 +187,27 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
                         return exit_with_error(
                             exit_tx,
                             dnsmasq,
-                            hotspot_connection,
-                            hotspot_ssid,
+                            portal_connection,
+                            portal_ssid,
                             format!("Getting access points failed: {}", e),
                         );
                     },
                 };
 
-                hotspot_connection = match create_hotspot(
+                portal_connection = match create_portal(
                     &device,
                     &config.ssid,
                     &config.gateway,
-                    &hotspot_password,
+                    &portal_passphrase,
                 ) {
                     Ok(connection) => Some(connection),
                     Err(e) => {
                         return exit_with_error(
                             exit_tx,
                             dnsmasq,
-                            hotspot_connection,
-                            hotspot_ssid,
-                            format!("Creating the hotspot failed: {}", e),
+                            portal_connection,
+                            portal_ssid,
+                            format!("Creating the access point failed: {}", e),
                         );
                     },
                 };
@@ -228,7 +228,7 @@ pub fn handle_existing_wifi_connections(clear: bool, interface: &Option<String>)
 
     if clear {
         if let Err(err) = clear_wifi_connections(connections) {
-            error!("Clearing Wi-Fi connections failed: {}", err);
+            error!("Clearing WiFi connections failed: {}", err);
             process::exit(1);
         }
     } else if !connections.is_empty() {
@@ -281,7 +281,7 @@ fn clear_wifi_connections(connections: Vec<Connection>) -> Result<(), String> {
     for connection in connections {
         if &connection.settings().kind == "802-11-wireless" {
             info!(
-                "Deleting Wi-Fi connection profile to {:?}...",
+                "Deleting WiFi connection profile to {:?}...",
                 connection.settings().ssid,
             );
 
@@ -313,7 +313,7 @@ fn try_activate_wifi_connection(connections: Vec<Connection>) {
             Ok(state) => {
                 if state == ConnectionState::Activated {
                     info!(
-                        "Activated Wi-Fi connection to {:?}: [{}] {}",
+                        "Activated WiFi connection to {:?}: [{}] {}",
                         connection.settings().ssid,
                         connection.settings().id,
                         connection.settings().uuid
@@ -321,7 +321,7 @@ fn try_activate_wifi_connection(connections: Vec<Connection>) {
                     process::exit(0);
                 } else {
                     debug!(
-                        "Cannot activate Wi-Fi connection to {:?}: [{}] {}",
+                        "Cannot activate WiFi connection to {:?}: [{}] {}",
                         connection.settings().ssid,
                         connection.settings().id,
                         connection.settings().uuid
@@ -329,12 +329,12 @@ fn try_activate_wifi_connection(connections: Vec<Connection>) {
                 }
             },
             Err(err) => {
-                warn!("Activating existing Wi-Fi connection failed: {}", err);
+                warn!("Activating existing WiFi connection failed: {}", err);
             },
         }
     }
 
-    info!("Cannot activate any existing Wi-Fi connection");
+    info!("Cannot activate any existing WiFi connection");
     process::exit(0);
 }
 
@@ -343,10 +343,10 @@ pub fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Resu
         let device = manager.get_device_by_interface(interface)?;
 
         if *device.device_type() == DeviceType::WiFi {
-            info!("Targeted Wi-Fi device: {}", interface);
+            info!("Targeted WiFi device: {}", interface);
             Ok(device)
         } else {
-            Err(format!("Not a Wi-Fi device: {}", interface))
+            Err(format!("Not a WiFi device: {}", interface))
         }
     } else {
         let devices = manager.get_devices()?;
@@ -356,10 +356,10 @@ pub fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Resu
         );
 
         if let Some(index) = index {
-            info!("Wi-Fi device: {}", devices[index].interface());
+            info!("WiFi device: {}", devices[index].interface());
             Ok(devices[index].clone())
         } else {
-            Err("Cannot find a Wi-Fi device".to_string())
+            Err("Cannot find a WiFi device".to_string())
         }
     }
 }
@@ -419,25 +419,29 @@ fn find_access_point<'a>(
     None
 }
 
-fn create_hotspot(
+fn create_portal(
     device: &Device,
     ssid: &str,
     gateway: &Ipv4Addr,
-    password: &Option<&str>,
+    passphrase: &Option<&str>,
 ) -> Result<Connection, String> {
-    info!("Creating hotspot...");
+    info!("Starting access point...");
     let wifi_device = device.as_wifi_device().unwrap();
-    let (hotspot_connection, _) = wifi_device.create_hotspot(ssid, *password, Some(*gateway))?;
-    info!("Hotspot '{}' created", ssid);
-    Ok(hotspot_connection)
+    let (portal_connection, _) = wifi_device.create_hotspot(
+        ssid,
+        *passphrase,
+        Some(*gateway),
+    )?;
+    info!("Access point '{}' created", ssid);
+    Ok(portal_connection)
 }
 
-fn stop_hotspot(connection: &Connection, ssid: &str) -> Result<(), String> {
-    info!("Stopping hotspot '{}'...", ssid);
+fn stop_portal(connection: &Connection, ssid: &str) -> Result<(), String> {
+    info!("Stopping access point '{}'...", ssid);
     connection.deactivate()?;
     connection.delete()?;
     thread::sleep(Duration::from_secs(1));
-    info!("Hotspot '{}' stopped", ssid);
+    info!("Access point '{}' stopped", ssid);
     Ok(())
 }
 
@@ -470,7 +474,7 @@ fn exit_with_result(
     let _ = dnsmasq.kill();
 
     if let Some(connection) = connection {
-        let _ = stop_hotspot(&connection, ssid);
+        let _ = stop_portal(&connection, ssid);
     }
 
     let _ = exit_tx.send(result);
