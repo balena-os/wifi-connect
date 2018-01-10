@@ -1,4 +1,4 @@
-use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc::{Receiver, Sender};
 use std::error::Error;
 use std::fmt;
 use std::net::Ipv4Addr;
@@ -6,14 +6,14 @@ use std::net::Ipv4Addr;
 use serde_json;
 use path::PathBuf;
 use iron::prelude::*;
-use iron::{Iron, Request, Response, IronResult, status, typemap, IronError, Url, AfterMiddleware,
-           headers};
+use iron::{headers, status, typemap, AfterMiddleware, Iron, IronError, IronResult, Request,
+           Response, Url};
 use iron::modifiers::Redirect;
 use router::Router;
 use staticfile::Static;
 use mount::Mount;
 use persistent::Write;
-use params::{Params, FromValue};
+use params::{FromValue, Params};
 
 use network::{NetworkCommand, NetworkCommandResponse};
 use {exit, ExitResult};
@@ -155,7 +155,11 @@ pub fn start_server(
     if let Err(e) = Iron::new(chain).http(&address) {
         exit(
             &exit_tx_clone,
-            format!("Cannot start HTTP server on '{}': {}", &address, e.description()),
+            format!(
+                "Cannot start HTTP server on '{}': {}",
+                &address,
+                e.description()
+            ),
         );
     }
 }
@@ -168,32 +172,35 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
     if let Err(err) = request_state.network_tx.send(NetworkCommand::Activate) {
         exit_with_error!(
             request_state,
-            format!("Sending NetworkCommand::Activate failed: {}", err.description())
+            format!(
+                "Sending NetworkCommand::Activate failed: {}",
+                err.description()
+            )
         );
     }
 
     let access_points_ssids = match request_state.server_rx.recv() {
-        Ok(result) => {
-            match result {
-                NetworkCommandResponse::AccessPointsSsids(ssids) => ssids,
-            }
+        Ok(result) => match result {
+            NetworkCommandResponse::AccessPointsSsids(ssids) => ssids,
         },
-        Err(err) => {
-            exit_with_error!(
-                request_state,
-                format!("Receiving access points ssids failed: {}", err.description())
+        Err(err) => exit_with_error!(
+            request_state,
+            format!(
+                "Receiving access points ssids failed: {}",
+                err.description()
             )
-        },
+        ),
     };
 
     let access_points_json = match serde_json::to_string(&access_points_ssids) {
         Ok(json) => json,
-        Err(err) => {
-            exit_with_error!(
-                request_state,
-                format!("Receiving access points ssids failed: {}", err.description())
+        Err(err) => exit_with_error!(
+            request_state,
+            format!(
+                "Receiving access points ssids failed: {}",
+                err.description()
             )
-        },
+        ),
     };
 
     Ok(Response::with((status::Ok, access_points_json)))
@@ -219,7 +226,10 @@ fn connect(req: &mut Request) -> IronResult<Response> {
     if let Err(err) = request_state.network_tx.send(command) {
         exit_with_error!(
             request_state,
-            format!("Sending NetworkCommand::Connect failed: {}", err.description())
+            format!(
+                "Sending NetworkCommand::Connect failed: {}",
+                err.description()
+            )
         );
     }
 

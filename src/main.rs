@@ -1,18 +1,18 @@
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature = "clippy", feature(plugin))]
+#![cfg_attr(feature = "clippy", plugin(clippy))]
 
+extern crate clap;
+extern crate env_logger;
+extern crate iron;
 #[macro_use]
 extern crate log;
-extern crate env_logger;
-extern crate clap;
-extern crate network_manager;
-extern crate iron;
-extern crate router;
-extern crate staticfile;
 extern crate mount;
-extern crate serde_json;
-extern crate persistent;
+extern crate network_manager;
 extern crate params;
+extern crate persistent;
+extern crate router;
+extern crate serde_json;
+extern crate staticfile;
 
 mod config;
 mod network;
@@ -26,7 +26,7 @@ use std::thread;
 use std::sync::mpsc::{channel, Sender};
 
 use config::get_config;
-use network::{process_network_commands, handle_existing_wifi_connections,
+use network::{handle_existing_wifi_connections, process_network_commands,
               start_network_manager_service};
 
 pub type ExitResult = Result<(), String>;
@@ -46,14 +46,14 @@ fn main() {
 
     let (exit_tx, exit_rx) = channel();
 
-    thread::spawn(move || { process_network_commands(&config, &exit_tx); });
+    thread::spawn(move || {
+        process_network_commands(&config, &exit_tx);
+    });
 
     match exit_rx.recv() {
-        Ok(result) => {
-            match result {
-                Err(reason) => error!("{}", reason),
-                Ok(_) => info!("Connection successfully established"),
-            }
+        Ok(result) => match result {
+            Err(reason) => error!("{}", reason),
+            Ok(_) => info!("Connection successfully established"),
         },
         Err(e) => error!("Exit receiver error: {}", e.description()),
     }
