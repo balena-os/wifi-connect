@@ -1,5 +1,5 @@
 use std::env;
-use log::{LogRecord, LogLevelFilter, LogLevel};
+use log::{LogLevel, LogLevelFilter, LogRecord};
 use env_logger::LogBuilder;
 
 pub fn init() {
@@ -8,10 +8,17 @@ pub fn init() {
     if env::var("RUST_LOG").is_ok() {
         builder.parse(&env::var("RUST_LOG").unwrap());
     } else {
-        let format = |record: &LogRecord| if record.level() == LogLevel::Info {
-            format!("{}", record.args())
-        } else {
-            format!("[{}:{}] {}", record.location().module_path(), record.level(), record.args())
+        let format = |record: &LogRecord| {
+            if record.level() == LogLevel::Info {
+                format!("{}", record.args())
+            } else {
+                format!(
+                    "[{}:{}] {}",
+                    record.location().module_path(),
+                    record.level(),
+                    record.args()
+                )
+            }
         };
 
         builder.format(format).filter(None, LogLevelFilter::Info);

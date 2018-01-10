@@ -1,4 +1,4 @@
-use clap::{Arg, App};
+use clap::{App, Arg};
 
 use std::env;
 use std::net::Ipv4Addr;
@@ -95,49 +95,35 @@ pub fn get_config() -> Config {
         .get_matches();
 
     let interface: Option<String> = matches.value_of("portal-interface").map_or_else(
-        || {
-            env::var("PORTAL_INTERFACE").ok()
-        },
+        || env::var("PORTAL_INTERFACE").ok(),
         |v| Some(v.to_string()),
     );
 
     let ssid: String = matches.value_of("portal-ssid").map_or_else(
-        || {
-            env::var("PORTAL_SSID").unwrap_or_else(|_| DEFAULT_SSID.to_string())
-        },
+        || env::var("PORTAL_SSID").unwrap_or_else(|_| DEFAULT_SSID.to_string()),
         String::from,
     );
 
     let passphrase: Option<String> = matches.value_of("portal-passphrase").map_or_else(
-        || {
-            env::var("PORTAL_PASSPHRASE").ok()
-        },
+        || env::var("PORTAL_PASSPHRASE").ok(),
         |v| Some(v.to_string()),
     );
 
     let clear = matches.value_of("clear").map_or(true, |v| !(v == "false"));
 
     let gateway = Ipv4Addr::from_str(&matches.value_of("portal-gateway").map_or_else(
-        || {
-
-            env::var("PORTAL_GATEWAY").unwrap_or_else(|_| DEFAULT_GATEWAY.to_string())
-        },
+        || env::var("PORTAL_GATEWAY").unwrap_or_else(|_| DEFAULT_GATEWAY.to_string()),
         String::from,
     )).expect("Cannot parse gateway address");
 
     let dhcp_range = matches.value_of("portal-dhcp-range").map_or_else(
-        || {
-            env::var("PORTAL_DHCP_RANGE").unwrap_or_else(|_| DEFAULT_DHCP_RANGE.to_string())
-        },
+        || env::var("PORTAL_DHCP_RANGE").unwrap_or_else(|_| DEFAULT_DHCP_RANGE.to_string()),
         String::from,
     );
 
     // TODO: network_manager receives the timeout in seconds, should be ms instead.
     let timeout = u64::from_str(&matches.value_of("timeout").map_or_else(
-        || {
-
-            env::var("CONNECT_TIMEOUT").unwrap_or_else(|_| DEFAULT_TIMEOUT_MS.to_string())
-        },
+        || env::var("CONNECT_TIMEOUT").unwrap_or_else(|_| DEFAULT_TIMEOUT_MS.to_string()),
         String::from,
     )).expect("Cannot parse connect timeout") / 1000;
 
@@ -170,7 +156,6 @@ fn get_ui_path(cmd_ui_path: Option<&str>) -> PathBuf {
 
     PathBuf::from(DEFAULT_UI_PATH)
 }
-
 
 /// Checks whether `WiFi Connect` is running from install path and whether the
 /// UI directory is present in a corresponding location
