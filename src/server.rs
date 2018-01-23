@@ -122,7 +122,7 @@ pub fn start_server(
     server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
     exit_tx: Sender<ExitResult>,
-    ui_path: &PathBuf,
+    ui_directory: &PathBuf,
 ) {
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
@@ -134,15 +134,15 @@ pub fn start_server(
     };
 
     let mut router = Router::new();
-    router.get("/", Static::new(ui_path), "index");
+    router.get("/", Static::new(ui_directory), "index");
     router.get("/ssid", ssid, "ssid");
     router.post("/connect", connect, "connect");
 
     let mut assets = Mount::new();
     assets.mount("/", router);
-    assets.mount("/css", Static::new(&ui_path.join("css")));
-    assets.mount("/img", Static::new(&ui_path.join("img")));
-    assets.mount("/js", Static::new(&ui_path.join("js")));
+    assets.mount("/css", Static::new(&ui_directory.join("css")));
+    assets.mount("/img", Static::new(&ui_directory.join("img")));
+    assets.mount("/js", Static::new(&ui_directory.join("js")));
 
     let mut chain = Chain::new(assets);
     chain.link(Write::<RequestSharedState>::both(request_state));
@@ -165,7 +165,7 @@ pub fn start_server(
 }
 
 fn ssid(req: &mut Request) -> IronResult<Response> {
-    debug!("Incoming `ssid` request");
+    info!("User connected to the captive portal");
 
     let request_state = get_request_state!(req);
 
@@ -197,7 +197,7 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
         Err(err) => exit_with_error!(
             request_state,
             format!(
-                "Receiving access points ssids failed: {}",
+                "Serializing access points ssids failed: {}",
                 err.description()
             )
         ),

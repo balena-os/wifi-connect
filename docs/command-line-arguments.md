@@ -14,48 +14,42 @@
 
 Command line options have environment variable counterpart. If both a command line option and its environment variable counterpart are defined, the command line option will take higher precedence.
 
-*   **-c, --clear** true|false
-
-    Clear saved WiFi credentials
-
-    Default: _true_
-
 *   **-d, --portal-dhcp-range** dhcp_range, **$PORTAL_DHCP_RANGE**
 
-    Portal DHCP range
+    DHCP range of the captive portal WiFi network
 
     Default: _192.168.42.2,192.168.42.254_
 
 *   **-g, --portal-gateway** gateway, **$PORTAL_GATEWAY**
 
-    Portal gateway
+    Gateway of the captive portal WiFi network
 
     Default: _192.168.42.1_
 
 *   **-i, --portal-interface** interface, **$PORTAL_INTERFACE**
 
-    Portal interface
+    Wireless network interface to be used by WiFi Connect
 
 *   **-p, --portal-passphrase** passphrase, **$PORTAL_PASSPHRASE**
 
-    Portal passphrase
+    WPA2 Passphrase of the captive portal WiFi network
 
-    Default:
+    Default: _no passphrase_
 
 *   **-s, --portal-ssid** ssid, **$PORTAL_SSID**
 
-    Portal SSID
+    SSID of the captive portal WiFi network
 
     Default: _WiFi Connect_
 
-*   **-t, --timeout** timeout, **$CONNECT_TIMEOUT**
+*   **-a, --activity-timeout** timeout, **$ACTIVITY_TIMEOUT**
 
-    Connect timeout (milliseconds)
+    Exit if no activity for the specified timeout (seconds)
 
-    Default: _15000_
+    Default: _0 - no timeout_
 
-*   **-u, --ui-path** ui_path, **$UI_PATH**
+*   **-u, --ui-directory** ui_directory, **$UI_DIRECTORY**
 
     Web UI directory location
 
-    Default: _public_
+    Default: _ui_

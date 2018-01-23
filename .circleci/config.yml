@@ -31,7 +31,7 @@ build: &build
 
     - run: mkdir -p pack /tmp/dist
     - run: mv target/$TARGET/release/$BINARY pack/$BINARY
-    - run: cp -R public pack/public
+    - run: cp -R ui pack/ui
     - run: tar -czvf $ARCHIVE_PATH -C pack .
     - run: rm -rdf pack
 
