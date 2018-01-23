@@ -26,8 +26,7 @@ use std::thread;
 use std::sync::mpsc::{channel, Sender};
 
 use config::get_config;
-use network::{handle_existing_wifi_connections, process_network_commands,
-              start_network_manager_service};
+use network::{init_networking, process_network_commands};
 
 pub type ExitResult = Result<(), String>;
 
@@ -40,9 +39,7 @@ fn main() {
 
     let config = get_config();
 
-    start_network_manager_service();
-
-    handle_existing_wifi_connections(config.clear, &config.interface);
+    init_networking();
 
     let (exit_tx, exit_rx) = channel();
 
@@ -51,9 +48,8 @@ fn main() {
     });
 
     match exit_rx.recv() {
-        Ok(result) => match result {
-            Err(reason) => error!("{}", reason),
-            Ok(_) => info!("Connection successfully established"),
+        Ok(result) => if let Err(reason) = result {
+            error!("{}", reason);
         },
         Err(e) => error!("Exit receiver error: {}", e.description()),
     }

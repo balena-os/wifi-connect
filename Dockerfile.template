@@ -3,11 +3,9 @@ FROM resin/%%RESIN_MACHINE_NAME%%-debian
 ENV INITSYSTEM on
 
 RUN apt-get update \
-    && apt-get install -y dnsmasq \
+    && apt-get install -y dnsmasq wireless-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /usr/src/app/
 
 WORKDIR /usr/src/app
 
@@ -16,6 +14,6 @@ RUN curl https://api.github.com/repos/resin-io/resin-wifi-connect/releases/lates
     | xargs -n1 curl -Ls \
     | tar -xvz -C /usr/src/app/
 
-COPY start .
+COPY scripts/start.sh .
 
-CMD ["bash", "start"]
+CMD ["bash", "start.sh"]
