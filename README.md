@@ -66,7 +66,7 @@ WiFi Connect depends on NetworkManager, but by default Raspbian Stretch uses dhc
 
 Run the following in your terminal, then follow the onscreen instructions:
 
-`curl https://raw.githubusercontent.com/resin-io/resin-wifi-connect/master/scripts/raspbian-install.sh -sSf | bash`
+`curl https://github.com/resin-io/resin-wifi-connect/raw/master/scripts/raspbian-install.sh -sSfL | bash`
 
 ### resinOS
 
