@@ -93,6 +93,12 @@ activate_network_manager() {
         ensure sudo apt-get install -y network-manager
 
         ensure sudo apt-get clean
+        
+        say 'Activating NetworkManager...'
+
+        ensure sudo systemctl enable NetworkManager
+
+        ensure sudo systemctl start NetworkManager
     else
         say 'NetworkManager is already installed'
 
