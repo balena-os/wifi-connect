@@ -5,7 +5,7 @@ authors = ["Zahari Petkov <zahari@resin.io>", "Aaron Brodersen <aaron@resin.io>"
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
 
 [dependencies]
-network-manager = "0.8"
+network-manager = "0.9"
 clap = "2.24"
 iron = "0.5"
 staticfile = "0.4"
@@ -16,6 +16,10 @@ persistent = "0.3"
 params = "0.6"
 log = "0.3"
 env_logger = "0.4"
+
+[dependencies.error-chain]
+version = "0.11"
+default-features = false
 
 [dependencies.clippy]
 version = "*"
