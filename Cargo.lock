@@ -945,7 +945,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "wifi-connect"
-version = "4.0.0"
+version = "4.0.4"
 dependencies = [
  "clap 2.29.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clippy 0.0.179 (registry+https://github.com/rust-lang/crates.io-index)",

@@ -1,7 +1,7 @@
 use std::sync::mpsc::{Receiver, Sender};
-use std::error::Error;
 use std::fmt;
 use std::net::Ipv4Addr;
+use std::error::Error as StdError;
 
 use serde_json;
 use path::PathBuf;
@@ -15,6 +15,7 @@ use mount::Mount;
 use persistent::Write;
 use params::{FromValue, Params};
 
+use errors::*;
 use network::{NetworkCommand, NetworkCommandResponse};
 use {exit, ExitResult};
 
@@ -38,7 +39,7 @@ impl fmt::Display for StringError {
     }
 }
 
-impl Error for StringError {
+impl StdError for StringError {
     fn description(&self) -> &str {
         &*self.0
     }
@@ -88,13 +89,17 @@ macro_rules! get_request_state {
     )
 }
 
-macro_rules! exit_with_error {
-    ($state:ident, $desc:expr) => (
-        {
-            exit(&$state.exit_tx, $desc.clone());
-            return Err(IronError::new(StringError($desc), status::InternalServerError));
-        }
-    )
+fn exit_with_error<E>(state: &RequestSharedState, e: E, e_kind: ErrorKind) -> IronResult<Response>
+where
+    E: ::std::error::Error + Send + 'static,
+{
+    let description = e_kind.description().into();
+    let err = Err::<Response, E>(e).chain_err(|| e_kind);
+    exit(&state.exit_tx, err.unwrap_err());
+    Err(IronError::new(
+        StringError(description),
+        status::InternalServerError,
+    ))
 }
 
 struct RedirectMiddleware;
@@ -155,11 +160,7 @@ pub fn start_server(
     if let Err(e) = Iron::new(chain).http(&address) {
         exit(
             &exit_tx_clone,
-            format!(
-                "Cannot start HTTP server on '{}': {}",
-                &address,
-                e.description()
-            ),
+            ErrorKind::StartHTTPServer(address, e.description().into()).into(),
         );
     }
 }
@@ -169,38 +170,20 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
 
     let request_state = get_request_state!(req);
 
-    if let Err(err) = request_state.network_tx.send(NetworkCommand::Activate) {
-        exit_with_error!(
-            request_state,
-            format!(
-                "Sending NetworkCommand::Activate failed: {}",
-                err.description()
-            )
-        );
+    if let Err(e) = request_state.network_tx.send(NetworkCommand::Activate) {
+        return exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandActivate);
     }
 
     let access_points_ssids = match request_state.server_rx.recv() {
         Ok(result) => match result {
             NetworkCommandResponse::AccessPointsSsids(ssids) => ssids,
         },
-        Err(err) => exit_with_error!(
-            request_state,
-            format!(
-                "Receiving access points ssids failed: {}",
-                err.description()
-            )
-        ),
+        Err(e) => return exit_with_error(&request_state, e, ErrorKind::RecvAccessPointSSIDs),
     };
 
     let access_points_json = match serde_json::to_string(&access_points_ssids) {
         Ok(json) => json,
-        Err(err) => exit_with_error!(
-            request_state,
-            format!(
-                "Serializing access points ssids failed: {}",
-                err.description()
-            )
-        ),
+        Err(e) => return exit_with_error(&request_state, e, ErrorKind::SerializeAccessPointSSIDs),
     };
 
     Ok(Response::with((status::Ok, access_points_json)))
@@ -223,15 +206,9 @@ fn connect(req: &mut Request) -> IronResult<Response> {
         passphrase: passphrase,
     };
 
-    if let Err(err) = request_state.network_tx.send(command) {
-        exit_with_error!(
-            request_state,
-            format!(
-                "Sending NetworkCommand::Connect failed: {}",
-                err.description()
-            )
-        );
+    if let Err(e) = request_state.network_tx.send(command) {
+        exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandConnect)
+    } else {
+        Ok(Response::with(status::Ok))
     }
-
-    Ok(Response::with(status::Ok))
 }

@@ -2,9 +2,10 @@ use std::process::{Child, Command};
 
 use network_manager::Device;
 
+use errors::*;
 use config::Config;
 
-pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child, String> {
+pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child> {
     let args = [
         &format!("--address=/#/{}", config.gateway),
         &format!("--dhcp-range={}", config.dhcp_range),
@@ -20,5 +21,5 @@ pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child, String> 
     Command::new("dnsmasq")
         .args(&args)
         .spawn()
-        .map_err(|_| "Error spawning dnsmasq".to_string())
+        .chain_err(|| ErrorKind::Dnsmasq)
 }
