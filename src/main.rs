@@ -11,6 +11,7 @@ extern crate env_logger;
 extern crate iron;
 extern crate mount;
 extern crate network_manager;
+extern crate nix;
 extern crate params;
 extern crate persistent;
 extern crate router;
@@ -23,22 +24,18 @@ mod network;
 mod server;
 mod dnsmasq;
 mod logger;
+mod exit;
 
 use std::path;
 use std::thread;
-use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::channel;
 use std::io::Write;
 use std::process;
 
 use errors::*;
 use config::get_config;
 use network::{init_networking, process_network_commands};
-
-pub type ExitResult = Result<()>;
-
-pub fn exit(exit_tx: &Sender<ExitResult>, error: Error) {
-    let _ = exit_tx.send(Err(error));
-}
+use exit::block_exit_signals;
 
 fn main() {
     if let Err(ref e) = run() {
@@ -56,6 +53,8 @@ fn main() {
 }
 
 fn run() -> Result<()> {
+    block_exit_signals()?;
+
     logger::init();
 
     let config = get_config();

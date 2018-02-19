@@ -16,6 +16,7 @@ persistent = "0.3"
 params = "0.6"
 log = "0.3"
 env_logger = "0.4"
+nix = "0.10"
 
 [dependencies.error-chain]
 version = "0.11"

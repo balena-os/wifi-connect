@@ -7,6 +7,7 @@ error_chain! {
         Io(::std::io::Error);
         Recv(::std::sync::mpsc::RecvError);
         SendNetworkCommand(::std::sync::mpsc::SendError<network::NetworkCommand>);
+        Nix(::nix::Error);
     }
 
     links {
@@ -88,6 +89,14 @@ error_chain! {
         Dnsmasq {
             description("Spawning dnsmasq failed")
         }
+
+        BlockExitSignals {
+            description("Blocking exit signals failed")
+        }
+
+        TrapExitSignals {
+            description("Trapping exit signals failed")
+        }
     }
 }
 
@@ -111,6 +120,8 @@ pub fn exit_code(e: &Error) -> i32 {
         ErrorKind::StartActiveNetworkManager => 18,
         ErrorKind::StartNetworkManager => 19,
         ErrorKind::NetworkManagerServiceState => 20,
+        ErrorKind::BlockExitSignals => 21,
+        ErrorKind::TrapExitSignals => 22,
         _ => 1,
     }
 }

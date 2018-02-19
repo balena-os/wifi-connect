@@ -17,7 +17,7 @@ use params::{FromValue, Params};
 
 use errors::*;
 use network::{NetworkCommand, NetworkCommandResponse};
-use {exit, ExitResult};
+use exit::{exit, ExitResult};
 
 struct RequestSharedState {
     gateway: Ipv4Addr,
