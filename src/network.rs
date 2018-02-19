@@ -229,7 +229,6 @@ impl NetworkCommandHandler {
     }
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
 pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
     let mut command_handler = match NetworkCommandHandler::new(config, exit_tx) {
         Ok(command_handler) => command_handler,
