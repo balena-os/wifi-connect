@@ -1,6 +1,6 @@
 [package]
 name = "wifi-connect"
-version = "4.0.4"
+version = "4.0.5"
 authors = ["Zahari Petkov <zahari@resin.io>", "Aaron Brodersen <aaron@resin.io>"]
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
 
@@ -20,10 +20,6 @@ env_logger = "0.4"
 [dependencies.error-chain]
 version = "0.11"
 default-features = false
-
-[dependencies.clippy]
-version = "*"
-optional = true
 
 [profile.release]
 lto = true
