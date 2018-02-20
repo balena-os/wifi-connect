@@ -9,7 +9,7 @@ use network_manager::{AccessPoint, Connection, ConnectionState, Connectivity, De
                       NetworkManager, ServiceState};
 
 use errors::*;
-use {exit, ExitResult};
+use exit::{exit, trap_exit_signals, ExitResult};
 use config::Config;
 use dnsmasq::start_dnsmasq;
 use server::start_server;
@@ -17,6 +17,7 @@ use server::start_server;
 pub enum NetworkCommand {
     Activate,
     Timeout,
+    Exit,
     Connect { ssid: String, passphrase: String },
 }
 
@@ -38,6 +39,10 @@ struct NetworkCommandHandler {
 
 impl NetworkCommandHandler {
     fn new(config: &Config, exit_tx: &Sender<ExitResult>) -> Result<Self> {
+        let (network_tx, network_rx) = channel();
+
+        Self::spawn_trap_exit_signals(exit_tx, network_tx.clone());
+
         let manager = NetworkManager::new();
         debug!("NetworkManager connection initialized");
 
@@ -50,7 +55,6 @@ impl NetworkCommandHandler {
         let dnsmasq = start_dnsmasq(config, &device)?;
 
         let (server_tx, server_rx) = channel();
-        let (network_tx, network_rx) = channel();
 
         Self::spawn_server(config, exit_tx, server_rx, network_tx.clone());
 
@@ -112,6 +116,21 @@ impl NetworkCommandHandler {
         });
     }
 
+    fn spawn_trap_exit_signals(exit_tx: &Sender<ExitResult>, network_tx: Sender<NetworkCommand>) {
+        let exit_tx_trap = exit_tx.clone();
+
+        thread::spawn(move || {
+            if let Err(e) = trap_exit_signals() {
+                exit(&exit_tx_trap, e);
+                return;
+            }
+
+            if let Err(err) = network_tx.send(NetworkCommand::Exit) {
+                error!("Sending NetworkCommand::Exit failed: {}", err.description());
+            }
+        });
+    }
+
     fn run(&mut self, exit_tx: &Sender<ExitResult>) {
         let result = self.run_loop();
         self.stop(exit_tx, result);
@@ -130,6 +149,10 @@ impl NetworkCommandHandler {
                         info!("Timeout reached. Exiting...");
                         return Ok(());
                     }
+                },
+                NetworkCommand::Exit => {
+                    info!("Exiting...");
+                    return Ok(());
                 },
                 NetworkCommand::Connect { ssid, passphrase } => {
                     if self.connect(&ssid, &passphrase)? {
