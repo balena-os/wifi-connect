@@ -97,6 +97,11 @@ error_chain! {
         TrapExitSignals {
             description("Trapping exit signals failed")
         }
+
+        RootPrivilegesRequired(app: String) {
+            description("Root privileges required")
+            display("You need root privileges to run {}", app)
+        }
     }
 }
 
@@ -122,6 +127,7 @@ pub fn exit_code(e: &Error) -> i32 {
         ErrorKind::NetworkManagerServiceState => 20,
         ErrorKind::BlockExitSignals => 21,
         ErrorKind::TrapExitSignals => 22,
+        ErrorKind::RootPrivilegesRequired(_) => 23,
         _ => 1,
     }
 }
