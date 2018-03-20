@@ -25,6 +25,7 @@ mod server;
 mod dnsmasq;
 mod logger;
 mod exit;
+mod privileges;
 
 use std::path;
 use std::thread;
@@ -36,6 +37,7 @@ use errors::*;
 use config::get_config;
 use network::{init_networking, process_network_commands};
 use exit::block_exit_signals;
+use privileges::require_root;
 
 fn main() {
     if let Err(ref e) = run() {
@@ -58,6 +60,8 @@ fn run() -> Result<()> {
     logger::init();
 
     let config = get_config();
+
+    require_root()?;
 
     init_networking()?;
 
