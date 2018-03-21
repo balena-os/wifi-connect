@@ -20,7 +20,7 @@ CONFIRMATION=true
 
 usage() {
     cat 1>&2 <<EOF
-$NAME 1.0.0 (2017-11-02)
+$NAME 1.0.1 (2018-21-03)
 
 USAGE:
     $SCRIPT [FLAGS]
@@ -55,9 +55,11 @@ main() {
 
     check_os_version
 
+    install_wfc
+
     activate_network_manager
 
-    install_wfc
+    say "Run 'wifi-connect --help' for available options"
 }
 
 check_os_version() {
@@ -185,8 +187,6 @@ install_wfc() {
     _wfc_version=$(ensure wifi-connect --version)
 
     say "Successfully installed $_wfc_version"
-
-    say "Run 'wifi-connect --help' for available options"
 }
 
 say() {
