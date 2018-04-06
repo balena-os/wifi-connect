@@ -26,6 +26,12 @@ Command line options have environment variable counterpart. If both a command li
 
     Default: _192.168.42.1_
 
+*   **-o, --portal-listening-port** listening_port, **$PORTAL_LISTENING_PORT**
+
+    Listening port of the captive portal web server
+
+    Default: _80_
+
 *   **-i, --portal-interface** interface, **$PORTAL_INTERFACE**
 
     Wireless network interface to be used by WiFi Connect
