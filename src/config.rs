@@ -11,6 +11,7 @@ const DEFAULT_DHCP_RANGE: &str = "192.168.42.2,192.168.42.254";
 const DEFAULT_SSID: &str = "WiFi Connect";
 const DEFAULT_ACTIVITY_TIMEOUT: &str = "0";
 const DEFAULT_UI_DIRECTORY: &str = "ui";
+const DEFAULT_LISTENING_PORT: &str = "80";
 
 #[derive(Clone)]
 pub struct Config {
@@ -19,6 +20,7 @@ pub struct Config {
     pub passphrase: Option<String>,
     pub gateway: Ipv4Addr,
     pub dhcp_range: String,
+    pub listening_port: u16,
     pub activity_timeout: u64,
     pub ui_directory: PathBuf,
 }
@@ -78,6 +80,17 @@ pub fn get_config() -> Config {
                 .takes_value(true),
         )
         .arg(
+            Arg::with_name("portal-listening-port")
+                .short("o")
+                .long("portal-listening-port")
+                .value_name("listening_port")
+                .help(&format!(
+                    "Listening port of the captive portal web server (default: {})",
+                    DEFAULT_LISTENING_PORT
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("activity-timeout")
                 .short("a")
                 .long("activity-timeout")
@@ -123,6 +136,18 @@ pub fn get_config() -> Config {
         String::from,
     );
 
+    let listening_port = matches
+        .value_of("portal-listening-port")
+        .map_or_else(
+            || {
+                env::var("PORTAL_LISTENING_PORT")
+                    .unwrap_or_else(|_| DEFAULT_LISTENING_PORT.to_string())
+            },
+            String::from,
+        )
+        .parse::<u16>()
+        .expect("Cannot parse listening port number");
+
     let activity_timeout = u64::from_str(&matches.value_of("activity-timeout").map_or_else(
         || env::var("ACTIVITY_TIMEOUT").unwrap_or_else(|_| DEFAULT_ACTIVITY_TIMEOUT.to_string()),
         String::from,
@@ -136,6 +161,7 @@ pub fn get_config() -> Config {
         passphrase: passphrase,
         gateway: gateway,
         dhcp_range: dhcp_range,
+        listening_port: listening_port,
         activity_timeout: activity_timeout,
         ui_directory: ui_directory,
     }
