@@ -9,6 +9,7 @@ use iron::prelude::*;
 use iron::{headers, status, typemap, AfterMiddleware, Iron, IronError, IronResult, Request,
            Response, Url};
 use iron::modifiers::Redirect;
+use iron_cors::CorsMiddleware;
 use router::Router;
 use staticfile::Static;
 use mount::Mount;
@@ -150,9 +151,12 @@ pub fn start_server(
     assets.mount("/img", Static::new(&ui_directory.join("img")));
     assets.mount("/js", Static::new(&ui_directory.join("js")));
 
+    let cors_middleware = CorsMiddleware::with_allow_any();
+
     let mut chain = Chain::new(assets);
     chain.link(Write::<RequestSharedState>::both(request_state));
     chain.link_after(RedirectMiddleware);
+    chain.link_around(cors_middleware);
 
     let address = format!("{}:{}", gateway_clone, listening_port);
 

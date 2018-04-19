@@ -9,6 +9,7 @@ extern crate error_chain;
 extern crate clap;
 extern crate env_logger;
 extern crate iron;
+extern crate iron_cors;
 extern crate mount;
 extern crate network_manager;
 extern crate nix;
