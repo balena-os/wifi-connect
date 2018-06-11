@@ -82,10 +82,6 @@ error_chain! {
             description("Starting the NetworkManager service failed")
         }
 
-        NetworkManagerServiceState {
-            description("Getting the NetworkManager service state failed")
-        }
-
         Dnsmasq {
             description("Spawning dnsmasq failed")
         }
@@ -124,7 +120,6 @@ pub fn exit_code(e: &Error) -> i32 {
         ErrorKind::StartHTTPServer(_, _) => 17,
         ErrorKind::StartActiveNetworkManager => 18,
         ErrorKind::StartNetworkManager => 19,
-        ErrorKind::NetworkManagerServiceState => 20,
         ErrorKind::BlockExitSignals => 21,
         ErrorKind::TrapExitSignals => 22,
         ErrorKind::RootPrivilegesRequired(_) => 23,
