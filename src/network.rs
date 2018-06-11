@@ -426,8 +426,13 @@ fn wait_for_connectivity(manager: &NetworkManager, timeout: u64) -> Result<bool>
 }
 
 pub fn start_network_manager_service() -> Result<()> {
-    let state =
-        NetworkManager::get_service_state().chain_err(|| ErrorKind::NetworkManagerServiceState)?;
+    let state = match NetworkManager::get_service_state() {
+        Ok(state) => state,
+        _ => {
+            info!("Cannot get the NetworkManager service state");
+            return Ok(());
+        },
+    };
 
     if state != ServiceState::Active {
         let state = NetworkManager::start_service(15).chain_err(|| ErrorKind::StartNetworkManager)?;
