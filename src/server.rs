@@ -142,7 +142,7 @@ pub fn start_server(
 
     let mut router = Router::new();
     router.get("/", Static::new(ui_directory), "index");
-    router.get("/ssid", ssid, "ssid");
+    router.get("/networks", networks, "networks");
     router.post("/connect", connect, "connect");
 
     let mut assets = Mount::new();
@@ -170,7 +170,7 @@ pub fn start_server(
     }
 }
 
-fn ssid(req: &mut Request) -> IronResult<Response> {
+fn networks(req: &mut Request) -> IronResult<Response> {
     info!("User connected to the captive portal");
 
     let request_state = get_request_state!(req);
@@ -179,14 +179,14 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
         return exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandActivate);
     }
 
-    let access_points_ssids = match request_state.server_rx.recv() {
+    let networks = match request_state.server_rx.recv() {
         Ok(result) => match result {
-            NetworkCommandResponse::AccessPointsSsids(ssids) => ssids,
+            NetworkCommandResponse::Networks(networks) => networks,
         },
         Err(e) => return exit_with_error(&request_state, e, ErrorKind::RecvAccessPointSSIDs),
     };
 
-    let access_points_json = match serde_json::to_string(&access_points_ssids) {
+    let access_points_json = match serde_json::to_string(&networks) {
         Ok(json) => json,
         Err(e) => return exit_with_error(&request_state, e, ErrorKind::SerializeAccessPointSSIDs),
     };
@@ -195,11 +195,12 @@ fn ssid(req: &mut Request) -> IronResult<Response> {
 }
 
 fn connect(req: &mut Request) -> IronResult<Response> {
-    let (ssid, passphrase) = {
+    let (ssid, identity, passphrase) = {
         let params = get_request_ref!(req, Params, "Getting request params failed");
         let ssid = get_param!(params, "ssid", String);
+        let identity = get_param!(params, "identity", String);
         let passphrase = get_param!(params, "passphrase", String);
-        (ssid, passphrase)
+        (ssid, identity, passphrase)
     };
 
     debug!("Incoming `connect` to access point `{}` request", ssid);
@@ -208,6 +209,7 @@ fn connect(req: &mut Request) -> IronResult<Response> {
 
     let command = NetworkCommand::Connect {
         ssid: ssid,
+        identity: identity,
         passphrase: passphrase,
     };
 
