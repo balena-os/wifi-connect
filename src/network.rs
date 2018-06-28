@@ -5,8 +5,8 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::error::Error;
 use std::net::Ipv4Addr;
 
-use network_manager::{AccessPoint, Connection, ConnectionState, Connectivity, Device, DeviceType,
-                      NetworkManager, ServiceState};
+use network_manager::{AccessPoint, AccessPointCredentials, Connection, ConnectionState,
+                      Connectivity, Device, DeviceType, NetworkManager, Security, ServiceState};
 
 use errors::*;
 use exit::{exit, trap_exit_signals, ExitResult};
@@ -18,11 +18,21 @@ pub enum NetworkCommand {
     Activate,
     Timeout,
     Exit,
-    Connect { ssid: String, passphrase: String },
+    Connect {
+        ssid: String,
+        identity: String,
+        passphrase: String,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct Network {
+    ssid: String,
+    security: String,
 }
 
 pub enum NetworkCommandResponse {
-    AccessPointsSsids(Vec<String>),
+    Networks(Vec<Network>),
 }
 
 struct NetworkCommandHandler {
@@ -156,8 +166,12 @@ impl NetworkCommandHandler {
                     info!("Exiting...");
                     return Ok(());
                 },
-                NetworkCommand::Connect { ssid, passphrase } => {
-                    if self.connect(&ssid, &passphrase)? {
+                NetworkCommand::Connect {
+                    ssid,
+                    identity,
+                    passphrase,
+                } => {
+                    if self.connect(&ssid, &identity, &passphrase)? {
                         return Ok(());
                     }
                 },
@@ -189,16 +203,14 @@ impl NetworkCommandHandler {
     fn activate(&mut self) -> ExitResult {
         self.activated = true;
 
-        let access_points_ssids = get_access_points_ssids_owned(&self.access_points);
+        let networks = get_networks(&self.access_points);
 
         self.server_tx
-            .send(NetworkCommandResponse::AccessPointsSsids(
-                access_points_ssids,
-            ))
+            .send(NetworkCommandResponse::Networks(networks))
             .chain_err(|| ErrorKind::SendAccessPointSSIDs)
     }
 
-    fn connect(&mut self, ssid: &str, passphrase: &str) -> Result<bool> {
+    fn connect(&mut self, ssid: &str, identity: &str, passphrase: &str) -> Result<bool> {
         delete_connection_if_exists(&self.manager, ssid);
 
         if let Some(ref connection) = self.portal_connection {
@@ -214,7 +226,9 @@ impl NetworkCommandHandler {
 
             info!("Connecting to access point '{}'...", ssid);
 
-            match wifi_device.connect(access_point, passphrase) {
+            let credentials = init_access_point_credentials(access_point, identity, passphrase);
+
+            match wifi_device.connect(access_point, &credentials) {
                 Ok((connection, state)) => {
                     if state == ConnectionState::Activated {
                         match wait_for_connectivity(&self.manager, 20) {
@@ -251,6 +265,31 @@ impl NetworkCommandHandler {
         self.portal_connection = Some(create_portal(&self.device, &self.config)?);
 
         Ok(false)
+    }
+}
+
+fn init_access_point_credentials(
+    access_point: &AccessPoint,
+    identity: &str,
+    passphrase: &str,
+) -> AccessPointCredentials {
+    if access_point.security.contains(Security::ENTERPRISE) {
+        AccessPointCredentials::Enterprise {
+            identity: identity.to_string(),
+            passphrase: passphrase.to_string(),
+        }
+    } else if access_point.security.contains(Security::WPA2)
+        || access_point.security.contains(Security::WPA)
+    {
+        AccessPointCredentials::Wpa {
+            passphrase: passphrase.to_string(),
+        }
+    } else if access_point.security.contains(Security::WEP) {
+        AccessPointCredentials::Wep {
+            passphrase: passphrase.to_string(),
+        }
+    } else {
+        AccessPointCredentials::None
     }
 }
 
@@ -340,11 +379,32 @@ fn get_access_points_ssids(access_points: &[AccessPoint]) -> Vec<&str> {
         .collect()
 }
 
-fn get_access_points_ssids_owned(access_points: &[AccessPoint]) -> Vec<String> {
+fn get_networks(access_points: &[AccessPoint]) -> Vec<Network> {
     access_points
         .iter()
-        .map(|ap| ap.ssid().as_str().unwrap().to_string())
+        .map(|ap| get_network_info(ap))
         .collect()
+}
+
+fn get_network_info(access_point: &AccessPoint) -> Network {
+    Network {
+        ssid: access_point.ssid().as_str().unwrap().to_string(),
+        security: get_network_security(access_point).to_string(),
+    }
+}
+
+fn get_network_security(access_point: &AccessPoint) -> &str {
+    if access_point.security.contains(Security::ENTERPRISE) {
+        "enterprise"
+    } else if access_point.security.contains(Security::WPA2)
+        || access_point.security.contains(Security::WPA)
+    {
+        "wpa"
+    } else if access_point.security.contains(Security::WEP) {
+        "wep"
+    } else {
+        "none"
+    }
 }
 
 fn find_access_point<'a>(access_points: &'a [AccessPoint], ssid: &str) -> Option<&'a AccessPoint> {
