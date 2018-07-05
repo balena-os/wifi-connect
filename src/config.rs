@@ -26,10 +26,10 @@ pub struct Config {
 }
 
 pub fn get_config() -> Config {
-    let matches = App::new(env!("CARGO_PKG_NAME"))
-        .version(env!("CARGO_PKG_VERSION"))
-        .author(env!("CARGO_PKG_AUTHORS"))
-        .about(env!("CARGO_PKG_DESCRIPTION"))
+    let matches = App::new(crate_name!())
+        .version(crate_version!())
+        .author(crate_authors!())
+        .about(crate_description!())
         .arg(
             Arg::with_name("portal-interface")
                 .short("i")

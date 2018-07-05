@@ -9,7 +9,9 @@ extern crate error_chain;
 #[macro_use]
 extern crate serde_derive;
 
+#[macro_use]
 extern crate clap;
+
 extern crate env_logger;
 extern crate iron;
 extern crate iron_cors;
