@@ -100,7 +100,7 @@ The following dongles are known **not** to work (as the driver is not friendly w
 
 Dongles with similar chipsets will probably not work.
 
-WiFi Connect is expected to work with all resin.io supported boards as long as they have the compatible dongles.
+WiFi Connect is expected to work with all [resin.io supported boards](https://docs.resin.io/reference/hardware/devices/) as long as they have the compatible dongles.
 
 ***
 
