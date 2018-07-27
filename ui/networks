@@ -1,0 +1,1 @@
+[{"ssid":"Open", "security":"none", "strength":90},{"ssid":"Theta", "security":"wpa", "strength":60},{"ssid":"Personal", "security":"wpa", "strength":40},{"ssid":"Enterprise", "security":"eap", "strength":20}]

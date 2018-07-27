@@ -3,7 +3,7 @@ $(function(){
 
 	function showHideEnterpriseSettings() {
 		var security = $(this).find(':selected').attr('data-security');
-		if(security === 'enterprise') {
+		if(security === 'eap') {
 			$('#identity-group').show();
 		} else {
 			$('#identity-group').hide();
@@ -11,6 +11,14 @@ $(function(){
 	}
 
 	$('#ssid-select').change(showHideEnterpriseSettings);
+
+	$('#connect-form').submit(function(ev){
+		$.post('/connect', $('#connect-form').serialize(), function(data){
+			$('.before-submit').hide();
+			$('#submit-message').removeClass('hidden');
+		});
+		ev.preventDefault();
+	});
 
 	$.get("/networks", function(data){
 		if(data.length === 0){
@@ -29,13 +37,5 @@ $(function(){
 
 			jQuery.proxy(showHideEnterpriseSettings, $('#ssid-select'))();
 		}
-	});
-
-	$('#connect-form').submit(function(ev){
-		$.post('/connect', $('#connect-form').serialize(), function(data){
-			$('.before-submit').hide();
-			$('#submit-message').removeClass('hidden');
-		});
-		ev.preventDefault();
 	});
 });
