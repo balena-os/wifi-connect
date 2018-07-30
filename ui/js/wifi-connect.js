@@ -5,7 +5,8 @@ $(document).on('change', '.custom-file-input', function () {
 	$(this).parent('.custom-file').find('.custom-file-label').text(fileName);
 });
 
-$("#settings").hide();
+//$("#settings").hide();
+$("#wifi-networks").hide();
 
 $(function(){
 
