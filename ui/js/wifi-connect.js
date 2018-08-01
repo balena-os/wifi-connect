@@ -17,10 +17,6 @@ $(function(){
 		$("#settings").show();
 	})
 
-	$(".navbar-brand").click(function (arg) {
-		console.log(arg);
-    });
-
 	$('#security-select').chosen().change(function (event) {
 		$("option:selected", this).tab('show');
 	});
