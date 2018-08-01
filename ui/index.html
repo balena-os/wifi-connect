@@ -34,10 +34,10 @@
   <body>
     <nav class="navbar navbar-dark bg-dark mb-5">
       <div class="container">
-        <span class="navbar-brand">
-          <img id="logo" height="30" width="26" src="/img/logo.svg" alt="">
+        <a class="navbar-brand" href="#">
+          <img id="logo" height="30" width="26" src="/img/logo.svg" class="d-inline-block align-top" alt="">
           <strong>resin.io</strong>
-        </span>
+        </a>
         <span class="navbar-text text-light">
           <i class="fas fa-broadcast-tower mr-3"></i>6c:88:14:78:21:83
         </span>
@@ -136,10 +136,10 @@
 
           <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
-              <a class="nav-link" id="security-tab" data-toggle="tab" href="#security" role="tab" aria-controls="security" aria-selected="false">Security</a>
+              <a class="nav-link active" id="security-tab" data-toggle="tab" href="#security" role="tab" aria-controls="security" aria-selected="true">Security</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" id="ipv4-tab" data-toggle="tab" href="#ipv4" role="tab" aria-controls="ipv4" aria-selected="true">IPv4</a>
+              <a class="nav-link" id="ipv4-tab" data-toggle="tab" href="#ipv4" role="tab" aria-controls="ipv4" aria-selected="false">IPv4</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" id="ipv6-tab" data-toggle="tab" href="#ipv6" role="tab" aria-controls="ipv6" aria-selected="false">IPv6</a>
@@ -151,7 +151,7 @@
 
       <div class="tab-content py-3">
 
-        <div class="tab-pane" id="security" role="tabpanel" aria-labelledby="security-tab">
+        <div class="tab-pane show active" id="security" role="tabpanel" aria-labelledby="security-tab">
 
           <div class="row justify-content-center form-group mb-3">
             <div class="col-12 col-xl-2">
@@ -426,7 +426,7 @@
 
         </div>
 
-        <div class="tab-pane show active" id="ipv4" role="tabpanel" aria-labelledby="ipv4-tab">
+        <div class="tab-pane" id="ipv4" role="tabpanel" aria-labelledby="ipv4-tab">
           <div class="container">
 
             <div class="row justify-content-center form-group mt-2 mb-4">
@@ -564,18 +564,18 @@
                   <div class="col-10">
                     <div class="row no-gutters">
                       <div class="col-4 pr-1">
-                        <input id="ipv4-addresses-1" class="form-control" name="ipv4-addresses-1"></input>
+                        <input id="ipv4-routes-1" class="form-control" name="ipv4-routes-1"></input>
                       </div>
                       <div class="col-4 pr-1">
-                        <input id="ipv4-addresses-2" class="form-control" name="ipv4-addresses-2"></input>
+                        <input id="ipv4-routes-2" class="form-control" name="ipv4-routes-2"></input>
                       </div>
                       <div class="col-4 pr-1">
-                        <input id="ipv4-addresses-3" class="form-control" name="ipv4-addresses-3"></input>
+                        <input id="ipv4-routes-3" class="form-control" name="ipv4-routes-3"></input>
                       </div>
                     </div>
                   </div>
                   <div class="col-1 pr-1">
-                    <input id="ipv4-addresses-4" class="form-control" name="ipv4-addresses-4"></input>
+                    <input id="ipv4-routes-4" class="form-control" name="ipv4-routes-4"></input>
                   </div>
                   <div class="col-1">
                     <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>

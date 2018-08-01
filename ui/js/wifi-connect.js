@@ -5,8 +5,8 @@ $(document).on('change', '.custom-file-input', function () {
 	$(this).parent('.custom-file').find('.custom-file-label').text(fileName);
 });
 
-//$("#settings").hide();
-$("#wifi-networks").hide();
+$("#settings").hide();
+//$("#wifi-networks").hide();
 
 $(function(){
 
@@ -16,6 +16,10 @@ $(function(){
 		$("#wifi-networks").hide();
 		$("#settings").show();
 	})
+
+	$(".navbar-brand").click(function (arg) {
+		console.log(arg);
+    });
 
 	$('#security-select').chosen().change(function (event) {
 		$("option:selected", this).tab('show');
