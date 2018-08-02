@@ -10,7 +10,7 @@ $("#settings").hide();
 
 $(function(){
 
-	$('#wifi-networks-list a').on('click', function (e) {
+	$('#wifi-networks-list').on('click', 'a', function (e) {
 		e.preventDefault();
 
 		$("#wifi-networks").hide();
@@ -53,21 +53,51 @@ $(function(){
 	});
 
 	$.get('/networks', function(data){
-		if(data.length === 0){
-			$('.before-submit').hide();
-			$('#no-networks-message').removeClass('hidden');
-		} else {
-			networks = JSON.parse(data);
-			$.each(networks, function(i, val){
-				$('#ssid-select').append(
-					$('<option>')
-						.text(val.ssid)
-						.attr('val', val.ssid)
-						.attr('data-security', val.security)
-				);
-			});
+		$('#wifi-networks-list').empty();
 
-			jQuery.proxy(showHideEnterpriseSettings, $('#ssid-select'))();
-		}
+		networks = JSON.parse(data);
+		$.each(networks, function(i, val){
+			/*
+			Reference view:
+
+			<a href="#" class="list-group-item list-group-item-action">
+			  <h5 class="d-flex">
+				<span class="flex-grow-1">SSID</span>
+				<i class="fas fa-check mr-3 light-icon"></i>
+				<i class="fas fa-lock mr-3 light-icon"></i>
+				<i class="fas fa-wifi strength-10"></i>
+			  </h5>
+			</a>
+			*/
+
+			let blackness = Math.round((val.strength - 1) / 10);
+			let strengthClass = 'strength-' + blackness;
+
+			let h5 = $('<h5 class="d-flex">')
+				.append(
+					$('<span class="flex-grow-1">')
+						.text(val.ssid)
+				);
+
+			if (val.active === true) {
+				h5.append($('<i class="fas fa-check mr-3 light-icon"></i>'));
+			}
+
+			if (val.security !== 'none') {
+				h5.append($('<i class="fas fa-lock mr-3 light-icon"></i>'));
+			}
+
+			h5.append(
+				$('<i class="fas fa-wifi"></i>')
+					.addClass(strengthClass)
+			);
+
+			let link = $('<a href="#" class="list-group-item list-group-item-action">')
+				.append(h5);
+
+			$('#wifi-networks-list').append(link);
+		});
+
+		jQuery.proxy(showHideEnterpriseSettings, $('#ssid-select'))();
 	});
 });

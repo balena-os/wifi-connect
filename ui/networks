@@ -1,1 +1,12 @@
-[{"ssid":"Open", "security":"none", "strength":90},{"ssid":"Theta", "security":"wpa", "strength":60},{"ssid":"Personal", "security":"wpa", "strength":40},{"ssid":"Enterprise", "security":"eap", "strength":20}]
+[
+    {"ssid":"Tetha 7FA8", "security":"wpa", "strength":100, "active":true},
+    {"ssid":"OpenNET", "security":"none", "strength":84},
+    {"ssid":"WPA-Personal", "security":"wpa", "strength":75},
+    {"ssid":"WPA-Enterprise", "security":"eap", "strength":64},
+    {"ssid":"Jordan", "security":"wpa", "strength":52},
+    {"ssid":"Netherlands", "security":"wpa", "strength":42},
+    {"ssid":"Sky2364", "security":"wpa", "strength":37},
+    {"ssid":"RPi3-AP", "security":"wpa", "strength":23},
+    {"ssid":"FreeNET", "security":"none", "strength":12},
+    {"ssid":"WiFi Connect", "security":"wpa", "strength":7}
+]
