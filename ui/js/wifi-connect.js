@@ -12,6 +12,20 @@ $(function(){
 
 		$("#wifi-networks").hide();
 		$("#settings").show();
+
+		let security = $(this).data("security");
+
+		switch(security) {
+			case "none":
+				$("#none-option").tab('show');
+				break;
+			case "wpa":
+				$("#wpa-option").tab('show');
+				break;
+			case "eap":
+				$("#eap-option").tab('show');
+				break;
+		}
 	})
 
 	$('#security-select').chosen().change(function (event) {
@@ -91,6 +105,8 @@ $(function(){
 
 			let link = $('<a href="#" class="list-group-item list-group-item-action">')
 				.append(h5);
+
+			link.data("security", val.security);
 
 			$('#wifi-networks-list').append(link);
 		});
