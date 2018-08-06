@@ -45,20 +45,25 @@ $(function(){
 
 	$('#ssid-select').change(showHideEnterpriseSettings);
 
-	$('.addresses-list').on('blur', '.address-input', function (e) {
-		let hasEmptyAddress = false;
-		$(this).closest('.addresses-list').find('.address-input').each(function() {
+	function hasEmptyAddress(addresses) {
+		let result = false;
+		addresses.find('.address-input').each(function() {
 			if(!$(this).val()) {
-				hasEmptyAddress = true;
+				result = true;
 				return;
 			}
 		});
-		if(hasEmptyAddress) {
+		return result;
+	}
+
+	$('.addresses-list').on('blur', '.address-input', function (e) {
+		let addresses = $(this).closest('.addresses-list');
+		if(hasEmptyAddress(addresses)) {
 			return;
 		}
 
 		let row = [
-			'<div class="row no-gutters mb-1">',
+			'<div class="row no-gutters mb-1 line">',
 			'  <div class="col-11">',
 			'    <div class="row no-gutters">',
 			'      <div class="col-4 pr-1">',
@@ -73,12 +78,22 @@ $(function(){
 			'    </div>',
 			'  </div>',
 			'  <div class="col-1">',
-			'    <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>',
+			'    <button type="button" class="btn btn-outline-danger btn-block remove">',
+			'      <i class="fas fa-times"></i>',
+			'    </button>',
 			'  </div>',
 			'</div>'
 		].join('\n');
 
-		$(this).closest('.addresses-list').append(row);
+		addresses.append(row);
+	});
+
+	$('.addresses-list').on('click', '.remove', function () {
+		if($(this).closest('.addresses-list').find('.address-input').length < 2) {
+			return;
+		}
+
+		$(this).closest('.line').remove();
 	});
 
 	$('#connect-form').submit(function(ev){
