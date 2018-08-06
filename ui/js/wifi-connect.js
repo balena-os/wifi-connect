@@ -15,17 +15,7 @@ $(function(){
 
 		let security = $(this).data("security");
 
-		switch(security) {
-			case "none":
-				$("#none-option").tab('show');
-				break;
-			case "wpa":
-				$("#wpa-option").tab('show');
-				break;
-			case "eap":
-				$("#eap-option").tab('show');
-				break;
-		}
+		$("#security-select").val(security).trigger('chosen:updated').change();
 	})
 
 	$('#security-select').chosen().change(function (event) {
