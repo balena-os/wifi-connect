@@ -374,26 +374,26 @@
         <div class="tab-pane" id="ipv4" role="tabpanel" aria-labelledby="ipv4-tab">
 
           <div class="row justify-content-center form-group mt-2 mb-4">
-            <legend class="col-form-label col-12 col-xl-2 pt-0 font-italic">IPv4 Method</legend>
-            <div class="col-12 col-xl-3 form-check">
+            <legend class="col-form-label col-12 col-xl-2 py-0 font-italic">IPv4 Method</legend>
+            <div class="col-12 col-xl-3 pb-2 form-check">
               <input class="form-check-input" type="radio" name="ipv4-method" id="ipv4-method-auto" value="ipv4-method-auto">
               <label class="form-check-label" for="ipv4-method-auto">
                 Automatic (DHCP)
               </label>
             </div>
-            <div class="col-12 col-xl-3 form-check">
+            <div class="col-12 col-xl-3 pb-2 form-check">
               <input class="form-check-input" type="radio" name="ipv4-method" id="ipv4-method-link-local" value="ipv4-method-link-local">
               <label class="form-check-label" for="ipv4-method-link-local">
                 Link-Local Only
               </label>
             </div>
-            <div class="col-12 col-xl-3 offset-xl-2 form-check">
+            <div class="col-12 col-xl-3 offset-xl-2 pb-2 form-check">
               <input class="form-check-input" type="radio" name="ipv4-method" id="ipv4-method-manual" value="ipv4-method-manual">
               <label class="form-check-label" for="ipv4-method-manual">
                 Manual
               </label>
             </div>
-            <div class="col-12 col-xl-3 form-check">
+            <div class="col-12 col-xl-3 pb-2 form-check">
               <input class="form-check-input" type="radio" name="ipv4-method" id="ipv4-method-disabled" value="ipv4-method-disabled">
               <label class="form-check-label" for="ipv4-method-disabled">
                 Disable
@@ -532,11 +532,169 @@
         </div>
 
         <div class="tab-pane" id="ipv6" role="tabpanel" aria-labelledby="ipv6-tab">
-            <div class="row justify-content-center">
-              <div class="col-12 col-lg-8">
-                IPV6 Settings...
+
+          <div class="row justify-content-center form-group mt-2 mb-4">
+            <legend class="col-form-label col-12 col-xl-2 py-0 font-italic">IPv6 Method</legend>
+            <div class="col-12 col-xl-3 pb-2 form-check">
+              <input class="form-check-input" type="radio" name="ipv6-method" id="ipv6-method-auto" value="ipv6-method-auto">
+              <label class="form-check-label" for="ipv6-method-auto">
+                Automatic (DHCP)
+              </label>
+            </div>
+            <div class="col-12 col-xl-3 pb-2 form-check">
+              <input class="form-check-input" type="radio" name="ipv6-method" id="ipv6-method-auto-dhcp-only" value="ipv6-method-auto-dhcp-only">
+              <label class="form-check-label" for="ipv6-method-auto-dhcp-only">
+                Automatic, DHCP only
+              </label>
+            </div>
+            <div class="col-12 col-xl-3 offset-xl-2 pb-2 form-check">
+              <input class="form-check-input" type="radio" name="ipv6-method" id="ipv6-method-link-local" value="ipv6-method-link-local">
+              <label class="form-check-label" for="ipv6-method-link-local">
+                Link-Local Only
+              </label>
+            </div>
+            <div class="col-12 col-xl-3 pb-2 form-check">
+              <input class="form-check-input" type="radio" name="ipv6-method" id="ipv6-method-manual" value="ipv6-method-manual">
+              <label class="form-check-label" for="ipv6-method-manual">
+                Manual
+              </label>
+            </div>
+            <div class="col-12 col-xl-6 offset-xl-2 pb-2 form-check">
+              <input class="form-check-input" type="radio" name="ipv6-method" id="ipv6-method-disabled" value="ipv6-method-disabled">
+              <label class="form-check-label" for="ipv6-method-disabled">
+                Disable
+              </label>
+            </div>
+          </div>
+
+          <div class="row justify-content-center form-group mb-0">
+            <legend class="col-form-label col-12 col-xl-8 pt-0 pb-1 font-italic">Addresses</legend>
+          </div>
+          <div class="row justify-content-center form-group mb-4">
+            <div class="col-12 col-xl-8">
+
+              <div class="row no-gutters">
+                <div class="col-11">
+                  <div class="row no-gutters">
+                    <div class="col-4 pr-1">
+                      <small class="form-text text-muted text-center">Address</small>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <small class="form-text text-muted text-center">Netmask</small>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <small class="form-text text-muted text-center">Gateway</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-1">
+                </div>
+              </div>
+
+              <div class="row no-gutters">
+                <div class="col-11">
+                  <div class="row no-gutters">
+                    <div class="col-4 pr-1">
+                      <input id="ipv6-addresses-1" class="form-control" name="ipv6-addresses-1"></input>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <input id="ipv6-addresses-2" class="form-control" name="ipv6-addresses-2"></input>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <input id="ipv6-addresses-3" class="form-control" name="ipv6-addresses-3"></input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-1">
+                  <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="row justify-content-center form-group mb-0">
+            <legend class="col-form-label col-12 col-xl-2 pt-0 font-italic">DNS</legend>
+            <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
+              <div>
+                <input class="form-check-input" type="checkbox" id="ipv6-dns-auto">
+                <label class="form-check-label" for="ipv6-dns-auto">
+                  Automatic
+                </label>
               </div>
             </div>
+          </div>
+          <div class="row justify-content-center form-group mb-0">
+            <div class="col-12 col-xl-8">
+              <input id="ipv6-dns" class="form-control" name="ipv6-dns"></input>
+            </div>
+          </div>
+          <div class="row justify-content-center form-group mb-4">
+            <div class="col-12 col-xl-8">
+              <small class="form-text text-muted">Separate IP addresses with commas</small>
+            </div>
+          </div>
+
+          <div class="row justify-content-center form-group mb-0">
+            <legend class="col-form-label col-12 col-xl-2 pt-0 font-italic">Routes</legend>
+            <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
+              <div>
+                <input class="form-check-input" type="checkbox" id="ipv6-routes-auto">
+                <label class="form-check-label" for="ipv6-routes-auto">
+                  Automatic
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-center form-group mb-4">
+            <div class="col-12 col-xl-8">
+
+              <div class="row no-gutters">
+                <div class="col-10">
+                  <div class="row no-gutters">
+                    <div class="col-4 pr-1">
+                      <small class="form-text text-muted text-center">Address</small>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <small class="form-text text-muted text-center">Netmask</small>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <small class="form-text text-muted text-center">Gateway</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-1 pr-1">
+                  <small class="form-text text-muted text-center">Metric</small>
+                </div>
+                <div class="col-1">
+                </div>
+              </div>
+
+              <div class="row no-gutters">
+                <div class="col-10">
+                  <div class="row no-gutters">
+                    <div class="col-4 pr-1">
+                      <input id="ipv6-routes-1" class="form-control" name="ipv6-routes-1"></input>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <input id="ipv6-routes-2" class="form-control" name="ipv6-routes-2"></input>
+                    </div>
+                    <div class="col-4 pr-1">
+                      <input id="ipv6-routes-3" class="form-control" name="ipv6-routes-3"></input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-1 pr-1">
+                  <input id="ipv6-routes-4" class="form-control" name="ipv6-routes-4"></input>
+                </div>
+                <div class="col-1">
+                  <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </div>
