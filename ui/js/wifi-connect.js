@@ -10,25 +10,25 @@ $(function(){
 	$('#wifi-networks-list').on('click', 'a', function (e) {
 		e.preventDefault();
 
-		$("#wifi-networks").hide();
-		$("#settings").show();
+		$('#wifi-networks').hide();
+		$('#settings').show();
 
-		let security = $(this).data("security");
+		let security = $(this).data('security');
 
-		$("#security-select").val(security).trigger('chosen:updated').change();
+		$('#security-select').val(security).trigger('chosen:updated').change();
 	})
 
 	$('#security-select').chosen().change(function (event) {
-		$("option:selected", this).tab('show');
+		$('option:selected', this).tab('show');
 	});
 
 	$('#eap-authentication').chosen().change(function (event) {
-		$("option:selected", this).tab('show');
+		$('option:selected', this).tab('show');
 
 		if($(this).val() === 'tls') {
-			$("#eap-username-password-pane").hide();
+			$('#eap-username-password-pane').hide();
 		} else {
-			$("#eap-username-password-pane").show();
+			$('#eap-username-password-pane').show();
 		}
 	});
 
@@ -44,6 +44,42 @@ $(function(){
 	}
 
 	$('#ssid-select').change(showHideEnterpriseSettings);
+
+	$('.addresses-list').on('blur', '.address-input', function (e) {
+		let hasEmptyAddress = false;
+		$(this).closest('.addresses-list').find('.address-input').each(function() {
+			if(!$(this).val()) {
+				hasEmptyAddress = true;
+				return;
+			}
+		});
+		if(hasEmptyAddress) {
+			return;
+		}
+
+		let row = [
+			'<div class="row no-gutters mb-1">',
+			'  <div class="col-11">',
+			'    <div class="row no-gutters">',
+			'      <div class="col-4 pr-1">',
+			'        <input class="form-control address-input"></input>',
+			'      </div>',
+			'      <div class="col-4 pr-1">',
+			'        <input class="form-control netmask-input"></input>',
+			'      </div>',
+			'      <div class="col-4 pr-1">',
+			'        <input class="form-control gateway-input"></input>',
+			'      </div>',
+			'    </div>',
+			'  </div>',
+			'  <div class="col-1">',
+			'    <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>',
+			'  </div>',
+			'</div>'
+		].join('\n');
+
+		$(this).closest('.addresses-list').append(row);
+	});
 
 	$('#connect-form').submit(function(ev){
 		$.post('/connect', $('#connect-form').serialize(), function(data){
@@ -96,7 +132,7 @@ $(function(){
 			let link = $('<a href="#" class="list-group-item list-group-item-action">')
 				.append(h5);
 
-			link.data("security", val.security);
+			link.data('security', val.security);
 
 			$('#wifi-networks-list').append(link);
 		});
