@@ -62,30 +62,10 @@ $(function(){
 			return;
 		}
 
-		let row = [
-			'<div class="row no-gutters mb-1 line">',
-			'  <div class="col-11">',
-			'    <div class="row no-gutters">',
-			'      <div class="col-4 pr-1">',
-			'        <input class="form-control address-input"></input>',
-			'      </div>',
-			'      <div class="col-4 pr-1">',
-			'        <input class="form-control netmask-input"></input>',
-			'      </div>',
-			'      <div class="col-4 pr-1">',
-			'        <input class="form-control gateway-input"></input>',
-			'      </div>',
-			'    </div>',
-			'  </div>',
-			'  <div class="col-1">',
-			'    <button type="button" class="btn btn-outline-danger btn-block remove">',
-			'      <i class="fas fa-times"></i>',
-			'    </button>',
-			'  </div>',
-			'</div>'
-		].join('\n');
+		let line = $($('.line', addresses)[0]).clone();
+		$('input', line).val('');
 
-		addresses.append(row);
+		addresses.append(line[0]);
 	});
 
 	$('.addresses-list').on('click', '.remove', function () {

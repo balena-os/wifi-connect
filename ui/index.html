@@ -407,7 +407,7 @@
             <legend class="col-form-label col-12 col-xl-8 pt-0 pb-1 font-italic">Addresses</legend>
           </div>
           <div class="row justify-content-center form-group mb-4">
-            <div class="col-12 col-xl-8 addresses-list">
+            <div id="ipv4-addresses" class="col-12 col-xl-8 addresses-list">
 
               <div class="row no-gutters">
                 <div class="col-11">
@@ -485,7 +485,7 @@
             </div>
           </div>
           <div class="row justify-content-center form-group mb-4">
-            <div class="col-12 col-xl-8">
+            <div id="ipv6-routes" class="col-12 col-xl-8 addresses-list">
 
               <div class="row no-gutters">
                 <div class="col-10">
@@ -508,25 +508,27 @@
                 </div>
               </div>
 
-              <div class="row no-gutters">
+              <div class="row no-gutters mb-1 line">
                 <div class="col-10">
                   <div class="row no-gutters">
                     <div class="col-4 pr-1">
-                      <input id="ipv4-routes-1" class="form-control" name="ipv4-routes-1"></input>
+                      <input class="form-control address-input"></input>
                     </div>
                     <div class="col-4 pr-1">
-                      <input id="ipv4-routes-2" class="form-control" name="ipv4-routes-2"></input>
+                      <input class="form-control netmask-input"></input>
                     </div>
                     <div class="col-4 pr-1">
-                      <input id="ipv4-routes-3" class="form-control" name="ipv4-routes-3"></input>
+                      <input class="form-control gateway-input"></input>
                     </div>
                   </div>
                 </div>
                 <div class="col-1 pr-1">
-                  <input id="ipv4-routes-4" class="form-control" name="ipv4-routes-4"></input>
+                  <input class="form-control metric-input"></input>
                 </div>
                 <div class="col-1">
-                  <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>
+                  <button type="button" class="btn btn-outline-danger btn-block remove">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
               </div>
 
@@ -575,7 +577,7 @@
             <legend class="col-form-label col-12 col-xl-8 pt-0 pb-1 font-italic">Addresses</legend>
           </div>
           <div class="row justify-content-center form-group mb-4">
-            <div class="col-12 col-xl-8">
+            <div id="ipv6-addresses" class="col-12 col-xl-8 addresses-list">
 
               <div class="row no-gutters">
                 <div class="col-11">
@@ -595,22 +597,24 @@
                 </div>
               </div>
 
-              <div class="row no-gutters">
+              <div class="row no-gutters mb-1 line">
                 <div class="col-11">
                   <div class="row no-gutters">
                     <div class="col-4 pr-1">
-                      <input id="ipv6-addresses-1" class="form-control" name="ipv6-addresses-1"></input>
+                      <input class="form-control address-input"></input>
                     </div>
                     <div class="col-4 pr-1">
-                      <input id="ipv6-addresses-2" class="form-control" name="ipv6-addresses-2"></input>
+                      <input class="form-control netmask-input"></input>
                     </div>
                     <div class="col-4 pr-1">
-                      <input id="ipv6-addresses-3" class="form-control" name="ipv6-addresses-3"></input>
+                      <input class="form-control gateway-input"></input>
                     </div>
                   </div>
                 </div>
                 <div class="col-1">
-                  <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>
+                  <button type="button" class="btn btn-outline-danger btn-block remove">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
               </div>
 
@@ -651,7 +655,7 @@
             </div>
           </div>
           <div class="row justify-content-center form-group mb-4">
-            <div class="col-12 col-xl-8">
+            <div id="ipv4-routes" class="col-12 col-xl-8 addresses-list">
 
               <div class="row no-gutters">
                 <div class="col-10">
@@ -674,25 +678,27 @@
                 </div>
               </div>
 
-              <div class="row no-gutters">
+              <div class="row no-gutters mb-1 line">
                 <div class="col-10">
                   <div class="row no-gutters">
                     <div class="col-4 pr-1">
-                      <input id="ipv6-routes-1" class="form-control" name="ipv6-routes-1"></input>
+                      <input class="form-control address-input"></input>
                     </div>
                     <div class="col-4 pr-1">
-                      <input id="ipv6-routes-2" class="form-control" name="ipv6-routes-2"></input>
+                      <input class="form-control netmask-input"></input>
                     </div>
                     <div class="col-4 pr-1">
-                      <input id="ipv6-routes-3" class="form-control" name="ipv6-routes-3"></input>
+                      <input class="form-control gateway-input"></input>
                     </div>
                   </div>
                 </div>
                 <div class="col-1 pr-1">
-                  <input id="ipv6-routes-4" class="form-control" name="ipv6-routes-4"></input>
+                  <input class="form-control metric-input"></input>
                 </div>
                 <div class="col-1">
-                  <button type="button" class="btn btn-outline-danger btn-block"><i class="fas fa-times"></i></button>
+                  <button type="button" class="btn btn-outline-danger btn-block remove">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </div>
               </div>
 
