@@ -130,7 +130,9 @@ $(function(){
 	//
 
 	$('#connect-form').submit(function(e) {
-		console.log('Submit form');
+		console.log(
+			$('form').serializeJSON({checkboxUncheckedValue: 'false', parseBooleans: true})
+		);
 
 		e.preventDefault();
 	});

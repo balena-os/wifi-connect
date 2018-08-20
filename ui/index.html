@@ -181,7 +181,7 @@
                     <div class="row justify-content-center form-group mb-3">
                       <div class="col-12 col-xl-6 offset-xl-2">
                         <div class="form-check">
-                          <input id="eap-peap-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-peap-ca-cert-not-required" checked>
+                          <input id="eap-peap-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-peap-ca-cert-not-required" value="true" checked>
                           <label class="form-check-label" for="eap-peap-ca-cert-not-required">
                             No CA certificate is required
                           </label>
@@ -255,7 +255,7 @@
                     <div class="row justify-content-center form-group mb-3">
                       <div class="col-12 col-xl-6 offset-xl-2">
                         <div class="form-check">
-                          <input id="eap-tls-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-tls-ca-cert-not-required" checked>
+                          <input id="eap-tls-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-tls-ca-cert-not-required" value="true" checked>
                           <label class="form-check-label" for="eap-tls-ca-cert-not-required">
                             No CA certificate is required
                           </label>
@@ -312,7 +312,7 @@
                     <div class="row justify-content-center form-group mb-3">
                       <div class="col-12 col-xl-6 offset-xl-2">
                         <div class="form-check">
-                          <input id="eap-ttls-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-ttls-ca-cert-not-required" checked>
+                          <input id="eap-ttls-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-ttls-ca-cert-not-required" value="true" checked>
                           <label class="form-check-label" for="eap-ttls-ca-cert-not-required">
                             No CA certificate is required
                           </label>
@@ -457,7 +457,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">DNS</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input class="form-check-input" type="checkbox" id="ip4-dns-auto">
+                  <input id="ip4-dns-auto" class="form-check-input" type="checkbox" name="ip4-dns-auto" value="true" checked>
                   <label class="form-check-label" for="ip4-dns-auto">
                     Automatic
                   </label>
@@ -479,7 +479,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">Routes</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input class="form-check-input" type="checkbox" id="ip4-routes-auto">
+                  <input id="ip4-routes-auto" class="form-check-input" type="checkbox" name="ip4-routes-auto" value="true" checked>
                   <label class="form-check-label" for="ip4-routes-auto">
                     Automatic
                   </label>
@@ -487,7 +487,7 @@
               </div>
             </div>
             <div class="row justify-content-center form-group mb-4">
-              <div id="ip6-routes" class="col-12 col-xl-8 addresses-list">
+              <div id="ip4-routes" class="col-12 col-xl-8 addresses-list">
 
                 <div class="row no-gutters">
                   <div class="col-10">
@@ -627,7 +627,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">DNS</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input class="form-check-input" type="checkbox" id="ip6-dns-auto">
+                  <input id="ip6-dns-auto" class="form-check-input" type="checkbox" name="ip6-dns-auto" value="true" checked>
                   <label class="form-check-label" for="ip6-dns-auto">
                     Automatic
                   </label>
@@ -649,7 +649,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">Routes</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input class="form-check-input" type="checkbox" id="ip6-routes-auto">
+                  <input id="ip6-routes-auto" class="form-check-input" type="checkbox" name="ip6-routes-auto" value="true" checked>
                   <label class="form-check-label" for="ip6-routes-auto">
                     Automatic
                   </label>
@@ -657,7 +657,7 @@
               </div>
             </div>
             <div class="row justify-content-center form-group mb-4">
-              <div id="ip4-routes" class="col-12 col-xl-8 addresses-list">
+              <div id="ip6-routes" class="col-12 col-xl-8 addresses-list">
 
                 <div class="row no-gutters">
                   <div class="col-10">
@@ -779,6 +779,7 @@
 
     <script src="/chosen/chosen.jquery.js"></script>
     <script src="/js/bootstrap-password-toggler.min.js"></script>
+    <script src="/js/jquery.serializejson.js"></script>
 
     <script src="/js/wifi-connect.js"></script>
   </body>
