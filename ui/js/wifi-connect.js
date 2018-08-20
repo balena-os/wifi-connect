@@ -6,83 +6,11 @@ $(document).on('change', '.custom-file-input', function () {
 });
 
 $(function(){
-
-	$('#wifi-networks-list').on('click', 'a', function (e) {
-		e.preventDefault();
-
-		$('#wifi-networks').hide();
-		$('#settings').show();
-
-		let security = $(this).data('security');
-
-		$('#security-select').val(security).trigger('chosen:updated').change();
-	})
-
-	$('#security-select').chosen().change(function (event) {
-		$('option:selected', this).tab('show');
-	});
-
-	$('#eap-authentication').chosen().change(function (event) {
-		$('option:selected', this).tab('show');
-
-		if($(this).val() === 'tls') {
-			$('#eap-username-password-pane').hide();
-		} else {
-			$('#eap-username-password-pane').show();
-		}
-	});
+	/////////////////////////////////////////////////////////////////////////
+	// Networks view
+	//
 
 	var networks = undefined;
-
-	function showHideEnterpriseSettings() {
-		var security = $(this).find(':selected').attr('data-security');
-		if(security === 'eap') {
-			$('#identity-group').show();
-		} else {
-			$('#identity-group').hide();
-		}
-	}
-
-	$('#ssid-select').change(showHideEnterpriseSettings);
-
-	function hasEmptyAddress(addresses) {
-		let result = false;
-		addresses.find('.address-input').each(function() {
-			if(!$(this).val()) {
-				result = true;
-				return;
-			}
-		});
-		return result;
-	}
-
-	$('.addresses-list').on('blur', '.address-input', function (e) {
-		let addresses = $(this).closest('.addresses-list');
-		if(hasEmptyAddress(addresses)) {
-			return;
-		}
-
-		let line = $($('.line', addresses)[0]).clone();
-		$('input', line).val('');
-
-		addresses.append(line[0]);
-	});
-
-	$('.addresses-list').on('click', '.remove', function () {
-		if($(this).closest('.addresses-list').find('.address-input').length < 2) {
-			return;
-		}
-
-		$(this).closest('.line').remove();
-	});
-
-	$('#connect-form').submit(function(ev){
-		$.post('/connect', $('#connect-form').serialize(), function(data){
-			$('.before-submit').hide();
-			$('#submit-message').removeClass('hidden');
-		});
-		ev.preventDefault();
-	});
 
 	$.get('/networks', function(data){
 		$('#wifi-networks-list').empty();
@@ -131,7 +59,79 @@ $(function(){
 
 			$('#wifi-networks-list').append(link);
 		});
+	});
 
-		jQuery.proxy(showHideEnterpriseSettings, $('#ssid-select'))();
+	$('#wifi-networks-list').on('click', 'a', function (e) {
+		e.preventDefault();
+
+		$('#wifi-networks').hide();
+		$('#settings').show();
+
+		let security = $(this).data('security');
+
+		$('#security-select').val(security).trigger('chosen:updated').change();
+	})
+
+	/////////////////////////////////////////////////////////////////////////
+	// Security view
+	//
+
+	$('#security-select').chosen().change(function (event) {
+		$('option:selected', this).tab('show');
+	});
+
+	$('#eap-authentication').chosen().change(function (event) {
+		$('option:selected', this).tab('show');
+
+		if($(this).val() === 'tls') {
+			$('#eap-username-password-pane').hide();
+		} else {
+			$('#eap-username-password-pane').show();
+		}
+	});
+
+	/////////////////////////////////////////////////////////////////////////
+	// Dynamic addresses UI
+	//
+
+	function hasEmptyAddress(addresses) {
+		let result = false;
+		addresses.find('.address-input').each(function() {
+			if(!$(this).val()) {
+				result = true;
+				return;
+			}
+		});
+		return result;
+	}
+
+	$('.addresses-list').on('blur', '.address-input', function (e) {
+		let addresses = $(this).closest('.addresses-list');
+		if(hasEmptyAddress(addresses)) {
+			return;
+		}
+
+		let line = $($('.line', addresses)[0]).clone();
+		$('input', line).val('');
+
+		addresses.append(line[0]);
+	});
+
+	$('.addresses-list').on('click', '.remove', function () {
+		if($(this).closest('.addresses-list').find('.address-input').length < 2) {
+			return;
+		}
+
+		$(this).closest('.line').remove();
+	});
+
+	/////////////////////////////////////////////////////////////////////////
+	// Connect form submit
+	//
+
+	$('#connect-form').submit(function(e) {
+		console.log('Submit form');
+
+		e.preventDefault();
 	});
 });
