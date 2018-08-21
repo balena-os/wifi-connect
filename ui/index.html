@@ -104,10 +104,10 @@
 
             <div class="row justify-content-center form-group mb-3">
               <div class="col-12 col-xl-2">
-                <label for="security-select" class="col-form-label">Security</label>
+                <label for="security-type" class="col-form-label">Security</label>
               </div>
               <div class="col-12 col-xl-6">
-                <select id="security-select" class="form-control chosen-select nav" name="security-select">
+                <select id="security-type" class="form-control chosen-select nav" name="security[type]">
                   <option value="none" data-toggle="tab" data-target="#none-pane">None</option>
                   <option value="wpa" data-toggle="tab" data-target="#wpa-pane">WPA & WPA2 Personal</option>
                   <option value="eap" data-toggle="tab" data-target="#eap-pane" selected>WPA & WPA2 Enterprise</option>
@@ -131,7 +131,7 @@
                     <label class="col-form-label">Password</label>
                   </div>
                   <div class="col-12 col-xl-6">
-                    <input type="password" id="wpa-password" class="form-control" name="wpa-password" data-toggle="password">
+                    <input type="password" id="wpa-password" class="form-control" name="security[wpa][password]" data-toggle="password">
                   </div>
                 </div>
               </div>
@@ -143,7 +143,7 @@
                     <label for="eap-authentication" class="col-form-label">Authentication</label>
                   </div>
                   <div class="col-12 col-xl-6">
-                    <select id="eap-authentication" class="form-control chosen-select nav" name="eap-authentication">
+                    <select id="eap-authentication" class="form-control chosen-select nav" name="security[eap][authentication]">
                       <option value="peap" data-toggle="tab" data-target="#peap-pane" selected>Protected EAP (PEAP)</option>
                       <option value="tls" data-toggle="tab" data-target="#tls-pane">TLS</option>
                       <option value="ttls" data-toggle="tab" data-target="#ttls-pane">Tunneled TLS</option>
@@ -162,7 +162,7 @@
                         <label for="eap-peap-anon-identity" class="col-form-label">Anonymous identity</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <input id="eap-peap-anon-identity" class="form-control" name="eap-peap-anon-identity">
+                        <input id="eap-peap-anon-identity" class="form-control" name="security[eap][peap][anon_identity]">
                       </div>
                     </div>
 
@@ -172,7 +172,7 @@
                       </div>
                       <div class="col-12 col-xl-6">
                         <div class="custom-file">
-                          <input id="eap-peap-ca-cert" type="file" class="custom-file-input" name="eap-peap-ca-cert">
+                          <input id="eap-peap-ca-cert" type="file" class="custom-file-input" name="security[eap][peap][ca_cert]">
                           <label class="custom-file-label" for="eap-peap-ca-cert">Choose file...</label>
                         </div>
                       </div>
@@ -181,7 +181,7 @@
                     <div class="row justify-content-center form-group mb-3">
                       <div class="col-12 col-xl-6 offset-xl-2">
                         <div class="form-check">
-                          <input id="eap-peap-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-peap-ca-cert-not-required" value="true" checked>
+                          <input id="eap-peap-ca-cert-not-required" class="form-check-input" type="checkbox" name="security[eap][peap][ca_cert_not_required]" value="true" checked>
                           <label class="form-check-label" for="eap-peap-ca-cert-not-required">
                             No CA certificate is required
                           </label>
@@ -194,7 +194,7 @@
                         <label for="eap-peap-version" class="col-form-label">PEAP version</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <select id="eap-peap-version" class="form-control chosen-select" name="eap-peap-version">
+                        <select id="eap-peap-version" class="form-control chosen-select" name="security[eap][peap][version]">
                           <option value="auto" selected>Automatic</option>
                           <option value="version-0">Version 0</option>
                           <option value="version-1">Version 1</option>
@@ -207,7 +207,7 @@
                         <label for="eap-peap-inner-auth" class="col-form-label">Inner authentication</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <select id="eap-peap-inner-auth" class="form-control chosen-select" name="eap-peap-inner-auth">
+                        <select id="eap-peap-inner-auth" class="form-control chosen-select" name="security[eap][peap][inner_auth]">
                           <option value="mschapv2" selected>MSCHAPv2</option>
                           <option value="md5">MD5</option>
                           <option value="gtc">GTC</option>
@@ -224,7 +224,7 @@
                         <label for="eap-tls-identity" class="col-form-label">Identity</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <input id="eap-tls-identity" class="form-control" name="eap-tls-identity">
+                        <input id="eap-tls-identity" class="form-control" name="security[eap][tls][identity]">
                       </div>
                     </div>
 
@@ -234,7 +234,7 @@
                       </div>
                       <div class="col-12 col-xl-6">
                         <div class="custom-file">
-                          <input id="eap-tls-user-cert" type="file" class="custom-file-input" name="eap-tls-user-cert">
+                          <input id="eap-tls-user-cert" type="file" class="custom-file-input" name="security[eap][tls][user_cert]">
                           <label class="custom-file-label" for="eap-tls-user-cert">Choose file...</label>
                         </div>
                       </div>
@@ -246,7 +246,7 @@
                       </div>
                       <div class="col-12 col-xl-6">
                         <div class="custom-file">
-                          <input id="eap-tls-ca-cert" type="file" class="custom-file-input" name="eap-tls-ca-cert">
+                          <input id="eap-tls-ca-cert" type="file" class="custom-file-input" name="security[eap][tls][ca_cert]">
                           <label class="custom-file-label" for="eap-tls-ca-cert">Choose file...</label>
                         </div>
                       </div>
@@ -255,7 +255,7 @@
                     <div class="row justify-content-center form-group mb-3">
                       <div class="col-12 col-xl-6 offset-xl-2">
                         <div class="form-check">
-                          <input id="eap-tls-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-tls-ca-cert-not-required" value="true" checked>
+                          <input id="eap-tls-ca-cert-not-required" class="form-check-input" type="checkbox" name="security[eap][tls][ca_cert_not_required]" value="true" checked>
                           <label class="form-check-label" for="eap-tls-ca-cert-not-required">
                             No CA certificate is required
                           </label>
@@ -269,7 +269,7 @@
                       </div>
                       <div class="col-12 col-xl-6">
                         <div class="custom-file">
-                          <input id="eap-tls-private-key" type="file" class="custom-file-input" name="eap-tls-private-key">
+                          <input id="eap-tls-private-key" type="file" class="custom-file-input" name="security[eap][tls][private_key]">
                           <label class="custom-file-label" for="eap-tls-private-key">Choose file...</label>
                         </div>
                       </div>
@@ -280,7 +280,7 @@
                         <label class="col-form-label">Private key password</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <input id="eap-tls-private-key-password" type="password" class="form-control" name="eap-tls-private-key-password" data-toggle="password">
+                        <input id="eap-tls-private-key-password" type="password" class="form-control" name="security[eap][tls][private_key_password]" data-toggle="password">
                       </div>
                     </div>
 
@@ -293,7 +293,7 @@
                         <label for="eap-ttls-anon-identity" class="col-form-label">Anonymous identity</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <input id="eap-ttls-anon-identity" class="form-control" name="eap-ttls-anon-identity">
+                        <input id="eap-ttls-anon-identity" class="form-control" name="security[eap][ttls][anon_identity]">
                       </div>
                     </div>
 
@@ -303,7 +303,7 @@
                       </div>
                       <div class="col-12 col-xl-6">
                         <div class="custom-file">
-                          <input id="eap-ttls-ca-cert" type="file" class="custom-file-input" name="eap-ttls-ca-cert">
+                          <input id="eap-ttls-ca-cert" type="file" class="custom-file-input" name="security[eap][ttls][ca_cert]">
                           <label class="custom-file-label" for="eap-ttls-ca-cert">Choose file...</label>
                         </div>
                       </div>
@@ -312,7 +312,7 @@
                     <div class="row justify-content-center form-group mb-3">
                       <div class="col-12 col-xl-6 offset-xl-2">
                         <div class="form-check">
-                          <input id="eap-ttls-ca-cert-not-required" class="form-check-input" type="checkbox" name="eap-ttls-ca-cert-not-required" value="true" checked>
+                          <input id="eap-ttls-ca-cert-not-required" class="form-check-input" type="checkbox" name="security[eap][ttls][ca_cert_not_required]" value="true" checked>
                           <label class="form-check-label" for="eap-ttls-ca-cert-not-required">
                             No CA certificate is required
                           </label>
@@ -325,7 +325,7 @@
                         <label for="eap-ttls-inner-auth" class="col-form-label">Inner authentication</label>
                       </div>
                       <div class="col-12 col-xl-6">
-                        <select id="eap-ttls-inner-auth" class="form-control chosen-select" name="eap-ttls-inner-auth">
+                        <select id="eap-ttls-inner-auth" class="form-control chosen-select" name="security[eap][ttls][inner_auth]">
                           <option value="pap" selected>PAP</option>
                           <option value="mschap">MSCHAP</option>
                           <option value="mschapv2">MSCHAPv2</option>
@@ -354,7 +354,7 @@
                       <label for="eap-username" class="col-form-label">Username</label>
                     </div>
                     <div class="col-12 col-xl-6">
-                      <input id="eap-username" class="form-control" name="eap-username">
+                      <input id="eap-username" class="form-control" name="security[eap][username]">
                     </div>
                   </div>
 
@@ -363,7 +363,7 @@
                       <label class="col-form-label">Password</label>
                     </div>
                     <div class="col-12 col-xl-6">
-                      <input type="password" id="eap-password" class="form-control" name="eap-password" data-toggle="password">
+                      <input type="password" id="eap-password" class="form-control" name="security[eap][password]" data-toggle="password">
                     </div>
                   </div>
 
@@ -380,25 +380,25 @@
             <div class="row justify-content-center form-group mt-2 mb-4">
               <div class="col-form-label col-12 col-xl-2 py-0 font-italic">IPv4 Method</div>
               <div class="col-12 col-xl-3 pb-2 form-check">
-                <input id="ip4-method-auto" class="form-check-input" type="radio" name="ip4-method" value="auto" checked>
+                <input id="ip4-method-auto" class="form-check-input" type="radio" name="ip4[method]" value="auto" checked>
                 <label class="form-check-label" for="ip4-method-auto">
                   Automatic (DHCP)
                 </label>
               </div>
               <div class="col-12 col-xl-3 pb-2 form-check">
-                <input id="ip4-method-link-local" class="form-check-input" type="radio" name="ip4-method" value="link-local">
+                <input id="ip4-method-link-local" class="form-check-input" type="radio" name="ip4[method]" value="link-local">
                 <label class="form-check-label" for="ip4-method-link-local">
                   Link-Local Only
                 </label>
               </div>
               <div class="col-12 col-xl-3 offset-xl-2 pb-2 form-check">
-                <input id="ip4-method-manual" class="form-check-input" type="radio" name="ip4-method" value="manual">
+                <input id="ip4-method-manual" class="form-check-input" type="radio" name="ip4[method]" value="manual">
                 <label class="form-check-label" for="ip4-method-manual">
                   Manual
                 </label>
               </div>
               <div class="col-12 col-xl-3 pb-2 form-check">
-                <input id="ip4-method-disabled" class="form-check-input" type="radio" name="ip4-method" value="disabled">
+                <input id="ip4-method-disabled" class="form-check-input" type="radio" name="ip4[method]" value="disabled">
                 <label class="form-check-label" for="ip4-method-disabled">
                   Disable
                 </label>
@@ -457,7 +457,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">DNS</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input id="ip4-dns-auto" class="form-check-input" type="checkbox" name="ip4-dns-auto" value="true" checked>
+                  <input id="ip4-dns-auto" class="form-check-input" type="checkbox" name="ip4[dns_auto]" value="true" checked>
                   <label class="form-check-label" for="ip4-dns-auto">
                     Automatic
                   </label>
@@ -466,7 +466,7 @@
             </div>
             <div class="row justify-content-center form-group mb-0">
               <div class="col-12 col-xl-8">
-                <input id="ip4-dns" class="form-control" name="ip4-dns">
+                <input id="ip4-dns" class="form-control" name="ip4[dns]">
               </div>
             </div>
             <div class="row justify-content-center form-group mb-4">
@@ -479,7 +479,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">Routes</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input id="ip4-routes-auto" class="form-check-input" type="checkbox" name="ip4-routes-auto" value="true" checked>
+                  <input id="ip4-routes-auto" class="form-check-input" type="checkbox" name="ip4[routes_auto]" value="true" checked>
                   <label class="form-check-label" for="ip4-routes-auto">
                     Automatic
                   </label>
@@ -544,31 +544,31 @@
             <div class="row justify-content-center form-group mt-2 mb-4">
               <div class="col-form-label col-12 col-xl-2 py-0 font-italic">IPv6 Method</div>
               <div class="col-12 col-xl-3 pb-2 form-check">
-                <input id="ip6-method-auto" class="form-check-input" type="radio" name="ip6-method" value="auto" checked>
+                <input id="ip6-method-auto" class="form-check-input" type="radio" name="ip6[method]" value="auto" checked>
                 <label class="form-check-label" for="ip6-method-auto">
                   Automatic
                 </label>
               </div>
               <div class="col-12 col-xl-3 pb-2 form-check">
-                <input id="ip6-method-dhcp" class="form-check-input" type="radio" name="ip6-method" value="dhcp">
+                <input id="ip6-method-dhcp" class="form-check-input" type="radio" name="ip6[method]" value="dhcp">
                 <label class="form-check-label" for="ip6-method-dhcp">
                   Automatic, DHCP only
                 </label>
               </div>
               <div class="col-12 col-xl-3 offset-xl-2 pb-2 form-check">
-                <input id="ip6-method-link-local" class="form-check-input" type="radio" name="ip6-method" value="link-local">
+                <input id="ip6-method-link-local" class="form-check-input" type="radio" name="ip6[method]" value="link-local">
                 <label class="form-check-label" for="ip6-method-link-local">
                   Link-Local Only
                 </label>
               </div>
               <div class="col-12 col-xl-3 pb-2 form-check">
-                <input id="ip6-method-manual" class="form-check-input" type="radio" name="ip6-method" value="manual">
+                <input id="ip6-method-manual" class="form-check-input" type="radio" name="ip6[method]" value="manual">
                 <label class="form-check-label" for="ip6-method-manual">
                   Manual
                 </label>
               </div>
               <div class="col-12 col-xl-6 offset-xl-2 pb-2 form-check">
-                <input id="ip6-method-ignore" class="form-check-input" type="radio" name="ip6-method" value="ignore">
+                <input id="ip6-method-ignore" class="form-check-input" type="radio" name="ip6[method]" value="ignore">
                 <label class="form-check-label" for="ip6-method-ignore">
                   Disable
                 </label>
@@ -627,7 +627,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">DNS</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input id="ip6-dns-auto" class="form-check-input" type="checkbox" name="ip6-dns-auto" value="true" checked>
+                  <input id="ip6-dns-auto" class="form-check-input" type="checkbox" name="ip6[dns_auto]" value="true" checked>
                   <label class="form-check-label" for="ip6-dns-auto">
                     Automatic
                   </label>
@@ -636,7 +636,7 @@
             </div>
             <div class="row justify-content-center form-group mb-0">
               <div class="col-12 col-xl-8">
-                <input id="ip6-dns" class="form-control" name="ip6-dns">
+                <input id="ip6-dns" class="form-control" name="ip6[dns]">
               </div>
             </div>
             <div class="row justify-content-center form-group mb-4">
@@ -649,7 +649,7 @@
               <div class="col-form-label col-12 col-xl-2 pt-0 font-italic">Routes</div>
               <div class="col-12 col-xl-6 form-check d-flex justify-content-end">
                 <div>
-                  <input id="ip6-routes-auto" class="form-check-input" type="checkbox" name="ip6-routes-auto" value="true" checked>
+                  <input id="ip6-routes-auto" class="form-check-input" type="checkbox" name="ip6[routes_auto]" value="true" checked>
                   <label class="form-check-label" for="ip6-routes-auto">
                     Automatic
                   </label>

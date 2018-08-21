@@ -69,14 +69,14 @@ $(function(){
 
 		let security = $(this).data('security');
 
-		$('#security-select').val(security).trigger('chosen:updated').change();
+		$('#security-type').val(security).trigger('chosen:updated').change();
 	})
 
 	/////////////////////////////////////////////////////////////////////////
 	// Security view
 	//
 
-	$('#security-select').chosen().change(function (event) {
+	$('#security-type').chosen().change(function (event) {
 		$('option:selected', this).tab('show');
 	});
 
