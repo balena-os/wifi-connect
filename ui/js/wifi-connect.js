@@ -1,8 +1,19 @@
 $('.chosen-select').chosen({disable_search_threshold: 10});
 
 $(document).on('change', '.custom-file-input', function () {
+	let input = $(this);
+
 	let fileName = $(this).val().replace(/\\/g, '/').replace(/.*\//, '');
-	$(this).parent('.custom-file').find('.custom-file-label').text(fileName);
+	input.parent('.custom-file').find('.custom-file-label').text(fileName);
+
+	if (this.files.length === 0) {
+		return;
+	}
+	let reader = new FileReader();
+	reader.onload = function(event) {
+		input.data('contents', event.target.result);
+	}
+	reader.readAsText(this.files[0]);
 });
 
 $(function(){
@@ -129,10 +140,56 @@ $(function(){
 	// Connect form submit
 	//
 
+	function tryAppendCertificate(eap, type, key, selector) {
+		let contents = $(selector).data('contents');
+		if (contents) {
+			eap[type][key] = contents;
+		}
+	}
+
+	function appendCertificates(data) {
+		if (data['security']['type'] !== 'eap') {
+			return;
+		}
+
+		let eap = data['security']['eap'];
+
+		if (eap['authentication'] === 'peap') {
+			if (!eap['peap']['ca_cert_not_required']) {
+				tryAppendCertificate(eap, 'peap', 'ca_cert', '#eap-peap-ca-cert');
+			}
+			return;
+		}
+
+		if (eap['authentication'] === 'tls') {
+			if (!eap['tls']['ca_cert_not_required']) {
+				tryAppendCertificate(eap, 'tls', 'ca_cert', '#eap-tls-ca-cert');
+			}
+			tryAppendCertificate(eap, 'tls', 'user_cert', '#eap-tls-user-cert');
+			tryAppendCertificate(eap, 'tls', 'private_key', '#eap-tls-private-key');
+			return;
+		}
+
+		if (eap['authentication'] === 'ttls') {
+			if (!eap['ttls']['ca_cert_not_required']) {
+				tryAppendCertificate(eap, 'ttls', 'ca_cert', '#eap-ttls-ca-cert');
+			}
+			return;
+		}
+	}
+
+	function collectFormData() {
+		let data = $('form').serializeJSON({checkboxUncheckedValue: 'false', parseBooleans: true});
+
+		appendCertificates(data);
+
+		return data;
+	}
+
 	$('#connect-form').submit(function(e) {
-		console.log(
-			$('form').serializeJSON({checkboxUncheckedValue: 'false', parseBooleans: true})
-		);
+		let data = collectFormData();
+
+		console.log(data);
 
 		e.preventDefault();
 	});
