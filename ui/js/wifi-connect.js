@@ -107,7 +107,7 @@ $(function(){
 
 	function hasEmptyAddress(addresses) {
 		let result = false;
-		addresses.find('.address-input').each(function() {
+		addresses.find('.address').each(function() {
 			if(!$(this).val()) {
 				result = true;
 				return;
@@ -116,7 +116,7 @@ $(function(){
 		return result;
 	}
 
-	$('.addresses-list').on('blur', '.address-input', function (e) {
+	$('.addresses-list').on('blur', '.address', function (e) {
 		let addresses = $(this).closest('.addresses-list');
 		if(hasEmptyAddress(addresses)) {
 			return;
@@ -129,7 +129,7 @@ $(function(){
 	});
 
 	$('.addresses-list').on('click', '.remove', function () {
-		if($(this).closest('.addresses-list').find('.address-input').length < 2) {
+		if($(this).closest('.addresses-list').find('.address').length < 2) {
 			return;
 		}
 
@@ -137,7 +137,7 @@ $(function(){
 	});
 
 	/////////////////////////////////////////////////////////////////////////
-	// Connect form submit
+	// Form submit
 	//
 
 	function tryAppendCertificate(eap, type, key, selector) {
@@ -178,10 +178,37 @@ $(function(){
 		}
 	}
 
+	function collectAddresses(selector) {
+		let list = [];
+		$('.line', $(selector)).each(function() {
+			let line = $(this);
+			let address = $('.address', line).val();
+			let netmask = $('.netmask', line).val();
+			let gateway = $('.gateway', line).val();
+			let metric = $('.metric', line).val();
+			if (address) {
+				let dict = {};
+				dict['address'] = address;
+				dict['netmask'] = netmask;
+				dict['gateway'] = gateway;
+				if (metric !== undefined) {
+					dict['gateway'] = gateway;
+				}
+				list.push(dict);
+			}
+		});
+		return list;
+	}
+
 	function collectFormData() {
 		let data = $('form').serializeJSON({checkboxUncheckedValue: 'false', parseBooleans: true});
 
 		appendCertificates(data);
+
+		data['ip4']['addresses'] = collectAddresses('#ip4-addresses');
+		data['ip4']['routes'] = collectAddresses('#ip4-routes');
+		data['ip6']['addresses'] = collectAddresses('#ip6-addresses');
+		data['ip6']['routes'] = collectAddresses('#ip6-routes');
 
 		return data;
 	}
