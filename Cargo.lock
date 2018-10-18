@@ -340,8 +340,8 @@ dependencies = [
 
 [[package]]
 name = "network-manager"
-version = "0.10.0"
-source = "git+https://github.com/resin-io-modules/network-manager?branch=118-wpa-eap#a6fc4e55f9a4b34e8de7350eadc1f90a51e046d4"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ascii 0.8.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -870,7 +870,7 @@ dependencies = [
  "iron-cors 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "mount 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "network-manager 0.10.0 (git+https://github.com/resin-io-modules/network-manager?branch=118-wpa-eap)",
+ "network-manager 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nix 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "params 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "persistent 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -948,7 +948,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum modifier 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "41f5c9112cb662acd3b204077e0de5bc66305fa8df65c8019d5adb10e9ab6e58"
 "checksum mount 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e25c06012941aaf8c75f2eaf7ec5c48cf69f9fc489ab3eb3589edc107e386f0b"
 "checksum multipart 0.13.6 (registry+https://github.com/rust-lang/crates.io-index)" = "92f54eb45230c3aa20864ccf0c277eeaeadcf5e437e91731db498dbf7fbe0ec6"
-"checksum network-manager 0.10.0 (git+https://github.com/resin-io-modules/network-manager?branch=118-wpa-eap)" = "<none>"
+"checksum network-manager 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8153439bd953eba4f6e7198ddbdc01badc246f39b0d7b3c79a997b390f76b1be"
 "checksum nix 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b7fd5681d13fda646462cfbd4e5f2051279a89a544d50eb98c365b507246839f"
 "checksum num 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)" = "4703ad64153382334aa8db57c637364c322d3372e097840c72000dabdcf6156e"
 "checksum num-bigint 0.1.44 (registry+https://github.com/rust-lang/crates.io-index)" = "e63899ad0da84ce718c14936262a41cee2c79c981fc0a0e7c7beb47d5a07e8c1"

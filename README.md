@@ -1,24 +1,24 @@
-<h1 align="center"><img width="460" src="https://github.com/resin-io/resin-wifi-connect/raw/master/docs/images/wifi-connect.png" /></h1>
+<h1 align="center"><img width="460" src="https://github.com/balena-io/wifi-connect/raw/master/docs/images/wifi-connect.png" /></h1>
 
 > Easy WiFi setup for Linux devices from your mobile phone or laptop
 
 WiFi Connect is a utility for dynamically setting the WiFi configuration on a Linux device via a captive portal. WiFi credentials are specified by connecting with a mobile phone or laptop to the access point that WiFi Connect creates.
 
-[![Current Release](https://img.shields.io/github/release/resin-io/resin-wifi-connect.svg?style=flat-square)](https://github.com/resin-io/resin-wifi-connect/releases/latest)
-[![CircleCI status](https://img.shields.io/circleci/project/github/resin-io/resin-wifi-connect.svg?style=flat-square)](https://circleci.com/gh/resin-io/resin-wifi-connect)
-[![License](https://img.shields.io/github/license/resin-io/resin-wifi-connect.svg?style=flat-square)](https://github.com/resin-io/resin-wifi-connect/blob/master/LICENSE)
-[![Issues](https://img.shields.io/github/issues/resin-io/resin-wifi-connect.svg?style=flat-square)](https://github.com/resin-io/resin-wifi-connect/issues)
+[![Current Release](https://img.shields.io/github/release/balena-io/wifi-connect.svg?style=flat-square)](https://github.com/balena-io/wifi-connect/releases/latest)
+[![CircleCI status](https://img.shields.io/circleci/project/github/balena-io/wifi-connect.svg?style=flat-square)](https://circleci.com/gh/balena-io/wifi-connect)
+[![License](https://img.shields.io/github/license/balena-io/wifi-connect.svg?style=flat-square)](https://github.com/balena-io/wifi-connect/blob/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues/balena-io/wifi-connect.svg?style=flat-square)](https://github.com/balena-io/wifi-connect/issues)
 
 <div align="center">
-  <sub>an open source :satellite: project by <a href="https://resin.io">resin.io</a></sub>
+  <sub>an open source :satellite: project by <a href="https://balena.io">balena.io</a></sub>
 </div>
 
 ***
 
-[**Download**][DOWNLOAD] | [**How it works**](#how-it-works) | [**How to use**](#how-to-use) | [**Support**](#support) | [**Roadmap**][MILESTONES]
+[**Download**][DOWNLOAD] | [**How it works**](#how-it-works) | [**Installation**](#installation) | [**Support**](#support) | [**Roadmap**][MILESTONES]
 
-[DOWNLOAD]: https://github.com/resin-io/resin-wifi-connect/releases/latest
-[MILESTONES]: https://github.com/resin-io/resin-wifi-connect/milestones
+[DOWNLOAD]: https://github.com/balena-io/wifi-connect/releases/latest
+[MILESTONES]: https://github.com/balena-io/wifi-connect/milestones
 
 ![How it works](./docs/images/how-it-works.png?raw=true)
 
@@ -33,7 +33,7 @@ WiFi Connect detects available WiFi networks and opens an access point with a ca
 
 ### 2. Connect: User Connects Phone to Device Access Point
 
-Connect to the opened access point on the device from your mobile phone or laptop. The access point SSID is, by default, `WiFi Connect`. It can be changed by setting the `--portal-ssid` command line argument or the `PORTAL_SSID` environment variable (see [this guide](https://docs.resin.io/management/env-vars/) for how to manage environment variables when running on top of resinOS). By default, the network is unprotected, but a WPA2 passphrase can be added by setting the `--portal-passphrase` command line argument or the `PORTAL_PASSPHRASE` environment variable.
+Connect to the opened access point on the device from your mobile phone or laptop. The access point SSID is, by default, `WiFi Connect`. It can be changed by setting the `--portal-ssid` command line argument or the `PORTAL_SSID` environment variable (see [this guide](https://balena.io/docs/management/env-vars/) for how to manage environment variables when running on top of balenaOS). By default, the network is unprotected, but a WPA2 passphrase can be added by setting the `--portal-passphrase` command line argument or the `PORTAL_PASSPHRASE` environment variable.
 
 ### 3. Portal: Phone Shows Captive Portal to User
 
@@ -58,7 +58,7 @@ The full application flow is illustrated in the [state flow diagram](./docs/stat
 Installation
 ------------
 
-WiFi Connect is designed to work on systems like Raspbian or Debian, or run in a docker container on top of resinOS.
+WiFi Connect is designed to work on systems like Raspbian or Debian, or run in a docker container on top of balenaOS.
 
 ### Raspbian/Debian Stretch
 
@@ -66,14 +66,14 @@ WiFi Connect depends on NetworkManager, but by default Raspbian Stretch uses dhc
 
 Run the following in your terminal, then follow the onscreen instructions:
 
-`bash <(curl -L https://github.com/resin-io/resin-wifi-connect/raw/master/scripts/raspbian-install.sh)`
+`bash <(curl -L https://github.com/balena-io/wifi-connect/raw/master/scripts/raspbian-install.sh)`
 
-### resinOS
+### balenaOS
 
-WiFi Connect can be integrated with a [resin.io](http://resin.io) application. (New to resin.io? Check out the [Getting Started Guide](http://docs.resin.io/#/pages/installing/gettingStarted.md).) This integration is accomplished through the use of two shared files:
-- The [Dockerfile template](./Dockerfile.template) manages dependencies. The example included here has everything necessary for WiFi Connect. Application dependencies need to be added. For help with Dockerfiles, take a look at this [guide](https://docs.resin.io/deployment/dockerfile/).
+WiFi Connect can be integrated with a [balena.io](http://balena.io) application. (New to balena.io? Check out the [Getting Started Guide](https://balena.io/docs/#/pages/installing/gettingStarted.md).) This integration is accomplished through the use of two shared files:
+- The [Dockerfile template](./Dockerfile.template) manages dependencies. The example included here has everything necessary for WiFi Connect. Application dependencies need to be added. For help with Dockerfiles, take a look at this [guide](https://balena.io/docs/deployment/dockerfile/).
 - The [start script](./scripts/start.sh) should contain the commands that run the application. Adding these commands at the end of the script will ensure that everything kicks off after WiFi is correctly configured. 
-An example of using WiFi Connect in a Python project can be found [here](https://github.com/resin-io-projects/resin-wifi-connect-example).
+An example of using WiFi Connect in a Python project can be found [here](https://github.com/balena-io-projects/wifi-connect-example).
 
 ***
 
@@ -100,14 +100,14 @@ The following dongles are known **not** to work (as the driver is not friendly w
 
 Dongles with similar chipsets will probably not work.
 
-WiFi Connect is expected to work with all resin.io supported boards as long as they have the compatible dongles.
+WiFi Connect is expected to work with all balena.io supported boards as long as they have the compatible dongles.
 
 ***
 
 Support
 -------
 
-If you're having any problem, please [raise an issue](https://github.com/resin-io/resin-wifi-connect/issues/new) on GitHub or [contact us](https://resin.io/community/), and the resin.io team will be happy to help.
+If you're having any problem, please [raise an issue](https://github.com/balena-io/wifi-connect/issues/new) on GitHub or [contact us](https://balena.io/community/), and the balena.io team will be happy to help.
 
 ***
 
@@ -115,4 +115,4 @@ License
 -------
 
 WiFi Connect is free software, and may be redistributed under the terms specified in
-the [license](https://github.com/resin-io/resin-wifi-connect/blob/master/LICENSE).
+the [license](https://github.com/balena-io/wifi-connect/blob/master/LICENSE).
