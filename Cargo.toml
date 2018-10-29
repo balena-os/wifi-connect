@@ -3,6 +3,8 @@ name = "wifi-connect"
 version = "4.2.2"
 authors = ["Zahari Petkov <zahari@balena.io>"]
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
+homepage = "https://github.com/resin-io/resin-wifi-connect"
+license = "Apache-2.0"
 
 [dependencies]
 network-manager = "0.11"
