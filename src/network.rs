@@ -1,17 +1,19 @@
-use std::thread;
-use std::process;
-use std::time::Duration;
-use std::sync::mpsc::{channel, Receiver, Sender};
 use std::error::Error;
 use std::net::Ipv4Addr;
+use std::process;
+use std::sync::mpsc::{channel, Receiver, Sender};
+use std::thread;
+use std::time::Duration;
 
-use network_manager::{AccessPoint, AccessPointCredentials, Connection, ConnectionState,
-                      Connectivity, Device, DeviceType, NetworkManager, Security, ServiceState};
+use network_manager::{
+    AccessPoint, AccessPointCredentials, Connection, ConnectionState, Connectivity, Device,
+    DeviceType, NetworkManager, Security, ServiceState,
+};
 
-use errors::*;
-use exit::{exit, trap_exit_signals, ExitResult};
 use config::Config;
 use dnsmasq::start_dnsmasq;
+use errors::*;
+use exit::{exit, trap_exit_signals, ExitResult};
 use server::start_server;
 
 pub enum NetworkCommand {
@@ -495,7 +497,8 @@ pub fn start_network_manager_service() -> Result<()> {
     };
 
     if state != ServiceState::Active {
-        let state = NetworkManager::start_service(15).chain_err(|| ErrorKind::StartNetworkManager)?;
+        let state =
+            NetworkManager::start_service(15).chain_err(|| ErrorKind::StartNetworkManager)?;
         if state != ServiceState::Active {
             bail!(ErrorKind::StartActiveNetworkManager);
         } else {
