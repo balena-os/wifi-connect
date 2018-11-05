@@ -16,7 +16,7 @@ error_chain! {
 
     errors {
         RecvAccessPointSSIDs {
-            description("Receiving access point SSIDs failed")
+            description("Receiving access point SSIDs failed!")
         }
 
         SendAccessPointSSIDs {
