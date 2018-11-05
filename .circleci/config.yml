@@ -81,8 +81,8 @@ jobs:
       - image: majorz/rust-test-deploy:rust-nightly-2018-01-08
 
     environment:
-      GITHUB_USER: resin-io
-      GITHUB_REPO: resin-wifi-connect
+      GITHUB_USER: balena-io
+      GITHUB_REPO: wifi-connect
 
     steps:
       - checkout

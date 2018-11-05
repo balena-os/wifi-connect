@@ -1,7 +1,7 @@
 [package]
 name = "wifi-connect"
 version = "4.2.1"
-authors = ["Zahari Petkov <zahari@resin.io>", "Aaron Brodersen <aaron@resin.io>"]
+authors = ["Zahari Petkov <zahari@balena.io>"]
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
 
 [dependencies]
