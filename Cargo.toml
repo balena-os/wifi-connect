@@ -28,4 +28,8 @@ version = "0.11"
 default-features = false
 
 [profile.release]
+panic = "abort"
 lto = true
+codegen-units = 1
+incremental = false
+opt-level = "z"
