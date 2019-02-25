@@ -19,7 +19,7 @@ $(function(){
 		} else {
 			networks = JSON.parse(data);
 			$.each(networks, function(i, val){
-				if((val !== '') && ($('#ssid-select option[val="' + val + '"]').length === 0)){
+				if((val.ssid !== '') && ($('#ssid-select option[val="' + val.ssid + '"]').length === 0)){
 					$('#ssid-select').append(
 						$('<option>')
 							.text(val.ssid)
