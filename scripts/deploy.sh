@@ -6,7 +6,7 @@ trap "exit 1" TERM
 export TOP_PID=$$
 
 : "${APPNAME:=deploy}"
-: "${CIRCLE_FULL_ENDPOINT:=https://circleci.com/api/v1.1/project/github/$GITHUB_USER/$GITHUB_REPO}"
+: "${CIRCLE_FULL_ENDPOINT:=https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME}"
 : "${CIRCLE_TAG:=}"
 
 main() {
@@ -78,7 +78,7 @@ main() {
     )
 
     _response=$(
-        curl -sSL -X POST "https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases" \
+        curl -sSL -X POST "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/releases" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
