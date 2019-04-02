@@ -104,10 +104,6 @@ jobs:
     docker:
       - image: majorz/rust-test-deploy:rust-nightly-2018-01-08
 
-    environment:
-      GITHUB_USER: balena-io
-      GITHUB_REPO: wifi-connect
-
     steps:
       - checkout
 
