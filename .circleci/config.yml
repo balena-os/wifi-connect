@@ -10,7 +10,7 @@ build: &build
     - checkout
 
     - run: cargo build --release --target=$TARGET
- 
+
     - run: cross-strip target/$TARGET/release/$BINARY
 
     - run: |
@@ -31,7 +31,7 @@ build: &build
 
     - run: mkdir -p pack /tmp/dist
     - run: mv target/$TARGET/release/$BINARY pack/$BINARY
-    - run: cp -R ui pack/ui
+    - run: cp -R ui/build pack/ui
     - run: tar -czvf $ARCHIVE_PATH -C pack .
     - run: rm -rdf pack
 
