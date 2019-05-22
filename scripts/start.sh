@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+export PORTAL_SSID="You shoud not see me"
 
 # Choose a condition for running WiFi Connect according to your use case:
 
