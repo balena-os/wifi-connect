@@ -16,7 +16,7 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # 4. Is there an active WiFi connection?
 iwgetid -r
 
-printf 'Checking Changed Shell by Log\n'
+printf 'Checking Changed Shell\n'
 
 if [ $? -eq 0 ]; then
     printf 'Skipping WiFi Connect\n'
