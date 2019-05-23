@@ -4,7 +4,7 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
 # 環境変数DEVICE_NAMEが無ければ環境変数BALENA_DEVICE_NAME_AT_INITを文字列結合する
 # 環境変数BALENA_DEVICE_NAME_AT_INITが無ければ文字列"sample"を文字列結合する
-wifi_connect_portal_ssid="WiFi-Connect_${DEVICE_NAME:-${BALENA_DEVICE_NAME_AT_INIT:-sample}}"
+wifi_connect_portal_ssid="COET ${DEVICE_NAME:-${BALENA_DEVICE_NAME_AT_INIT:-sample}}"
 
 # Choose a condition for running WiFi Connect according to your use case:
 
@@ -24,7 +24,7 @@ if [ $? -eq 0 ]; then
     printf 'Skipping WiFi Connect\n'
 else
     printf 'Starting WiFi Connect\n'
-    RUST_LOG=debug ./wifi-connect --portal-ssid "$wifi_connect_portal_ssid"
+    ./wifi-connect --portal-ssid "$wifi_connect_portal_ssid"
 fi
 
 # Start your application here.
