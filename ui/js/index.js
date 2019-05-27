@@ -19,12 +19,14 @@ $(function(){
 		} else {
 			networks = JSON.parse(data);
 			$.each(networks, function(i, val){
-				$('#ssid-select').append(
-					$('<option>')
-						.text(val.ssid)
-						.attr('val', val.ssid)
-						.attr('data-security', val.security)
-				);
+                if((val.ssid !== '') && ($('#ssid-select option[val="' + val.ssid + '"]').length === 0)){
+                    $('#ssid-select').append(
+                        $('<option>')
+                            .text(val.ssid)
+                            .attr('val', val.ssid)
+                            .attr('data-security', val.security)
+                    );
+                };
 			});
 
 			jQuery.proxy(showHideEnterpriseSettings, $('#ssid-select'))();
