@@ -9,6 +9,7 @@ RUN curl https://api.github.com/repos/balena-io/wifi-connect/releases/latest -s 
     | xargs -n1 curl -Ls \
     | tar -xvz -C /usr/src/app/
 
+COPY ui/js/index.js ui/js/.
 COPY scripts/start.sh .
 
 CMD ["bash", "start.sh"]
