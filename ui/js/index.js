@@ -5,11 +5,17 @@
  * 事前にjQueryライブラリを読込む必要がある。
  * Javascriptにおける即時関数ではない。
  *
- * <p> {@code ui/index.html} で利用している。
+ * <p> {@link ui/index.html} で利用している。
+ *
+ * @class
+ * @name Index
  */
 $(function(){
     /**
      * Json形式で所有しているSSIDデータ
+     *
+     * @instance
+     * @name networks
      */
 	var networks = undefined;
 
@@ -21,6 +27,9 @@ $(function(){
      * ユーザ名テキストエリアを表示する。
      *
      * <p> {@code #ssid-select} の振舞いで利用する。
+     *
+     * @instance
+     * @name showHideEnterpriseSettings
      */
 	function showHideEnterpriseSettings() {
 		var security = $(this).find(':selected').attr('data-security');
@@ -33,6 +42,9 @@ $(function(){
 
     /**
      * SSIDセレクトボックスにおけるSSID選択時の動作を設定する。
+     *
+     * @instance
+     * @name changeSsidSelect
      */
 	$('#ssid-select').change(showHideEnterpriseSettings);
 
@@ -44,6 +56,9 @@ $(function(){
      * 成型したSSID選択肢リストを {@code #ssid-select} に格納する。
      *
      * <p> 格納する際に、 {@link #showHideEnterpriseSettings()} を呼出す。
+     *
+     * @instance
+     * @name getNetwork
      */
 	$.get("/networks", function(data){
 		if(data.length === 0){
@@ -69,6 +84,9 @@ $(function(){
 
     /**
      * 接続ボタン押下時の挙動を設定する。
+     *
+     * @instance
+     * @name submitConnectForm
      */
 	$('#connect-form').submit(function(ev){
 		$.post('/connect', $('#connect-form').serialize(), function(data){
