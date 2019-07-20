@@ -22,7 +22,7 @@ $(function(){
 				$('#ssid-select').append(
 					$('<option>')
 						.text(val.ssid)
-						.attr('val', val.ssid)
+						.attr('value', val.ssid)
 						.attr('data-security', val.security)
 				);
 			});
