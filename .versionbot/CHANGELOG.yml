@@ -1,4 +1,16 @@
 - commits:
+    - subject: Optional wait in the start.sh script
+      hash: dfcc876df6c0b3deba7117057b48cb8e08f7817e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 4.2.8
+  date: 2019-07-21T10:14:10.097Z
+- commits:
     - subject: Fix incorrect attribute name
       hash: e3144902b57f720ba44af83a6b326510927fdb6a
       body: ''
