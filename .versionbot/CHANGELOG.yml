@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add link to supported boards/dongles
+      hash: 28f1e9ffa1cdf5df76eb5d81e61a5fc7bea28d9c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 4.2.9
+  date: 2019-07-21T10:22:46.444Z
+- commits:
     - subject: Optional wait in the start.sh script
       hash: dfcc876df6c0b3deba7117057b48cb8e08f7817e
       body: ''
