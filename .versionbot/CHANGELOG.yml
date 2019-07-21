@@ -1,4 +1,16 @@
 - commits:
+    - subject: Fix incorrect attribute name
+      hash: e3144902b57f720ba44af83a6b326510927fdb6a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 4.2.7
+  date: 2019-07-20T09:37:09.591Z
+- commits:
     - subject: Add machine-readable changelog
       hash: fe671647bd6612c9a8f44ad31682ec791a7b2b2d
       body: ''
