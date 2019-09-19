@@ -1,4 +1,16 @@
 - commits:
+    - subject: Delete only the right AP profile on start
+      hash: 38770406eee93f5031c6de5b0413fce9279719da
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.2.10
+  date: 2019-09-19T10:10:42.210Z
+- commits:
     - subject: Add link to supported boards/dongles
       hash: 28f1e9ffa1cdf5df76eb5d81e61a5fc7bea28d9c
       body: ''
