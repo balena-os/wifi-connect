@@ -69,7 +69,7 @@ fn run() -> Result<()> {
 
     require_root()?;
 
-    init_networking()?;
+    init_networking(&config)?;
 
     let (exit_tx, exit_rx) = channel();
 
