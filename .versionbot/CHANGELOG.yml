@@ -1,4 +1,18 @@
 - commits:
+    - subject: Support Buster and future Raspbian versions in the installer
+      hash: 285c339dc986f6f2aa029160d7cdfa165bfe8846
+      body: >
+        Reverse installer logic to exclude Jessie only from allowing
+        installation.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.2.11
+  date: 2019-10-23T19:45:39.458Z
+- commits:
     - subject: Delete only the right AP profile on start
       hash: 38770406eee93f5031c6de5b0413fce9279719da
       body: ''
