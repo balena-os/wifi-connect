@@ -49,6 +49,11 @@ error_chain! {
             display("Not a WiFi device: {}", interface)
         }
 
+        UnmanagedDevice(interface: String) {
+            description("Unmanaged device")
+            display("Unmanaged device: {}", interface)
+        }
+
         NoWiFiDevice {
             description("Cannot find a WiFi device")
         }
@@ -123,6 +128,7 @@ pub fn exit_code(e: &Error) -> i32 {
         ErrorKind::BlockExitSignals => 21,
         ErrorKind::TrapExitSignals => 22,
         ErrorKind::RootPrivilegesRequired(_) => 23,
+        ErrorKind::UnmanagedDevice(_) => 24,
         _ => 1,
     }
 }
