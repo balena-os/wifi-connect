@@ -6,7 +6,8 @@ use std::error::Error;
 use std::net::Ipv4Addr;
 
 use network_manager::{AccessPoint, AccessPointCredentials, Connection, ConnectionState,
-                      Connectivity, Device, DeviceType, NetworkManager, Security, ServiceState};
+                      Connectivity, Device, DeviceState, DeviceType, NetworkManager, Security,
+                      ServiceState};
 
 use errors::*;
 use exit::{exit, trap_exit_signals, ExitResult};
@@ -317,26 +318,39 @@ pub fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Resu
             .get_device_by_interface(interface)
             .chain_err(|| ErrorKind::DeviceByInterface(interface.clone()))?;
 
-        if *device.device_type() == DeviceType::WiFi {
-            info!("Targeted WiFi device: {}", interface);
-            Ok(device)
-        } else {
+        info!("Targeted WiFi device: {}", interface);
+
+        if *device.device_type() != DeviceType::WiFi {
             bail!(ErrorKind::NotAWiFiDevice(interface.clone()))
         }
+
+        if device.get_state()? == DeviceState::Unmanaged {
+            bail!(ErrorKind::UnmanagedDevice(interface.clone()))
+        }
+
+        Ok(device)
     } else {
         let devices = manager.get_devices()?;
 
-        let index = devices
-            .iter()
-            .position(|d| *d.device_type() == DeviceType::WiFi);
-
-        if let Some(index) = index {
-            info!("WiFi device: {}", devices[index].interface());
-            Ok(devices[index].clone())
+        if let Some(device) = find_wifi_managed_device(devices)? {
+            info!("WiFi device: {}", device.interface());
+            Ok(device)
         } else {
             bail!(ErrorKind::NoWiFiDevice)
         }
     }
+}
+
+fn find_wifi_managed_device(devices: Vec<Device>) -> Result<Option<Device>> {
+    for device in devices {
+        if *device.device_type() == DeviceType::WiFi
+            && device.get_state()? != DeviceState::Unmanaged
+        {
+            return Ok(Some(device));
+        }
+    }
+
+    Ok(None)
 }
 
 fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>> {
