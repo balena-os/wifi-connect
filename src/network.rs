@@ -387,10 +387,15 @@ fn get_access_points_impl(device: &Device) -> Result<Vec<AccessPoint>> {
 }
 
 fn get_access_points_ssids(access_points: &[AccessPoint]) -> Vec<&str> {
-    access_points
+    let mut ssids: Vec<&str> = access_points
         .iter()
         .map(|ap| ap.ssid().as_str().unwrap())
-        .collect()
+        .collect();
+    // Sort and then dedup to remove all duplicate ssids, which come from
+    // the same ssid on multiple channels/frequencies
+    ssids.sort();
+    ssids.dedup();
+    ssids
 }
 
 fn get_networks(access_points: &[AccessPoint]) -> Vec<Network> {
