@@ -1,4 +1,14 @@
 - commits:
+    - subject: Remove duplicates when calling `get_access_points_ssids`
+      hash: 0a84f6990452534270d06025ddb42f36b2ca6f19
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Pagan Gazzard
+  version: 4.2.13
+  date: 2019-11-06T00:02:47.615Z
+- commits:
     - subject: Ignore unmanaged devices
       hash: 131c3a6ed24b5589e916d8b10cf72bb7a8514600
       body: >
