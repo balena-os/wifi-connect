@@ -1,4 +1,18 @@
 - commits:
+    - subject: 'readme: Add balenaOS multicontainer app example.'
+      hash: 02f4f8f6817ad659036efeaade87e354efa33fb2
+      body: ''
+      footer:
+        Connects-to: '#239'
+        connects-to: '#239'
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Tomás Migone <tomas@balena.io>
+        signed-off-by: Tomás Migone <tomas@balena.io>
+      author: Tomás Migone
+  version: 4.2.13
+  date: 2019-12-27T20:20:13.865Z
+- commits:
     - subject: Ignore unmanaged devices
       hash: 131c3a6ed24b5589e916d8b10cf72bb7a8514600
       body: >
