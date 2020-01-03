@@ -75,6 +75,30 @@ WiFi Connect can be integrated with a [balena.io](http://balena.io) application.
 - The [start script](./scripts/start.sh) should contain the commands that run the application. Adding these commands at the end of the script will ensure that everything kicks off after WiFi is correctly configured. 
 An example of using WiFi Connect in a Python project can be found [here](https://github.com/balena-io-projects/balena-wifi-connect-example).
 
+### balenaOS: multicontainer app
+
+To use WiFi Connect on a multicontainer app you need to:
+- Set container network mode to host
+- Enable DBUS by adding the required label and environment variable (more on [balenaOS dbus](https://www.balena.io/docs/learn/develop/runtime/#dbus-communication-with-host-os))
+- Grant the container Network Admin capabilities
+
+Your `docker-compose.yml` file should look like this:
+```yaml
+version: "2.1"
+
+services:
+    wifi-connect:
+        build: ./wifi-connect
+        network_mode: "host"
+        labels:
+            io.balena.features.dbus: '1'
+        cap_add:
+            - NET_ADMIN
+        environment:
+            DBUS_SYSTEM_BUS_ADDRESS: "unix:path=/host/run/dbus/system_bus_socket"
+    ...
+```
+
 ***
 
 Supported boards / dongles

@@ -1,4 +1,18 @@
 - commits:
+    - subject: Ignore unmanaged devices
+      hash: 131c3a6ed24b5589e916d8b10cf72bb7a8514600
+      body: >
+        Unmanaged device could be wrongly picked when enumerating WiFi
+        interfaces. Those are now ignored.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.2.12
+  date: 2019-10-31T12:06:33.399Z
+- commits:
     - subject: Support Buster and future Raspbian versions in the installer
       hash: 285c339dc986f6f2aa029160d7cdfa165bfe8846
       body: >
