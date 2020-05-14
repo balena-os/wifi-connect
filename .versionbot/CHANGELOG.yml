@@ -1,4 +1,21 @@
 - commits:
+    - subject: Remove duplicate SSIDs from network list
+      hash: 9132ee93b0f3e58b5ba503194b843bb2503f1c06
+      body: |
+        The new UI does not handle properly duplicate network names and the form
+        cannot be submitted because of errors. This patch filters out duplicate
+        network names preserving the sort order by signal strength. Now both
+        unnecessary duplicates in the network list are removed and the UI issue
+        is resolved.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.3.1
+  date: 2020-05-14T09:19:03.506Z
+- commits:
     - subject: Replace UI with React and Rendition
       hash: dfe7802988f286e4bdc2d5d24590b8c06dc0a093
       body: ''
