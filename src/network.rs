@@ -4,6 +4,7 @@ use std::time::Duration;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::error::Error;
 use std::net::Ipv4Addr;
+use std::collections::HashSet;
 
 use network_manager::{AccessPoint, AccessPointCredentials, Connection, ConnectionState,
                       Connectivity, Device, DeviceState, DeviceType, NetworkManager, Security,
@@ -368,6 +369,10 @@ fn get_access_points_impl(device: &Device) -> Result<Vec<AccessPoint>> {
         let mut access_points = wifi_device.get_access_points()?;
 
         access_points.retain(|ap| ap.ssid().as_str().is_ok());
+
+        // Purge access points with duplicate SSIDs
+        let mut inserted = HashSet::new();
+        access_points.retain(|ap| inserted.insert(ap.ssid.clone()));
 
         if !access_points.is_empty() {
             info!(
