@@ -25,6 +25,7 @@ const getSchema = (availableNetworks: Network[]): JSONSchema6 => ({
 		passphrase: {
 			title: 'Passphrase',
 			type: 'string',
+			default: '',
 		},
 	},
 	required: ['ssid'],
