@@ -1,4 +1,18 @@
 - commits:
+    - subject: allow connections to open networks by providing a default arg
+      hash: 3fc981583744dcbfd1e8b7ac14f9865af294bee0
+      body: ''
+      footer:
+        Connects-to: 'https://github.com/balena-io/wifi-connect/issues/343'
+        connects-to: 'https://github.com/balena-io/wifi-connect/issues/343'
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Matthew McGinn <matthew@balena.io>
+        signed-off-by: Matthew McGinn <matthew@balena.io>
+      author: Matthew McGinn
+  version: 4.3.2
+  date: 2020-08-13T21:00:08.981Z
+- commits:
     - subject: Remove duplicate SSIDs from network list
       hash: 9132ee93b0f3e58b5ba503194b843bb2503f1c06
       body: |
