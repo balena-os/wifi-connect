@@ -1,11 +1,9 @@
-import { JSONSchema6 } from 'json-schema';
+import { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
-import { Flex, Heading } from 'rendition';
-import { Form } from 'rendition/dist/unstable';
+import { Flex, Form, Heading, RenditionUiSchema } from 'rendition';
 import { Network, NetworkInfo } from './App';
-import { RenditionUiSchema } from 'rendition/dist/unstable/unstable-typings';
 
-const getSchema = (availableNetworks: Network[]): JSONSchema6 => ({
+const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
 	properties: {
 		ssid: {
