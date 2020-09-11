@@ -1,4 +1,18 @@
 - commits:
+    - subject: Allow toggling "show password" on password input
+      hash: 582dc761d92edc38d225dfe139a602ef0c06479d
+      body: ''
+      footer:
+        Connects-to: '#54'
+        connects-to: '#54'
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Stevche Radevski <stevche@balena.io>
+        signed-off-by: Stevche Radevski <stevche@balena.io>
+      author: Stevche Radevski
+  version: 4.4.0
+  date: 2020-08-21T13:55:00.315Z
+- commits:
     - subject: allow connections to open networks by providing a default arg
       hash: 3fc981583744dcbfd1e8b7ac14f9865af294bee0
       body: ''
