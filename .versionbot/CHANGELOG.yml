@@ -1,4 +1,16 @@
 - commits:
+    - subject: target correctly the arch dockerfile template var
+      hash: 2e3046fae7043f7cece17e6b53746f78280c3a6a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Maria Curinga <carlo@balena.io>
+        signed-off-by: Carlo Maria Curinga <carlo@balena.io>
+      author: Carlo Maria Curinga
+  version: 4.4.1
+  date: 2020-10-07T17:54:49.932Z
+- commits:
     - subject: Allow toggling "show password" on password input
       hash: 582dc761d92edc38d225dfe139a602ef0c06479d
       body: ''
