@@ -1,6 +1,6 @@
-use env_logger::LogBuilder;
-use log::{LogLevel, LogLevelFilter, LogRecord};
 use std::env;
+use log::{LogLevel, LogLevelFilter, LogRecord};
+use env_logger::LogBuilder;
 
 pub fn init() {
     let mut builder = LogBuilder::new();
