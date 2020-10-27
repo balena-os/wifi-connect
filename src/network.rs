@@ -1,19 +1,20 @@
-use std::thread;
-use std::process;
-use std::time::Duration;
-use std::sync::mpsc::{channel, Receiver, Sender};
+use std::collections::HashSet;
 use std::error::Error;
 use std::net::Ipv4Addr;
-use std::collections::HashSet;
+use std::process;
+use std::sync::mpsc::{channel, Receiver, Sender};
+use std::thread;
+use std::time::Duration;
 
-use network_manager::{AccessPoint, AccessPointCredentials, Connection, ConnectionState,
-                      Connectivity, Device, DeviceState, DeviceType, NetworkManager, Security,
-                      ServiceState};
+use network_manager::{
+    AccessPoint, AccessPointCredentials, Connection, ConnectionState, Connectivity, Device,
+    DeviceState, DeviceType, NetworkManager, Security, ServiceState,
+};
 
-use errors::*;
-use exit::{exit, trap_exit_signals, ExitResult};
 use config::Config;
 use dnsmasq::start_dnsmasq;
+use errors::*;
+use exit::{exit, trap_exit_signals, ExitResult};
 use server::start_server;
 
 pub enum NetworkCommand {
@@ -157,17 +158,17 @@ impl NetworkCommandHandler {
             match command {
                 NetworkCommand::Activate => {
                     self.activate()?;
-                },
+                }
                 NetworkCommand::Timeout => {
                     if !self.activated {
                         info!("Timeout reached. Exiting...");
                         return Ok(());
                     }
-                },
+                }
                 NetworkCommand::Exit => {
                     info!("Exiting...");
                     return Ok(());
-                },
+                }
                 NetworkCommand::Connect {
                     ssid,
                     identity,
@@ -176,7 +177,7 @@ impl NetworkCommandHandler {
                     if self.connect(&ssid, &identity, &passphrase)? {
                         return Ok(());
                     }
-                },
+                }
             }
         }
     }
@@ -188,7 +189,7 @@ impl NetworkCommandHandler {
                 // Sleep for a second, so that other threads may log error info.
                 thread::sleep(Duration::from_secs(1));
                 Err(e).chain_err(|| ErrorKind::RecvNetworkCommand)
-            },
+            }
         }
     }
 
@@ -240,7 +241,7 @@ impl NetworkCommandHandler {
                                 } else {
                                     warn!("Cannot establish Internet connectivity");
                                 }
-                            },
+                            }
                             Err(err) => error!("Getting Internet connectivity failed: {}", err),
                         }
 
@@ -255,10 +256,10 @@ impl NetworkCommandHandler {
                         "Connection to access point not activated '{}': {:?}",
                         ssid, state
                     );
-                },
+                }
                 Err(e) => {
                     warn!("Error connecting to access point '{}': {}", ssid, e);
-                },
+                }
             }
         }
 
@@ -301,7 +302,7 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
         Err(e) => {
             exit(exit_tx, e);
             return;
-        },
+        }
     };
 
     command_handler.run(exit_tx);
@@ -513,11 +514,12 @@ pub fn start_network_manager_service() -> Result<()> {
         _ => {
             info!("Cannot get the NetworkManager service state");
             return Ok(());
-        },
+        }
     };
 
     if state != ServiceState::Active {
-        let state = NetworkManager::start_service(15).chain_err(|| ErrorKind::StartNetworkManager)?;
+        let state =
+            NetworkManager::start_service(15).chain_err(|| ErrorKind::StartNetworkManager)?;
         if state != ServiceState::Active {
             bail!(ErrorKind::StartActiveNetworkManager);
         } else {
@@ -552,7 +554,7 @@ fn delete_existing_connections_to_same_network(manager: &NetworkManager, ssid: &
         Err(e) => {
             error!("Getting existing connections failed: {}", e);
             return;
-        },
+        }
     };
 
     for connection in &connections {
