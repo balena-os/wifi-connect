@@ -2,8 +2,8 @@ use std::process::{Child, Command};
 
 use network_manager::Device;
 
-use errors::*;
 use config::Config;
+use errors::*;
 
 pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child> {
     let args = [
