@@ -1,4 +1,16 @@
 - commits:
+    - subject: Do not show hidden/empty SSID networks
+      hash: a3a2867ff24909c563cbbb52325e43a3ac7f7f30
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.4.2
+  date: 2020-10-27T16:12:59.789Z
+- commits:
     - subject: target correctly the arch dockerfile template var
       hash: 2e3046fae7043f7cece17e6b53746f78280c3a6a
       body: ''
