@@ -1,4 +1,17 @@
 - commits:
+    - subject: Revert "Run cargo fmt"
+      hash: 02594e248a0b5122e91b2244cc2e96b49cef6c9c
+      body: |
+        This reverts commit 8ae4554ffd44426b4f0ae11317679b9e89e7979f.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.4.3
+  date: 2020-10-27T16:38:50.088Z
+- commits:
     - subject: Do not show hidden/empty SSID networks
       hash: a3a2867ff24909c563cbbb52325e43a3ac7f7f30
       body: ''
