@@ -374,6 +374,9 @@ fn get_access_points_impl(device: &Device) -> Result<Vec<AccessPoint>> {
         let mut inserted = HashSet::new();
         access_points.retain(|ap| inserted.insert(ap.ssid.clone()));
 
+        // Remove access points without SSID (hidden)
+        access_points.retain(|ap| !ap.ssid().as_str().unwrap().is_empty());
+
         if !access_points.is_empty() {
             info!(
                 "Access points: {:?}",
