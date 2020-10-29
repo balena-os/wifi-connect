@@ -1,7 +1,8 @@
 import { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
-import { Flex, Form, Heading, RenditionUiSchema } from 'rendition';
+import { Button, Flex, Form, Heading, RenditionUiSchema } from 'rendition';
 import { Network, NetworkInfo } from './App';
+import { RefreshIcon } from './RefreshIcon';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
@@ -61,11 +62,13 @@ const isEnterpriseNetwork = (
 };
 
 interface NetworkInfoFormProps {
+	fetchNetworks: () => void;
 	availableNetworks: Network[];
 	onSubmit: (data: NetworkInfo) => void;
 }
 
 export const NetworkInfoForm = ({
+	fetchNetworks,
 	availableNetworks,
 	onSubmit,
 }: NetworkInfoFormProps) => {
@@ -85,7 +88,18 @@ export const NetworkInfoForm = ({
 			mt={5}
 		>
 			<Heading.h3 align="center" mb={4}>
-				Hi! Please choose your WiFi from the list
+				<Flex flexDirection={['column', 'row']} flexWrap="wrap">
+					Hi! Please choose your WiFi
+					<Button
+						ml={[0, 3]}
+						tertiary
+						plain
+						icon={<RefreshIcon />}
+						onClick={fetchNetworks}
+					>
+						Rescan
+					</Button>
+				</Flex>
 			</Heading.h3>
 
 			<Form
