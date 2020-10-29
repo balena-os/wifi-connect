@@ -13,7 +13,7 @@ use network_manager::{AccessPoint, AccessPointCredentials, Connection, Connectio
 use errors::*;
 use exit::{exit, trap_exit_signals, ExitResult};
 use config::Config;
-use dnsmasq::start_dnsmasq;
+use dnsmasq::{start_dnsmasq, stop_dnsmasq};
 use server::start_server;
 
 pub enum NetworkCommand {
@@ -193,7 +193,7 @@ impl NetworkCommandHandler {
     }
 
     fn stop(&mut self, exit_tx: &Sender<ExitResult>, result: ExitResult) {
-        let _ = self.dnsmasq.kill();
+        let _ = stop_dnsmasq(&mut self.dnsmasq);
 
         if let Some(ref connection) = self.portal_connection {
             let _ = stop_portal_impl(connection, &self.config);
