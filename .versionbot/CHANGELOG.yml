@@ -1,52 +1,17 @@
 - commits:
-    - subject: Terminate dnsmasq gracefully and wait for its exit
-      hash: 382773d1d41010e3e620f8bd2ba3200999f04ad5
+    - subject: Add a refresh networks button
+      hash: 56f61632f60fd1977112d7fa080fa0268f858e3e
       body: ''
       footer:
-        Change-type: patch
-        change-type: patch
-        Signed-off-by: Zahari Petkov <zahari@balena.io>
-        signed-off-by: Zahari Petkov <zahari@balena.io>
-      author: Zahari Petkov
-  version: 4.4.4
-  date: 2020-10-29T12:16:50.988Z
-- commits:
-    - subject: Revert "Run cargo fmt"
-      hash: 02594e248a0b5122e91b2244cc2e96b49cef6c9c
-      body: |
-        This reverts commit 8ae4554ffd44426b4f0ae11317679b9e89e7979f.
-      footer:
-        Change-type: patch
-        change-type: patch
-        Signed-off-by: Zahari Petkov <zahari@balena.io>
-        signed-off-by: Zahari Petkov <zahari@balena.io>
-      author: Zahari Petkov
-  version: 4.4.3
-  date: 2020-10-27T16:38:50.088Z
-- commits:
-    - subject: Do not show hidden/empty SSID networks
-      hash: a3a2867ff24909c563cbbb52325e43a3ac7f7f30
-      body: ''
-      footer:
-        Change-type: patch
-        change-type: patch
-        Signed-off-by: Zahari Petkov <zahari@balena.io>
-        signed-off-by: Zahari Petkov <zahari@balena.io>
-      author: Zahari Petkov
-  version: 4.4.2
-  date: 2020-10-27T16:12:59.789Z
-- commits:
-    - subject: target correctly the arch dockerfile template var
-      hash: 2e3046fae7043f7cece17e6b53746f78280c3a6a
-      body: ''
-      footer:
-        Change-type: patch
-        change-type: patch
-        Signed-off-by: Carlo Maria Curinga <carlo@balena.io>
-        signed-off-by: Carlo Maria Curinga <carlo@balena.io>
-      author: Carlo Maria Curinga
-  version: 4.4.1
-  date: 2020-10-07T17:54:49.932Z
+        Connects-to: '#225'
+        connects-to: '#225'
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Stevche Radevski <stevche@balena.io>
+        signed-off-by: Stevche Radevski <stevche@balena.io>
+      author: Stevche Radevski
+  version: 4.5.0
+  date: 2020-12-03T01:47:18.166Z
 - commits:
     - subject: Allow toggling "show password" on password input
       hash: 582dc761d92edc38d225dfe139a602ef0c06479d
