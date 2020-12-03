@@ -1,6 +1,6 @@
 [package]
 name = "wifi-connect"
-version = "4.4.0"
+version = "4.5.0"
 authors = ["Zahari Petkov <zahari@balena.io>"]
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
 
