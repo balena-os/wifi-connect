@@ -1,4 +1,16 @@
 - commits:
+    - subject: Bump version in Dockerfile.template
+      hash: 9f2db04a6302c6262a596747174195e0f679fbcc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Vipul Gupta (@vipulgupta2048) <vipul@balena.io>
+        signed-off-by: Vipul Gupta (@vipulgupta2048) <vipul@balena.io>
+      author: Vipul Gupta (@vipulgupta2048)
+  version: 4.4.5
+  date: 2020-12-08T12:06:00.094Z
+- commits:
     - subject: Terminate dnsmasq gracefully and wait for its exit
       hash: 382773d1d41010e3e620f8bd2ba3200999f04ad5
       body: ''
