@@ -135,6 +135,13 @@ If you're having any problem, please [raise an issue](https://github.com/balena-
 
 ***
 
+Related Projects
+----------------
+
+The [Open Agriculture Foundation](https://github.com/OpenAgricultureFoundation) re-wrote WiFi Connect in Python 3.6 language. Their version comes with additional features like connecting to hidden networks and deleting all stored connections. The repository can be found [here](https://github.com/OpenAgricultureFoundation/python-wifi-connect).
+
+***
+
 License
 -------
 
