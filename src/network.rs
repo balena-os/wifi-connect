@@ -236,7 +236,12 @@ impl NetworkCommandHandler {
                         match wait_for_connectivity(&self.manager, 20) {
                             Ok(has_connectivity) => {
                                 if has_connectivity {
-                                    info!("Internet connectivity established");
+                                    if let url_callback = config.url_callback {
+                                        callback(url_callback);
+                                        info!("Internet connectivity established");
+                                    } else {
+                                        info!("Internet connectivity established");
+                                    }
                                 } else {
                                     warn!("Cannot establish Internet connectivity");
                                 }
