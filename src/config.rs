@@ -12,6 +12,7 @@ const DEFAULT_SSID: &str = "WiFi Connect";
 const DEFAULT_ACTIVITY_TIMEOUT: &str = "0";
 const DEFAULT_UI_DIRECTORY: &str = "ui";
 const DEFAULT_LISTENING_PORT: &str = "80";
+const DEFAULT_URL_CALLBACK: &str = "";
 
 #[derive(Clone)]
 pub struct Config {
@@ -23,6 +24,7 @@ pub struct Config {
     pub listening_port: u16,
     pub activity_timeout: u64,
     pub ui_directory: PathBuf,
+    pub url_callback: String,
 }
 
 pub fn get_config() -> Config {
@@ -109,6 +111,17 @@ pub fn get_config() -> Config {
                 ))
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("url-callback")
+                .short("uc")
+                .long("url-callback")
+                .value_name("url_callback")
+                .help(&format!(
+                    "URL callback to be called after connection connects successfully. (default: none)",
+                    DEFAULT_URL_CALLBACK
+                ))
+                .takes_value(true),
+        )
         .get_matches();
 
     let interface: Option<String> = matches.value_of("portal-interface").map_or_else(
@@ -155,6 +168,11 @@ pub fn get_config() -> Config {
 
     let ui_directory = get_ui_directory(matches.value_of("ui-directory"));
 
+    let url_callback: Option<String> = matches.value_of("url_callback").map_or_else(
+        || env::var("DEFAULT_URL_CALLBACK").ok(),
+        |v| Some(v.to_string()),
+    ).expect("Cannot parse gateway address");
+
     Config {
         interface: interface,
         ssid: ssid,
@@ -164,6 +182,7 @@ pub fn get_config() -> Config {
         listening_port: listening_port,
         activity_timeout: activity_timeout,
         ui_directory: ui_directory,
+        url_callback: url_callback,
     }
 }
 
