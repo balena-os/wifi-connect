@@ -32,6 +32,7 @@ mod dnsmasq;
 mod logger;
 mod exit;
 mod privileges;
+mod client;
 
 use std::path;
 use std::thread;
