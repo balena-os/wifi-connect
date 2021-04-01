@@ -74,6 +74,10 @@ jobs:
       - checkout
 
       - run:
+          name: DEBUG TOKEN!
+          command: echo $GITHUB_TOKEN
+
+      - run:
           name: Get the username associated with the GitHub token
           command: |
             USER_URL=https://api.github.com/user
