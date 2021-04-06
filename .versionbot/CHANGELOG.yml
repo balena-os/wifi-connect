@@ -1,4 +1,20 @@
 - commits:
+    - subject: Point Raspbian installer regex to new repo org `balena-os`
+      hash: 1600c88b1e2f29eb0e88d9d38190f0a8dc51b0fc
+      body: |
+        This is needed to fix the currently broken Raspbian install, which
+        relies on knowing the location of the repository.
+
+        Fixes #389
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.4.5
+  date: 2021-04-06T06:52:22.047Z
+- commits:
     - subject: Terminate dnsmasq gracefully and wait for its exit
       hash: 382773d1d41010e3e620f8bd2ba3200999f04ad5
       body: ''
