@@ -73,6 +73,8 @@ jobs:
     steps:
       - checkout
 
+    environment:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run:
           name: DEBUG TOKEN!
           command: echo $GITHUB_TOKEN
@@ -81,7 +83,7 @@ jobs:
           name: Get the username associated with the GitHub token
           command: |
             USER_URL=https://api.github.com/user
-            GITHUB_TOKEN_USER=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$USER_URL" | jq -r .login)
+            GITHUB_TOKEN_USER=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$USER_URL" | jq -r .login)
             echo "GITHUB_TOKEN_USER=$GITHUB_TOKEN_USER"
             echo "export GITHUB_TOKEN_USER=$GITHUB_TOKEN_USER" >> $BASH_ENV
 
