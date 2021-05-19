@@ -46,6 +46,7 @@ struct NetworkCommandHandler {
     dnsmasq: process::Child,
     server_tx: Sender<NetworkCommandResponse>,
     network_rx: Receiver<NetworkCommand>,
+    network_tx: Sender<NetworkCommand>,
     activated: bool,
 }
 
@@ -84,6 +85,7 @@ impl NetworkCommandHandler {
             dnsmasq,
             server_tx,
             network_rx,
+            network_tx,
             activated,
         })
     }
@@ -157,12 +159,14 @@ impl NetworkCommandHandler {
             match command {
                 NetworkCommand::Activate => {
                     self.activate()?;
+                    Self::spawn_activity_timeout(&self.config, self.network_tx.clone());
                 },
                 NetworkCommand::Timeout => {
                     if !self.activated {
                         info!("Timeout reached. Exiting...");
                         return Ok(());
                     }
+                    self.activated=false;
                 },
                 NetworkCommand::Exit => {
                     info!("Exiting...");
