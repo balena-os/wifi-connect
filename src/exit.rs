@@ -2,7 +2,7 @@ use std::sync::mpsc::Sender;
 
 use nix::sys::signal::{SigSet, SIGHUP, SIGINT, SIGQUIT, SIGTERM};
 
-use errors::*;
+use crate::errors::*;
 
 pub type ExitResult = Result<()>;
 

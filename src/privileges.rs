@@ -1,6 +1,6 @@
 use nix::unistd::Uid;
 
-use errors::*;
+use crate::errors::*;
 
 pub fn require_root() -> Result<()> {
     if !Uid::effective().is_root() {

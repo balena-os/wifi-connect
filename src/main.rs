@@ -39,11 +39,11 @@ use std::process;
 use std::sync::mpsc::channel;
 use std::thread;
 
-use config::get_config;
-use errors::*;
-use exit::block_exit_signals;
-use network::{init_networking, process_network_commands};
-use privileges::require_root;
+use crate::config::get_config;
+use crate::errors::*;
+use crate::exit::block_exit_signals;
+use crate::network::{init_networking, process_network_commands};
+use crate::privileges::require_root;
 
 fn main() {
     if let Err(ref e) = run() {

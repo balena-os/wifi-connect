@@ -10,11 +10,11 @@ use network_manager::{
     DeviceState, DeviceType, NetworkManager, Security, ServiceState,
 };
 
-use config::Config;
-use dnsmasq::{start_dnsmasq, stop_dnsmasq};
-use errors::*;
-use exit::{exit, trap_exit_signals, ExitResult};
-use server::start_server;
+use crate::config::Config;
+use crate::dnsmasq::{start_dnsmasq, stop_dnsmasq};
+use crate::errors::*;
+use crate::exit::{exit, trap_exit_signals, ExitResult};
+use crate::server::start_server;
 
 pub enum NetworkCommand {
     Activate,

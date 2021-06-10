@@ -2,7 +2,7 @@
 
 use network_manager;
 
-use network;
+use crate::network;
 
 error_chain! {
     foreign_links {
