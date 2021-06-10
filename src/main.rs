@@ -24,25 +24,25 @@ extern crate router;
 extern crate serde_json;
 extern crate staticfile;
 
-mod errors;
 mod config;
-mod network;
-mod server;
 mod dnsmasq;
-mod logger;
+mod errors;
 mod exit;
+mod logger;
+mod network;
 mod privileges;
+mod server;
 
-use std::path;
-use std::thread;
-use std::sync::mpsc::channel;
 use std::io::Write;
+use std::path;
 use std::process;
+use std::sync::mpsc::channel;
+use std::thread;
 
-use errors::*;
 use config::get_config;
-use network::{init_networking, process_network_commands};
+use errors::*;
 use exit::block_exit_signals;
+use network::{init_networking, process_network_commands};
 use privileges::require_root;
 
 fn main() {
@@ -78,12 +78,14 @@ fn run() -> Result<()> {
     });
 
     match exit_rx.recv() {
-        Ok(result) => if let Err(reason) = result {
-            return Err(reason);
-        },
+        Ok(result) => {
+            if let Err(reason) = result {
+                return Err(reason);
+            }
+        }
         Err(e) => {
             return Err(e.into());
-        },
+        }
     }
 
     Ok(())
