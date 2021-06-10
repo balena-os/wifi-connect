@@ -2,7 +2,6 @@ use std::thread;
 use std::process;
 use std::time::Duration;
 use std::sync::mpsc::{channel, Receiver, Sender};
-use std::error::Error;
 use std::net::Ipv4Addr;
 use std::collections::HashSet;
 
@@ -124,7 +123,7 @@ impl NetworkCommandHandler {
             if let Err(err) = network_tx.send(NetworkCommand::Timeout) {
                 error!(
                     "Sending NetworkCommand::Timeout failed: {}",
-                    err.description()
+                    err
                 );
             }
         });
@@ -140,7 +139,7 @@ impl NetworkCommandHandler {
             }
 
             if let Err(err) = network_tx.send(NetworkCommand::Exit) {
-                error!("Sending NetworkCommand::Exit failed: {}", err.description());
+                error!("Sending NetworkCommand::Exit failed: {}", err);
             }
         });
     }

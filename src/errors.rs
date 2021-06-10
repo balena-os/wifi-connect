@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use network_manager;
 
 use network;

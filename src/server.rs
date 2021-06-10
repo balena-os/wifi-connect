@@ -166,7 +166,7 @@ pub fn start_server(
     if let Err(e) = Iron::new(chain).http(&address) {
         exit(
             &exit_tx_clone,
-            ErrorKind::StartHTTPServer(address, e.description().into()).into(),
+            ErrorKind::StartHTTPServer(address, e.to_string().into()).into(),
         );
     }
 }
