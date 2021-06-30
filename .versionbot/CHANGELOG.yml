@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove CODEOWNERS file
+      hash: b1a1d51d0bafec133ced017066710ab1a94fba45
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+  version: 4.4.6
+  date: 2021-06-30T16:44:52.895Z
+- commits:
     - subject: Point Raspbian installer regex to new repo org `balena-os`
       hash: 1600c88b1e2f29eb0e88d9d38190f0a8dc51b0fc
       body: |
