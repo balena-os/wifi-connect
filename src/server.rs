@@ -3,6 +3,7 @@ use std::fmt;
 use std::net::Ipv4Addr;
 use std::sync::mpsc::{Receiver, Sender};
 
+use crate::path::Path;
 use iron::modifiers::Redirect;
 use iron::prelude::*;
 use iron::{
@@ -11,10 +12,8 @@ use iron::{
 use iron_cors::CorsMiddleware;
 use mount::Mount;
 use params::{FromValue, Params};
-use crate::path::PathBuf;
 use persistent::Write;
 use router::Router;
-use serde_json;
 use staticfile::Static;
 
 use crate::errors::*;
@@ -137,15 +136,15 @@ pub fn start_server(
     server_rx: Receiver<NetworkCommandResponse>,
     network_tx: Sender<NetworkCommand>,
     exit_tx: Sender<ExitResult>,
-    ui_directory: &PathBuf,
+    ui_directory: &Path,
 ) {
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
     let request_state = RequestSharedState {
-        gateway: gateway,
-        server_rx: server_rx,
-        network_tx: network_tx,
-        exit_tx: exit_tx,
+        gateway,
+        server_rx,
+        network_tx,
+        exit_tx,
     };
 
     let mut router = Router::new();
@@ -174,7 +173,7 @@ pub fn start_server(
     if let Err(e) = Iron::new(chain).http(&address) {
         exit(
             &exit_tx_clone,
-            ErrorKind::StartHTTPServer(address, e.to_string().into()).into(),
+            ErrorKind::StartHTTPServer(address, e.to_string()).into(),
         );
     }
 }
@@ -217,9 +216,9 @@ fn connect(req: &mut Request) -> IronResult<Response> {
     let request_state = get_request_state!(req);
 
     let command = NetworkCommand::Connect {
-        ssid: ssid,
-        identity: identity,
-        passphrase: passphrase,
+        ssid,
+        identity,
+        passphrase,
     };
 
     if let Err(e) = request_state.network_tx.send(command) {

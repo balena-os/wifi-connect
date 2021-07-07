@@ -6,7 +6,6 @@ description = "Easy WiFi setup for Linux devices from your mobile phone or lapto
 edition = "2018"
 
 [dependencies]
-network-manager = "0.11"
 clap = "2.24"
 iron = "0.6"
 iron-cors = "0.8"
@@ -21,6 +20,17 @@ params = "0.8"
 log = "0.3"
 env_logger = "0.4"
 nix = "0.21"
+libc = "0.2"
+futures-core = "0.3"
+futures-channel = "0.3"
+bitflags = "1.2"
+ascii = "0.8"
+
+[dependencies.nm]
+git = "https://github.com/balena-io-modules/libnm-rs.git"
+
+[dependencies.glib]
+git = 'https://github.com/gtk-rs/gtk-rs-core'
 
 [dependencies.error-chain]
 version = "0.11"

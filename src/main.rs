@@ -12,11 +12,13 @@ extern crate serde_derive;
 #[macro_use]
 extern crate clap;
 
+#[macro_use]
+extern crate bitflags;
+
 extern crate env_logger;
 extern crate iron;
 extern crate iron_cors;
 extern crate mount;
-extern crate network_manager;
 extern crate nix;
 extern crate params;
 extern crate persistent;

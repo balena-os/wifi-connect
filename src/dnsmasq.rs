@@ -3,17 +3,17 @@ use std::process::{Child, Command};
 use nix::sys::signal::{kill, SIGTERM};
 use nix::unistd::Pid;
 
-use network_manager::Device;
+use nm::DeviceExt;
 
 use crate::config::Config;
 use crate::errors::*;
 
-pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child> {
+pub fn start_dnsmasq(config: &Config, device: &nm::Device) -> Result<Child> {
     let args = [
         &format!("--address=/#/{}", config.gateway),
         &format!("--dhcp-range={}", config.dhcp_range),
         &format!("--dhcp-option=option:router,{}", config.gateway),
-        &format!("--interface={}", device.interface()),
+        &format!("--interface={}", device.iface().unwrap()),
         "--keep-in-foreground",
         "--bind-interfaces",
         "--except-interface=lo",

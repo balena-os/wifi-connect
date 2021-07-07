@@ -1,21 +1,25 @@
+use std::cell::RefCell;
 use std::collections::HashSet;
-use std::net::Ipv4Addr;
 use std::process;
+use std::rc::Rc;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
 
-use network_manager::{
-    AccessPoint, AccessPointCredentials, Connection, ConnectionState, Connectivity, Device,
-    DeviceState, DeviceType, NetworkManager, Security, ServiceState,
-};
+use ascii::AsciiStr;
 
-use crate::config::Config;
+use glib::translate::FromGlib;
+
+use futures_channel::oneshot;
+use futures_core::future::Future;
+
+use nm::{ActiveConnectionExt, Cast, ConnectionExt, DeviceExt, SettingIPConfigExt};
+
+use crate::config::{Config, DEFAULT_GATEWAY};
 use crate::dnsmasq::{start_dnsmasq, stop_dnsmasq};
 use crate::errors::*;
 use crate::exit::{exit, trap_exit_signals, ExitResult};
 use crate::server::start_server;
-
 pub enum NetworkCommand {
     Activate,
     Timeout,
@@ -38,10 +42,10 @@ pub enum NetworkCommandResponse {
 }
 
 struct NetworkCommandHandler {
-    manager: NetworkManager,
-    device: Device,
-    access_points: Vec<AccessPoint>,
-    portal_connection: Option<Connection>,
+    client: nm::Client,
+    device: nm::Device,
+    access_points: Vec<nm::AccessPoint>,
+    portal_connection: Option<nm::ActiveConnection>,
     config: Config,
     dnsmasq: process::Child,
     server_tx: Sender<NetworkCommandResponse>,
@@ -55,14 +59,16 @@ impl NetworkCommandHandler {
 
         Self::spawn_trap_exit_signals(exit_tx, network_tx.clone());
 
-        let manager = NetworkManager::new();
+        let client = nm::Client::new(nm::NONE_CANCELLABLE).unwrap();
         debug!("NetworkManager connection initialized");
 
-        let device = find_device(&manager, &config.interface)?;
+        let device = find_device(&client, &config.interface)?;
+
+        println!("Device: {:?}", device);
 
         let access_points = get_access_points(&device)?;
 
-        let portal_connection = Some(create_portal(&device, config)?);
+        let portal_connection = Some(create_portal(&client, &device, config)?);
 
         let dnsmasq = start_dnsmasq(config, &device)?;
 
@@ -70,13 +76,13 @@ impl NetworkCommandHandler {
 
         Self::spawn_server(config, exit_tx, server_rx, network_tx.clone());
 
-        Self::spawn_activity_timeout(config, network_tx.clone());
+        Self::spawn_activity_timeout(config, network_tx);
 
         let config = config.clone();
         let activated = false;
 
         Ok(NetworkCommandHandler {
-            manager,
+            client,
             device,
             access_points,
             portal_connection,
@@ -192,8 +198,8 @@ impl NetworkCommandHandler {
     fn stop(&mut self, exit_tx: &Sender<ExitResult>, result: ExitResult) {
         let _ = stop_dnsmasq(&mut self.dnsmasq);
 
-        if let Some(ref connection) = self.portal_connection {
-            let _ = stop_portal_impl(connection, &self.config);
+        if let Some(ref active_connection) = self.portal_connection {
+            let _ = stop_portal(&self.client, active_connection, &self.config);
         }
 
         let _ = exit_tx.send(result);
@@ -210,10 +216,15 @@ impl NetworkCommandHandler {
     }
 
     fn connect(&mut self, ssid: &str, identity: &str, passphrase: &str) -> Result<bool> {
-        delete_existing_connections_to_same_network(&self.manager, ssid);
+        let context = glib::MainContext::default();
 
-        if let Some(ref connection) = self.portal_connection {
-            stop_portal(connection, &self.config)?;
+        context.block_on(delete_exising_wifi_connect_ap_profile(
+            Some(&self.client),
+            ssid,
+        ))?;
+
+        if let Some(ref active_connection) = self.portal_connection {
+            stop_portal(&self.client, active_connection, &self.config)?;
         }
 
         self.portal_connection = None;
@@ -221,16 +232,19 @@ impl NetworkCommandHandler {
         self.access_points = get_access_points(&self.device)?;
 
         if let Some(access_point) = find_access_point(&self.access_points, ssid) {
-            let wifi_device = self.device.as_wifi_device().unwrap();
-
             info!("Connecting to access point '{}'...", ssid);
 
             let credentials = init_access_point_credentials(access_point, identity, passphrase);
 
-            match wifi_device.connect(access_point, &credentials) {
-                Ok((connection, state)) => {
-                    if state == ConnectionState::Activated {
-                        match wait_for_connectivity(&self.manager, 20) {
+            match context.block_on(connect_to_access_point(
+                &self.client,
+                &self.device,
+                access_point,
+                &credentials,
+            )) {
+                Ok(active_connection) => {
+                    if active_connection.state() == nm::ActiveConnectionState::Activated {
+                        match wait_for_connectivity(&self.client, 20) {
                             Ok(has_connectivity) => {
                                 if has_connectivity {
                                     info!("Internet connectivity established");
@@ -244,13 +258,19 @@ impl NetworkCommandHandler {
                         return Ok(true);
                     }
 
-                    if let Err(err) = connection.delete() {
+                    if let Err(err) = context.block_on(
+                        active_connection
+                            .connection()
+                            .unwrap()
+                            .delete_async_future(),
+                    ) {
                         error!("Deleting connection object failed: {}", err)
                     }
 
                     warn!(
                         "Connection to access point not activated '{}': {:?}",
-                        ssid, state
+                        ssid,
+                        active_connection.state()
                     );
                 }
                 Err(e) => {
@@ -261,29 +281,43 @@ impl NetworkCommandHandler {
 
         self.access_points = get_access_points(&self.device)?;
 
-        self.portal_connection = Some(create_portal(&self.device, &self.config)?);
+        self.portal_connection = Some(create_portal(&self.client, &self.device, &self.config)?);
 
         Ok(false)
     }
 }
 
+#[derive(Debug)]
+pub enum AccessPointCredentials {
+    None,
+    Wep {
+        passphrase: String,
+    },
+    Wpa {
+        passphrase: String,
+    },
+    Enterprise {
+        identity: String,
+        passphrase: String,
+    },
+}
+
 fn init_access_point_credentials(
-    access_point: &AccessPoint,
+    access_point: &nm::AccessPoint,
     identity: &str,
     passphrase: &str,
 ) -> AccessPointCredentials {
-    if access_point.security.contains(Security::ENTERPRISE) {
+    let security = get_access_point_security(access_point);
+    if security.contains(Security::ENTERPRISE) {
         AccessPointCredentials::Enterprise {
             identity: identity.to_string(),
             passphrase: passphrase.to_string(),
         }
-    } else if access_point.security.contains(Security::WPA2)
-        || access_point.security.contains(Security::WPA)
-    {
+    } else if security.contains(Security::WPA2) || security.contains(Security::WPA) {
         AccessPointCredentials::Wpa {
             passphrase: passphrase.to_string(),
         }
-    } else if access_point.security.contains(Security::WEP) {
+    } else if security.contains(Security::WEP) {
         AccessPointCredentials::Wep {
             passphrase: passphrase.to_string(),
         }
@@ -305,74 +339,71 @@ pub fn process_network_commands(config: &Config, exit_tx: &Sender<ExitResult>) {
 }
 
 pub fn init_networking(config: &Config) -> Result<()> {
-    start_network_manager_service()?;
+    let context = glib::MainContext::default();
 
-    delete_exising_wifi_connect_ap_profile(&config.ssid).chain_err(|| ErrorKind::DeleteAccessPoint)
+    context
+        .block_on(delete_exising_wifi_connect_ap_profile(None, &config.ssid))
+        .chain_err(|| ErrorKind::DeleteAccessPoint)
 }
 
-pub fn find_device(manager: &NetworkManager, interface: &Option<String>) -> Result<Device> {
+pub fn find_device(client: &nm::Client, interface: &Option<String>) -> Result<nm::Device> {
     if let Some(ref interface) = *interface {
-        let device = manager
-            .get_device_by_interface(interface)
-            .chain_err(|| ErrorKind::DeviceByInterface(interface.clone()))?;
-
-        info!("Targeted WiFi device: {}", interface);
-
-        if *device.device_type() != DeviceType::WiFi {
-            bail!(ErrorKind::NotAWiFiDevice(interface.clone()))
-        }
-
-        if device.get_state()? == DeviceState::Unmanaged {
-            bail!(ErrorKind::UnmanagedDevice(interface.clone()))
-        }
-
-        Ok(device)
+        get_exact_device(client, interface)
     } else {
-        let devices = manager.get_devices()?;
-
-        if let Some(device) = find_wifi_managed_device(devices)? {
-            info!("WiFi device: {}", device.interface());
-            Ok(device)
-        } else {
-            bail!(ErrorKind::NoWiFiDevice)
-        }
+        find_any_wifi_device(client)
     }
 }
 
-fn find_wifi_managed_device(devices: Vec<Device>) -> Result<Option<Device>> {
-    for device in devices {
-        if *device.device_type() == DeviceType::WiFi
-            && device.get_state()? != DeviceState::Unmanaged
+fn get_exact_device(client: &nm::Client, interface: &str) -> Result<nm::Device> {
+    let device = client
+        .device_by_iface(interface)
+        .chain_err(|| ErrorKind::DeviceByInterface(interface.to_string()))?;
+
+    if device.device_type() != nm::DeviceType::Wifi {
+        bail!(ErrorKind::NotAWiFiDevice(interface.to_string()))
+    }
+
+    if device.state() == nm::DeviceState::Unmanaged {
+        bail!(ErrorKind::UnmanagedDevice(interface.to_string()))
+    }
+
+    Ok(device)
+}
+
+fn find_any_wifi_device(client: &nm::Client) -> Result<nm::Device> {
+    for device in client.devices() {
+        if device.device_type() == nm::DeviceType::Wifi
+            && device.state() != nm::DeviceState::Unmanaged
         {
-            return Ok(Some(device));
+            return Ok(device);
         }
     }
 
-    Ok(None)
+    bail!(ErrorKind::NoWiFiDevice)
 }
 
-fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>> {
+fn get_access_points(device: &nm::Device) -> Result<Vec<nm::AccessPoint>> {
     get_access_points_impl(device).chain_err(|| ErrorKind::NoAccessPoints)
 }
 
-fn get_access_points_impl(device: &Device) -> Result<Vec<AccessPoint>> {
+fn get_access_points_impl(device: &nm::Device) -> Result<Vec<nm::AccessPoint>> {
     let retries_allowed = 10;
     let mut retries = 0;
 
     // After stopping the hotspot we may have to wait a bit for the list
     // of access points to become available
     while retries < retries_allowed {
-        let wifi_device = device.as_wifi_device().unwrap();
-        let mut access_points = wifi_device.get_access_points()?;
+        let wifi_device = device.downcast_ref::<nm::DeviceWifi>().unwrap();
+        let mut access_points = wifi_device.access_points();
 
-        access_points.retain(|ap| ap.ssid().as_str().is_ok());
+        access_points.retain(|ap| ssid_to_string(ap.ssid()).is_some());
 
         // Purge access points with duplicate SSIDs
         let mut inserted = HashSet::new();
-        access_points.retain(|ap| inserted.insert(ap.ssid.clone()));
+        access_points.retain(|ap| inserted.insert(ssid_to_string(ap.ssid()).unwrap()));
 
         // Remove access points without SSID (hidden)
-        access_points.retain(|ap| !ap.ssid().as_str().unwrap().is_empty());
+        access_points.retain(|ap| !ssid_to_string(ap.ssid()).unwrap().is_empty());
 
         if !access_points.is_empty() {
             info!(
@@ -391,44 +422,89 @@ fn get_access_points_impl(device: &Device) -> Result<Vec<AccessPoint>> {
     Ok(vec![])
 }
 
-fn get_access_points_ssids(access_points: &[AccessPoint]) -> Vec<&str> {
+fn get_access_points_ssids(access_points: &[nm::AccessPoint]) -> Vec<String> {
     access_points
         .iter()
-        .map(|ap| ap.ssid().as_str().unwrap())
+        .map(|ap| ssid_to_string(ap.ssid()).unwrap())
         .collect()
 }
 
-fn get_networks(access_points: &[AccessPoint]) -> Vec<Network> {
+fn get_networks(access_points: &[nm::AccessPoint]) -> Vec<Network> {
     access_points
         .iter()
         .map(|ap| get_network_info(ap))
         .collect()
 }
 
-fn get_network_info(access_point: &AccessPoint) -> Network {
+fn get_network_info(access_point: &nm::AccessPoint) -> Network {
     Network {
-        ssid: access_point.ssid().as_str().unwrap().to_string(),
+        ssid: ssid_to_string(access_point.ssid()).unwrap(),
         security: get_network_security(access_point).to_string(),
     }
 }
 
-fn get_network_security(access_point: &AccessPoint) -> &str {
-    if access_point.security.contains(Security::ENTERPRISE) {
+fn get_network_security(access_point: &nm::AccessPoint) -> &str {
+    let security = get_access_point_security(access_point);
+    if security.contains(Security::ENTERPRISE) {
         "enterprise"
-    } else if access_point.security.contains(Security::WPA2)
-        || access_point.security.contains(Security::WPA)
-    {
+    } else if security.contains(Security::WPA2) || security.contains(Security::WPA) {
         "wpa"
-    } else if access_point.security.contains(Security::WEP) {
+    } else if security.contains(Security::WEP) {
         "wep"
     } else {
         "none"
     }
 }
 
-fn find_access_point<'a>(access_points: &'a [AccessPoint], ssid: &str) -> Option<&'a AccessPoint> {
+bitflags! {
+    pub struct Security: u32 {
+        const NONE         = 0b0000_0000;
+        const WEP          = 0b0000_0001;
+        const WPA          = 0b0000_0010;
+        const WPA2         = 0b0000_0100;
+        const ENTERPRISE   = 0b0000_1000;
+    }
+}
+
+fn get_access_point_security(access_point: &nm::AccessPoint) -> Security {
+    let flags = access_point.flags();
+
+    let wpa_flags = access_point.wpa_flags();
+
+    let rsn_flags = access_point.rsn_flags();
+
+    let mut security = Security::NONE;
+
+    if flags.contains(nm::_80211ApFlags::PRIVACY)
+        && wpa_flags == nm::_80211ApSecurityFlags::NONE
+        && rsn_flags == nm::_80211ApSecurityFlags::NONE
+    {
+        security |= Security::WEP;
+    }
+
+    if wpa_flags != nm::_80211ApSecurityFlags::NONE {
+        security |= Security::WPA;
+    }
+
+    if rsn_flags != nm::_80211ApSecurityFlags::NONE {
+        security |= Security::WPA2;
+    }
+
+    if wpa_flags.contains(nm::_80211ApSecurityFlags::KEY_MGMT_802_1X)
+        || rsn_flags.contains(nm::_80211ApSecurityFlags::KEY_MGMT_802_1X)
+    {
+        security |= Security::ENTERPRISE;
+    }
+
+    security
+}
+
+fn find_access_point<'a>(
+    access_points: &'a [nm::AccessPoint],
+    ssid: &str,
+) -> Option<&'a nm::AccessPoint> {
     for access_point in access_points.iter() {
-        if let Ok(access_point_ssid) = access_point.ssid().as_str() {
+        if let Some(access_point_ssid) = ssid_to_string(access_point.ssid()) {
             if access_point_ssid == ssid {
                 return Some(access_point);
             }
@@ -438,46 +514,304 @@ fn find_access_point<'a>(access_points: &'a [AccessPoint], ssid: &str) -> Option
     None
 }
 
-fn create_portal(device: &Device, config: &Config) -> Result<Connection> {
-    let portal_passphrase = config.passphrase.as_ref().map(|p| p as &str);
+fn create_portal(
+    client: &nm::Client,
+    device: &nm::Device,
+    config: &Config,
+) -> Result<nm::ActiveConnection> {
+    let context = glib::MainContext::default();
 
-    create_portal_impl(device, &config.ssid, &config.gateway, &portal_passphrase)
+    let password = config.passphrase.as_ref().map(|p| p as &str);
+
+    context
+        .block_on(create_portal_impl(
+            client,
+            device,
+            &config.ssid,
+            DEFAULT_GATEWAY,
+            &password,
+        ))
         .chain_err(|| ErrorKind::CreateCaptivePortal)
 }
 
-fn create_portal_impl(
-    device: &Device,
+async fn create_portal_impl(
+    client: &nm::Client,
+    device: &nm::Device,
     ssid: &str,
-    gateway: &Ipv4Addr,
+    gateway: &str,
     passphrase: &Option<&str>,
-) -> Result<Connection> {
-    info!("Starting access point...");
-    let wifi_device = device.as_wifi_device().unwrap();
-    let (portal_connection, _) = wifi_device.create_hotspot(ssid, *passphrase, Some(*gateway))?;
-    info!("Access point '{}' created", ssid);
-    Ok(portal_connection)
+) -> Result<nm::ActiveConnection> {
+    let interface = device.iface().unwrap();
+    let connection = create_ap_connection(interface.as_str(), ssid, gateway, passphrase)?;
+
+    let active_connection = client
+        .add_and_activate_connection_async_future(Some(&connection), device, None)
+        .await?;
+    //        .context("Failed to add and activate connection")?;
+
+    let (sender, receiver) = oneshot::channel::<Result<()>>();
+    let sender = Rc::new(RefCell::new(Some(sender)));
+
+    active_connection.connect_state_changed(move |active_connection, state, _| {
+        let sender = sender.clone();
+        let active_connection = active_connection.clone();
+        spawn_local(async move {
+            let state = unsafe { nm::ActiveConnectionState::from_glib(state as _) };
+            println!("Active connection state: {:?}", state);
+
+            let exit = match state {
+                nm::ActiveConnectionState::Activated => {
+                    println!("Successfully activated");
+                    Some(Ok(()))
+                }
+                nm::ActiveConnectionState::Deactivated => {
+                    println!("Connection deactivated");
+                    if let Some(remote_connection) = active_connection.connection() {
+                        Some(
+                            remote_connection
+                                .delete_async_future()
+                                .await
+                                .chain_err(|| ErrorKind::CreateCaptivePortal),
+                        )
+                        //.context("Failed to delete connection"),
+                    } else {
+                        Some(Err(
+                            "Failed to get remote connection from active connection".into(),
+                        ))
+                    }
+                }
+                _ => None,
+            };
+            if let Some(result) = exit {
+                let sender = sender.borrow_mut().take();
+                if let Some(sender) = sender {
+                    sender.send(result).expect("Sender dropped");
+                }
+            }
+        });
+    });
+
+    if let Err(err) = receiver.await? {
+        Err(err)
+    } else {
+        Ok(active_connection)
+    }
 }
 
-fn stop_portal(connection: &Connection, config: &Config) -> Result<()> {
-    stop_portal_impl(connection, config).chain_err(|| ErrorKind::StopAccessPoint)
+pub fn spawn_local<F: Future<Output = ()> + 'static>(f: F) {
+    glib::MainContext::ref_thread_default().spawn_local(f);
 }
 
-fn stop_portal_impl(connection: &Connection, config: &Config) -> Result<()> {
+fn create_ap_connection(
+    interface: &str,
+    ssid: &str,
+    address: &str,
+    passphrase: &Option<&str>,
+) -> Result<nm::SimpleConnection> {
+    let connection = nm::SimpleConnection::new();
+
+    let s_connection = nm::SettingConnection::new();
+    s_connection.set_type(Some(&nm::SETTING_WIRELESS_SETTING_NAME));
+    s_connection.set_id(Some(ssid));
+    s_connection.set_autoconnect(false);
+    s_connection.set_interface_name(Some(interface));
+    connection.add_setting(&s_connection);
+
+    let s_wireless = nm::SettingWireless::new();
+    s_wireless.set_ssid(Some(&(ssid.as_bytes().into())));
+    s_wireless.set_band(Some("bg"));
+    s_wireless.set_hidden(false);
+    s_wireless.set_mode(Some(&nm::SETTING_WIRELESS_MODE_AP));
+    connection.add_setting(&s_wireless);
+
+    if let Some(password) = passphrase {
+        let s_wireless_security = nm::SettingWirelessSecurity::new();
+        s_wireless_security.set_key_mgmt(Some("wpa-psk"));
+        s_wireless_security.set_psk(Some(password));
+        connection.add_setting(&s_wireless_security);
+    }
+
+    let s_ip4 = nm::SettingIP4Config::new();
+    let address = nm::IPAddress::new(libc::AF_INET, address, 24).unwrap(); //context("Failed to parse address")?;
+    s_ip4.add_address(&address);
+    s_ip4.set_method(Some(&nm::SETTING_IP4_CONFIG_METHOD_MANUAL));
+    connection.add_setting(&s_ip4);
+
+    Ok(connection)
+}
+
+fn stop_portal(
+    client: &nm::Client,
+    active_connection: &nm::ActiveConnection,
+    config: &Config,
+) -> Result<()> {
+    let context = glib::MainContext::default();
+
+    context
+        .block_on(stop_portal_impl(client, active_connection, config))
+        .chain_err(|| ErrorKind::StopAccessPoint)
+}
+
+async fn stop_portal_impl(
+    client: &nm::Client,
+    active_connection: &nm::ActiveConnection,
+    config: &Config,
+) -> Result<()> {
     info!("Stopping access point '{}'...", config.ssid);
-    connection.deactivate()?;
-    connection.delete()?;
+    client
+        .deactivate_connection_async_future(active_connection)
+        .await?;
+    active_connection
+        .connection()
+        .unwrap()
+        .delete_async_future()
+        .await?;
     thread::sleep(Duration::from_secs(1));
     info!("Access point '{}' stopped", config.ssid);
     Ok(())
 }
 
-fn wait_for_connectivity(manager: &NetworkManager, timeout: u64) -> Result<bool> {
+pub async fn connect_to_access_point(
+    client: &nm::Client,
+    device: &nm::Device,
+    access_point: &nm::AccessPoint,
+    credentials: &AccessPointCredentials,
+) -> Result<nm::ActiveConnection> {
+    let connection =
+        create_station_connection(&ssid_to_string(access_point.ssid()).unwrap(), credentials)?;
+
+    let active_connection = client
+        .add_and_activate_connection_async_future(Some(&connection), device, None)
+        .await?;
+    //        .context("Failed to add and activate connection")?;
+
+    let (sender, receiver) = oneshot::channel::<Result<()>>();
+    let sender = Rc::new(RefCell::new(Some(sender)));
+
+    active_connection.connect_state_changed(move |active_connection, state, _| {
+        let sender = sender.clone();
+        let active_connection = active_connection.clone();
+        spawn_local(async move {
+            let state = unsafe { nm::ActiveConnectionState::from_glib(state as _) };
+            println!("Active connection state: {:?}", state);
+
+            let exit = match state {
+                nm::ActiveConnectionState::Activated => {
+                    println!("Successfully activated");
+                    Some(Ok(()))
+                }
+                nm::ActiveConnectionState::Deactivated => {
+                    println!("Connection deactivated");
+                    if let Some(remote_connection) = active_connection.connection() {
+                        Some(
+                            remote_connection
+                                .delete_async_future()
+                                .await
+                                .chain_err(|| ErrorKind::CreateCaptivePortal),
+                        )
+                        //.context("Failed to delete connection"),
+                    } else {
+                        Some(Err(
+                            "Failed to get remote connection from active connection".into(),
+                        ))
+                    }
+                }
+                _ => None,
+            };
+            if let Some(result) = exit {
+                let sender = sender.borrow_mut().take();
+                if let Some(sender) = sender {
+                    sender.send(result).expect("Sender dropped");
+                }
+            }
+        });
+    });
+
+    if let Err(err) = receiver.await? {
+        Err(err)
+    } else {
+        Ok(active_connection)
+    }
+}
+
+fn create_station_connection(
+    ssid: &str,
+    credentials: &AccessPointCredentials,
+) -> Result<nm::SimpleConnection> {
+    let connection = nm::SimpleConnection::new();
+
+    let s_connection = nm::SettingConnection::new();
+    s_connection.set_type(Some(&nm::SETTING_WIRELESS_SETTING_NAME));
+    connection.add_setting(&s_connection);
+
+    let s_wireless = nm::SettingWireless::new();
+    s_wireless.set_ssid(Some(&(ssid.as_bytes().into())));
+    connection.add_setting(&s_wireless);
+
+    match *credentials {
+        AccessPointCredentials::Wep { ref passphrase } => {
+            let s_wireless_security = nm::SettingWirelessSecurity::new();
+            s_wireless_security.set_wep_key_type(nm::WepKeyType::Passphrase);
+            s_wireless_security.set_wep_key0(Some(verify_ascii_password(passphrase)?));
+            connection.add_setting(&s_wireless_security);
+        }
+        AccessPointCredentials::Wpa { ref passphrase } => {
+            let s_wireless_security = nm::SettingWirelessSecurity::new();
+            s_wireless_security.set_key_mgmt(Some("wpa-psk"));
+            s_wireless_security.set_psk(Some(verify_ascii_password(passphrase)?));
+            connection.add_setting(&s_wireless_security);
+        }
+        AccessPointCredentials::Enterprise {
+            ref identity,
+            ref passphrase,
+        } => {
+            let s_wireless_security = nm::SettingWirelessSecurity::new();
+            s_wireless_security.set_key_mgmt(Some("wpa-eap"));
+            connection.add_setting(&s_wireless_security);
+
+            let s_enterprise = nm::Setting8021x::new();
+            s_enterprise.set_eap(&["peap"]);
+            s_enterprise.set_identity(Some(identity as &str));
+            s_enterprise.set_password(Some(passphrase as &str));
+            s_enterprise.set_phase2_auth(Some("mschapv2"));
+            connection.add_setting(&s_enterprise);
+        }
+        AccessPointCredentials::None => {}
+    };
+
+    Ok(connection)
+}
+
+fn verify_ascii_password(password: &str) -> Result<&str> {
+    match AsciiStr::from_ascii(password) {
+        Err(e) => Err(e).chain_err(|| ErrorKind::PreSharedKey("Not an ASCII password".into())),
+        Ok(p) => {
+            if p.len() < 8 {
+                bail!(ErrorKind::PreSharedKey(format!(
+                    "Password length should be at least 8 characters: {} len",
+                    p.len()
+                )))
+            } else if p.len() > 64 {
+                bail!(ErrorKind::PreSharedKey(format!(
+                    "Password length should not exceed 64: {} len",
+                    p.len()
+                )))
+            } else {
+                Ok(password)
+            }
+        }
+    }
+}
+
+fn wait_for_connectivity(client: &nm::Client, timeout: u64) -> Result<bool> {
     let mut total_time = 0;
 
     loop {
-        let connectivity = manager.get_connectivity()?;
+        let connectivity = client.connectivity();
 
-        if connectivity == Connectivity::Full || connectivity == Connectivity::Limited {
+        if connectivity == nm::ConnectivityState::Full
+            || connectivity == nm::ConnectivityState::Limited
+        {
             debug!(
                 "Connectivity established: {:?} / {}s elapsed",
                 connectivity, total_time
@@ -504,82 +838,64 @@ fn wait_for_connectivity(manager: &NetworkManager, timeout: u64) -> Result<bool>
     }
 }
 
-pub fn start_network_manager_service() -> Result<()> {
-    let state = match NetworkManager::get_service_state() {
-        Ok(state) => state,
-        _ => {
-            info!("Cannot get the NetworkManager service state");
-            return Ok(());
-        }
+async fn delete_exising_wifi_connect_ap_profile(
+    client: Option<&nm::Client>,
+    ssid: &str,
+) -> Result<()> {
+    let connections = if let Some(client) = client {
+        client.connections()
+    } else {
+        let client = nm::Client::new(nm::NONE_CANCELLABLE).unwrap();
+        client.connections()
     };
 
-    if state != ServiceState::Active {
-        let state =
-            NetworkManager::start_service(15).chain_err(|| ErrorKind::StartNetworkManager)?;
-        if state != ServiceState::Active {
-            bail!(ErrorKind::StartActiveNetworkManager);
-        } else {
-            info!("NetworkManager service started successfully");
-        }
-    } else {
-        debug!("NetworkManager service already running");
-    }
-
-    Ok(())
-}
-
-fn delete_exising_wifi_connect_ap_profile(ssid: &str) -> Result<()> {
-    let manager = NetworkManager::new();
-
-    for connection in &manager.get_connections()? {
-        if is_access_point_connection(connection) && is_same_ssid(connection, ssid) {
+    for connection in connections {
+        let c = connection.clone().upcast::<nm::Connection>();
+        if is_access_point_connection(&c) && is_same_ssid(&c, ssid) {
             info!(
                 "Deleting already created by WiFi Connect access point connection profile: {:?}",
-                connection.settings().ssid,
+                ssid,
             );
-            connection.delete()?;
+            connection.delete_async_future().await?;
         }
     }
 
     Ok(())
 }
 
-fn delete_existing_connections_to_same_network(manager: &NetworkManager, ssid: &str) {
-    let connections = match manager.get_connections() {
-        Ok(connections) => connections,
-        Err(e) => {
-            error!("Getting existing connections failed: {}", e);
-            return;
-        }
-    };
+fn is_same_ssid(connection: &nm::Connection, ssid: &str) -> bool {
+    connection_ssid_as_str(&connection) == Some(ssid.to_string())
+}
 
-    for connection in &connections {
-        if is_wifi_connection(connection) && is_same_ssid(connection, ssid) {
-            info!(
-                "Deleting existing WiFi connection to the same network: {:?}",
-                connection.settings().ssid,
-            );
+fn connection_ssid_as_str(connection: &nm::Connection) -> Option<String> {
+    ssid_to_string(connection.setting_wireless()?.ssid())
+}
 
-            if let Err(e) = connection.delete() {
-                error!("Deleting existing WiFi connection failed: {}", e);
-            }
+fn ssid_to_string(ssid: Option<glib::Bytes>) -> Option<String> {
+    // An access point SSID could be random bytes and not a UTF-8 encoded string
+    std::str::from_utf8(&ssid?).ok().map(str::to_owned)
+}
+
+fn is_access_point_connection(connection: &nm::Connection) -> bool {
+    is_wifi_connection(&connection) && is_access_point_mode(&connection)
+}
+
+fn is_access_point_mode(connection: &nm::Connection) -> bool {
+    if let Some(setting) = connection.setting_wireless() {
+        if let Some(mode) = setting.mode() {
+            return mode == *nm::SETTING_WIRELESS_MODE_AP;
         }
     }
+
+    false
 }
 
-fn is_same_ssid(connection: &Connection, ssid: &str) -> bool {
-    connection_ssid_as_str(connection) == Some(ssid)
-}
+fn is_wifi_connection(connection: &nm::Connection) -> bool {
+    if let Some(setting) = connection.setting_connection() {
+        if let Some(connection_type) = setting.connection_type() {
+            return connection_type == *nm::SETTING_WIRELESS_SETTING_NAME;
+        }
+    }
 
-fn connection_ssid_as_str(connection: &Connection) -> Option<&str> {
-    // An access point SSID could be random bytes and not a UTF-8 encoded string
-    connection.settings().ssid.as_str().ok()
-}
-
-fn is_access_point_connection(connection: &Connection) -> bool {
-    is_wifi_connection(connection) && connection.settings().mode == "ap"
-}
-
-fn is_wifi_connection(connection: &Connection) -> bool {
-    connection.settings().kind == "802-11-wireless"
+    false
 }

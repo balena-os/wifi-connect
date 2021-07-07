@@ -6,7 +6,7 @@ use std::net::Ipv4Addr;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-const DEFAULT_GATEWAY: &str = "192.168.42.1";
+pub const DEFAULT_GATEWAY: &str = "192.168.42.1";
 const DEFAULT_DHCP_RANGE: &str = "192.168.42.2,192.168.42.254";
 const DEFAULT_SSID: &str = "WiFi Connect";
 const DEFAULT_ACTIVITY_TIMEOUT: &str = "0";
@@ -158,14 +158,14 @@ pub fn get_config() -> Config {
     let ui_directory = get_ui_directory(matches.value_of("ui-directory"));
 
     Config {
-        interface: interface,
-        ssid: ssid,
-        passphrase: passphrase,
-        gateway: gateway,
-        dhcp_range: dhcp_range,
-        listening_port: listening_port,
-        activity_timeout: activity_timeout,
-        ui_directory: ui_directory,
+        interface,
+        ssid,
+        passphrase,
+        gateway,
+        dhcp_range,
+        listening_port,
+        activity_timeout,
+        ui_directory,
     }
 }
 

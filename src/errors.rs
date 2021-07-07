@@ -1,7 +1,5 @@
 #![allow(deprecated)]
 
-use network_manager;
-
 use crate::network;
 
 error_chain! {
@@ -10,10 +8,8 @@ error_chain! {
         Recv(::std::sync::mpsc::RecvError);
         SendNetworkCommand(::std::sync::mpsc::SendError<network::NetworkCommand>);
         Nix(::nix::Error);
-    }
-
-    links {
-        NetworkManager(network_manager::errors::Error, network_manager::errors::ErrorKind);
+        Glib(::glib::Error);
+        Cancelled(::futures_channel::oneshot::Canceled);
     }
 
     errors {
@@ -105,6 +101,11 @@ error_chain! {
             description("Root privileges required")
             display("You need root privileges to run {}", app)
         }
+
+        PreSharedKey(info: String) {
+            description("Invalid Pre-Shared-Key")
+            display("{}", info)
+        }
     }
 }
 
@@ -131,6 +132,7 @@ pub fn exit_code(e: &Error) -> i32 {
         ErrorKind::TrapExitSignals => 22,
         ErrorKind::RootPrivilegesRequired(_) => 23,
         ErrorKind::UnmanagedDevice(_) => 24,
+        ErrorKind::PreSharedKey(_) => 25,
         _ => 1,
     }
 }
