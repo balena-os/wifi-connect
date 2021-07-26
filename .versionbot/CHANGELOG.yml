@@ -1,4 +1,16 @@
 - commits:
+    - subject: Include captive portal port on redirect
+      hash: 17be02ec29c79c6ee62c923ec297cf492f640c89
+      body: |
+        * allows the use of non-default listening ports
+        * allows captive portal redirect when using non-standard listening port
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: ab77
+  version: 4.4.7
+  date: 2021-07-26T14:32:01.990Z
+- commits:
     - subject: Remove CODEOWNERS file
       hash: b1a1d51d0bafec133ced017066710ab1a94fba45
       body: ''
