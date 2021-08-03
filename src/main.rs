@@ -16,6 +16,7 @@ extern crate clap;
 extern crate bitflags;
 
 extern crate env_logger;
+/*
 extern crate iron;
 extern crate iron_cors;
 extern crate mount;
@@ -23,8 +24,9 @@ extern crate nix;
 extern crate params;
 extern crate persistent;
 extern crate router;
-extern crate serde_json;
 extern crate staticfile;
+*/
+extern crate serde_json;
 
 mod config;
 mod dnsmasq;

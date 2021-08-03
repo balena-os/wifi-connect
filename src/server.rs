@@ -4,6 +4,8 @@ use std::net::Ipv4Addr;
 use std::sync::mpsc::{Receiver, Sender};
 
 use crate::path::Path;
+
+/*
 use iron::modifiers::Redirect;
 use iron::prelude::*;
 use iron::{
@@ -15,11 +17,14 @@ use params::{FromValue, Params};
 use persistent::Write;
 use router::Router;
 use staticfile::Static;
+*/
+use warp::Filter;
 
 use crate::errors::*;
 use crate::exit::{exit, ExitResult};
 use crate::network::{NetworkCommand, NetworkCommandResponse};
 
+/*
 struct RequestSharedState {
     gateway: Ipv4Addr,
     server_rx: Receiver<NetworkCommandResponse>,
@@ -129,8 +134,9 @@ impl AfterMiddleware for RedirectMiddleware {
         Err(err)
     }
 }
+*/
 
-pub fn start_server(
+pub async fn start_server(
     gateway: Ipv4Addr,
     listening_port: u16,
     server_rx: Receiver<NetworkCommandResponse>,
@@ -140,6 +146,7 @@ pub fn start_server(
 ) {
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
+    /*
     let request_state = RequestSharedState {
         gateway,
         server_rx,
@@ -176,7 +183,15 @@ pub fn start_server(
             ErrorKind::StartHTTPServer(address, e.to_string()).into(),
         );
     }
+    */
+
+
+    let routes = warp::any().map(|| "Hello, World!");
+
+    warp::serve(routes).run((gateway_clone, listening_port)).await;
 }
+
+/*
 
 fn networks(req: &mut Request) -> IronResult<Response> {
     info!("User connected to the captive portal");
@@ -227,3 +242,4 @@ fn connect(req: &mut Request) -> IronResult<Response> {
         Ok(Response::with(status::Ok))
     }
 }
+*/

@@ -15,6 +15,8 @@ use futures_core::future::Future;
 
 use nm::{ActiveConnectionExt, Cast, ConnectionExt, DeviceExt, SettingIPConfigExt};
 
+use tokio::runtime::Runtime;
+
 use crate::config::{Config, DEFAULT_GATEWAY};
 use crate::dnsmasq::{start_dnsmasq, stop_dnsmasq};
 use crate::errors::*;
@@ -106,14 +108,17 @@ impl NetworkCommandHandler {
         let ui_directory = config.ui_directory.clone();
 
         thread::spawn(move || {
-            start_server(
-                gateway,
-                listening_port,
-                server_rx,
-                network_tx,
-                exit_tx_server,
-                &ui_directory,
-            );
+            let rt = Runtime::new().unwrap();
+            rt.block_on(async move {
+                start_server(
+                    gateway,
+                    listening_port,
+                    server_rx,
+                    network_tx,
+                    exit_tx_server,
+                    &ui_directory,
+                ).await
+            });
         });
     }
 
