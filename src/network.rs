@@ -33,7 +33,7 @@ pub enum NetworkCommand {
     },
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct Network {
     ssid: String,
     security: String,
@@ -46,7 +46,7 @@ pub enum NetworkCommandResponse {
 struct NetworkCommandHandler {
     client: nm::Client,
     device: nm::Device,
-    access_points: Vec<nm::AccessPoint>,
+    networks: Vec<Network>,
     portal_connection: Option<nm::ActiveConnection>,
     config: Config,
     dnsmasq: process::Child,
@@ -69,6 +69,7 @@ impl NetworkCommandHandler {
         println!("Device: {:?}", device);
 
         let access_points = get_access_points(&device)?;
+        let networks = get_networks(&access_points);
 
         let portal_connection = Some(create_portal(&client, &device, config)?);
 
@@ -86,7 +87,7 @@ impl NetworkCommandHandler {
         Ok(NetworkCommandHandler {
             client,
             device,
-            access_points,
+            networks,
             portal_connection,
             config,
             dnsmasq,
@@ -117,7 +118,8 @@ impl NetworkCommandHandler {
                     network_tx,
                     exit_tx_server,
                     &ui_directory,
-                ).await
+                )
+                .await
             });
         });
     }
@@ -213,10 +215,8 @@ impl NetworkCommandHandler {
     fn activate(&mut self) -> ExitResult {
         self.activated = true;
 
-        let networks = get_networks(&self.access_points);
-
         self.server_tx
-            .send(NetworkCommandResponse::Networks(networks))
+            .send(NetworkCommandResponse::Networks(self.networks.clone()))
             .chain_err(|| ErrorKind::SendAccessPointSSIDs)
     }
 
@@ -234,9 +234,9 @@ impl NetworkCommandHandler {
 
         self.portal_connection = None;
 
-        self.access_points = get_access_points(&self.device)?;
+        let access_points = get_access_points(&self.device)?;
 
-        if let Some(access_point) = find_access_point(&self.access_points, ssid) {
+        if let Some(access_point) = find_access_point(&access_points, ssid) {
             info!("Connecting to access point '{}'...", ssid);
 
             let credentials = init_access_point_credentials(access_point, identity, passphrase);
@@ -284,7 +284,8 @@ impl NetworkCommandHandler {
             }
         }
 
-        self.access_points = get_access_points(&self.device)?;
+        let access_points = get_access_points(&self.device)?;
+        self.networks = get_networks(&access_points);
 
         self.portal_connection = Some(create_portal(&self.client, &self.device, &self.config)?);
 

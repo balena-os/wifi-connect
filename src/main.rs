@@ -16,16 +16,6 @@ extern crate clap;
 extern crate bitflags;
 
 extern crate env_logger;
-/*
-extern crate iron;
-extern crate iron_cors;
-extern crate mount;
-extern crate nix;
-extern crate params;
-extern crate persistent;
-extern crate router;
-extern crate staticfile;
-*/
 extern crate serde_json;
 
 mod config;
@@ -38,7 +28,6 @@ mod privileges;
 mod server;
 
 use std::io::Write;
-use std::path;
 use std::process;
 use std::sync::mpsc::channel;
 use std::thread;
