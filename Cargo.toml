@@ -1,29 +1,17 @@
 [package]
 name = "wifi-connect"
-version = "4.4.6"
-authors = ["Zahari Petkov <zahari@balena.io>"]
+version = "5.0.0"
+authors = ["majorz"]
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
+edition = "2018"
 
 [dependencies]
-network-manager = "0.11"
-clap = "2.24"
-iron = "0.6"
-iron-cors = "0.7"
-staticfile = "0.5"
-mount = "0.4"
-router = "0.6"
-serde = "1.0"
-serde_json = "1.0"
-serde_derive = "1.0"
-persistent = "0.4"
-params = "0.8"
-log = "0.3"
-env_logger = "0.4"
-nix = "0.10"
-
-[dependencies.error-chain]
-version = "0.11"
-default-features = false
+anyhow = "1"
+axum = "0.2"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+nm = { git = "https://github.com/balena-io-modules/libnm-rs.git" }
+glib = { git = "https://github.com/gtk-rs/gtk-rs-core" }
 
 [profile.release]
 lto = true
