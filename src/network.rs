@@ -104,11 +104,21 @@ pub fn run_network_manager_loop(glib_receiver: glib::Receiver<NetworkRequest>) {
     let context = MainContext::new();
     let loop_ = MainLoop::new(Some(&context), false);
 
-    context.with_thread_default(|| {
-        glib_receiver.attach(None, dispatch_command_requests);
+    context
+        .with_thread_default(|| {
+            glib_receiver.attach(None, dispatch_command_requests);
 
-        loop_.run();
-    }).unwrap();
+            context.spawn_local(init_network());
+
+            loop_.run();
+        })
+        .unwrap();
+}
+
+async fn init_network() {
+    delete_exising_wifi_connect_ap_profile(crate::config::DEFAULT_SSID)
+        .await
+        .unwrap();
 }
 
 fn dispatch_command_requests(command_request: NetworkRequest) -> glib::Continue {
@@ -259,4 +269,55 @@ async fn create_client() -> Result<Client> {
     }
 
     Ok(client)
+}
+
+async fn delete_exising_wifi_connect_ap_profile(ssid: &str) -> Result<()> {
+    let client = create_client().await?;
+
+    let connections = client.connections();
+
+    for connection in connections {
+        let c = connection.clone().upcast::<nm::Connection>();
+        if is_access_point_connection(&c) && is_same_ssid(&c, ssid) {
+            println!(
+                "Deleting already created by WiFi Connect access point connection profile: {:?}",
+                ssid,
+            );
+            connection.delete_async_future().await?;
+        }
+    }
+
+    Ok(())
+}
+
+fn is_same_ssid(connection: &nm::Connection, ssid: &str) -> bool {
+    connection_ssid_as_str(&connection) == Some(ssid.to_string())
+}
+
+fn connection_ssid_as_str(connection: &nm::Connection) -> Option<String> {
+    ssid_to_string(connection.setting_wireless()?.ssid())
+}
+
+fn is_access_point_connection(connection: &nm::Connection) -> bool {
+    is_wifi_connection(&connection) && is_access_point_mode(&connection)
+}
+
+fn is_access_point_mode(connection: &nm::Connection) -> bool {
+    if let Some(setting) = connection.setting_wireless() {
+        if let Some(mode) = setting.mode() {
+            return mode == *nm::SETTING_WIRELESS_MODE_AP;
+        }
+    }
+
+    false
+}
+
+fn is_wifi_connection(connection: &nm::Connection) -> bool {
+    if let Some(setting) = connection.setting_connection() {
+        if let Some(connection_type) = setting.connection_type() {
+            return connection_type == *nm::SETTING_WIRELESS_SETTING_NAME;
+        }
+    }
+
+    false
 }
