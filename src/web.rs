@@ -1,7 +1,7 @@
 use std::convert::Infallible;
 use std::sync::Arc;
 
-use anyhow::Context;
+use anyhow::{Context, Result};
 
 use axum::{
     body::{Bytes, Full},
@@ -90,6 +90,13 @@ async fn send_command(state: &Arc<State>, command: NetworkCommand) -> AppRespons
         .send(NetworkRequest::new(responder, command))
         .unwrap();
 
+    receive_network_thread_response(receiver, action).await
+}
+
+async fn receive_network_thread_response(
+    receiver: oneshot::Receiver<Result<NetworkResponse>>,
+    action: &str,
+) -> AppResponse {
     let received = receiver
         .await
         .context("Failed to receive network thread response");
