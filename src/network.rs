@@ -293,7 +293,7 @@ async fn delete_exising_wifi_connect_ap_profile(ssid: &str) -> Result<()> {
 }
 
 fn is_same_ssid(connection: &nm::Connection, ssid: &str) -> bool {
-    connection_ssid_as_str(&connection) == Some(ssid.to_string())
+    connection_ssid_as_str(connection) == Some(ssid.to_string())
 }
 
 fn connection_ssid_as_str(connection: &nm::Connection) -> Option<String> {
@@ -301,7 +301,7 @@ fn connection_ssid_as_str(connection: &nm::Connection) -> Option<String> {
 }
 
 fn is_access_point_connection(connection: &nm::Connection) -> bool {
-    is_wifi_connection(&connection) && is_access_point_mode(&connection)
+    is_wifi_connection(connection) && is_access_point_mode(connection)
 }
 
 fn is_access_point_mode(connection: &nm::Connection) -> bool {
