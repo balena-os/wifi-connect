@@ -4,7 +4,7 @@ mod web;
 
 use std::thread;
 
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 
 use clap::Parser;
 
@@ -26,15 +26,19 @@ async fn main() -> Result<()> {
         run_network_manager_loop(opts, network_init_sender, glib_receiver);
     });
 
-    let received = network_init_receiver
+    receive_network_init_response(network_init_receiver).await?;
+
+    run_web_loop(glib_sender).await;
+
+    Ok(())
+}
+
+async fn receive_network_init_response(receiver: oneshot::Receiver<Result<()>>) -> Result<()> {
+    let received = receiver
         .await
         .context("Failed to receive network initialization response");
 
     received
         .and_then(|r| r)
-        .or_else(|e| Err(e).context("Failed to initialize network"))?;
-
-    run_web_loop(glib_sender).await;
-
-    Ok(())
+        .or_else(|e| Err(e).context("Failed to initialize network"))
 }
