@@ -102,7 +102,7 @@ pub fn create_channel() -> (glib::Sender<NetworkRequest>, glib::Receiver<Network
     MainContext::channel(glib::PRIORITY_DEFAULT)
 }
 
-pub fn run_network_manager_loop(opts: Opts, glib_receiver: glib::Receiver<NetworkRequest>) {
+pub fn run_network_manager_loop(opts: Opts, network_init_sender: oneshot::Sender<Result<()>>, glib_receiver: glib::Receiver<NetworkRequest>) {
     let context = MainContext::new();
     let loop_ = MainLoop::new(Some(&context), false);
 
@@ -110,17 +110,19 @@ pub fn run_network_manager_loop(opts: Opts, glib_receiver: glib::Receiver<Networ
         .with_thread_default(|| {
             glib_receiver.attach(None, dispatch_command_requests);
 
-            context.spawn_local(init_network(opts));
+            context.spawn_local(init_network(opts, network_init_sender));
 
             loop_.run();
         })
         .unwrap();
 }
 
-async fn init_network(opts: Opts) {
+async fn init_network(opts: Opts, network_init_sender: oneshot::Sender<Result<()>>) {
     delete_exising_wifi_connect_ap_profile(&opts.ssid)
         .await
         .unwrap();
+
+    let _ = network_init_sender.send(Ok(()));
 }
 
 fn dispatch_command_requests(command_request: NetworkRequest) -> glib::Continue {
