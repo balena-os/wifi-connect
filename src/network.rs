@@ -110,19 +110,24 @@ pub fn run_network_manager_loop(opts: Opts, network_init_sender: oneshot::Sender
         .with_thread_default(|| {
             glib_receiver.attach(None, dispatch_command_requests);
 
-            context.spawn_local(init_network(opts, network_init_sender));
+            context.spawn_local(init_network_respond(opts, network_init_sender));
 
             loop_.run();
         })
         .unwrap();
 }
 
-async fn init_network(opts: Opts, network_init_sender: oneshot::Sender<Result<()>>) {
-    delete_exising_wifi_connect_ap_profile(&opts.ssid)
-        .await
-        .unwrap();
+async fn init_network_respond(opts: Opts, network_init_sender: oneshot::Sender<Result<()>>) {
+    let init_result = init_network(opts).await;
 
-    let _ = network_init_sender.send(Ok(()));
+    let _ = network_init_sender.send(init_result);
+}
+
+async fn init_network(opts: Opts) -> Result<()> {
+    delete_exising_wifi_connect_ap_profile(&opts.ssid)
+        .await?;
+
+    Ok(())
 }
 
 fn dispatch_command_requests(command_request: NetworkRequest) -> glib::Continue {

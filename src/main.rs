@@ -4,7 +4,7 @@ mod web;
 
 use std::thread;
 
-use anyhow::Context;
+use anyhow::{Result, Context};
 
 use clap::Parser;
 
@@ -15,7 +15,7 @@ use crate::opts::Opts;
 use crate::web::run_web_loop;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     let opts: Opts = Opts::parse();
 
     let (glib_sender, glib_receiver) = create_channel();
@@ -30,11 +30,11 @@ async fn main() {
         .await
         .context("Failed to receive network initialization response");
 
-    let result = received
+    received
         .and_then(|r| r)
-        .or_else(|e| Err(e).context("Failed to initialize network"));
-
-    println!("{:?}", result);
+        .or_else(|e| Err(e).context("Failed to initialize network"))?;
 
     run_web_loop(glib_sender).await;
+
+    Ok(())
 }
