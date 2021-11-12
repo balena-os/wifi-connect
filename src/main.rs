@@ -20,21 +20,23 @@ async fn main() -> Result<()> {
 
     let (glib_sender, glib_receiver) = create_channel();
 
-    let (network_init_sender, network_init_receiver) = oneshot::channel();
+    let (initialized_sender, initialized_receiver) = oneshot::channel();
 
     thread::spawn(move || {
-        run_network_manager_loop(opts, network_init_sender, glib_receiver);
+        run_network_manager_loop(opts, initialized_sender, glib_receiver);
     });
 
-    receive_network_init_response(network_init_receiver).await?;
+    receive_network_initialized(initialized_receiver).await?;
 
     run_web_loop(glib_sender).await;
 
     Ok(())
 }
 
-async fn receive_network_init_response(receiver: oneshot::Receiver<Result<()>>) -> Result<()> {
-    let received = receiver
+async fn receive_network_initialized(
+    initialized_receiver: oneshot::Receiver<Result<()>>,
+) -> Result<()> {
+    let received = initialized_receiver
         .await
         .context("Failed to receive network initialization response");
 

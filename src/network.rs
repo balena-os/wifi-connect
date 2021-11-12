@@ -104,7 +104,7 @@ pub fn create_channel() -> (glib::Sender<NetworkRequest>, glib::Receiver<Network
 
 pub fn run_network_manager_loop(
     opts: Opts,
-    network_init_sender: oneshot::Sender<Result<()>>,
+    initialized_sender: oneshot::Sender<Result<()>>,
     glib_receiver: glib::Receiver<NetworkRequest>,
 ) {
     let context = MainContext::new();
@@ -114,17 +114,17 @@ pub fn run_network_manager_loop(
         .with_thread_default(|| {
             glib_receiver.attach(None, dispatch_command_requests);
 
-            context.spawn_local(init_network_respond(opts, network_init_sender));
+            context.spawn_local(init_network_respond(opts, initialized_sender));
 
             loop_.run();
         })
         .unwrap();
 }
 
-async fn init_network_respond(opts: Opts, network_init_sender: oneshot::Sender<Result<()>>) {
+async fn init_network_respond(opts: Opts, initialized_sender: oneshot::Sender<Result<()>>) {
     let init_result = init_network(opts).await;
 
-    let _ = network_init_sender.send(init_result);
+    let _ = initialized_sender.send(init_result);
 }
 
 async fn init_network(opts: Opts) -> Result<()> {
