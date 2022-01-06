@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix offline page attempts to load from google fonts
+      hash: a4bb2bd40779f932fe1501d6870c8eff0987adcf
+      body: >
+        Since the device has no network access, the font request will fail and
+        delay the page load.
+      footer:
+        Connects-to: '#412'
+        connects-to: '#412'
+        Change-type: minor
+        change-type: minor
+      author: Joe Frambach
+  version: 4.5.0
+  date: 2022-01-06T05:41:10.420Z
+- commits:
     - subject: Remove CODEOWNERS file
       hash: b1a1d51d0bafec133ced017066710ab1a94fba45
       body: ''
