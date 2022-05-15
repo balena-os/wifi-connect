@@ -20,14 +20,17 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # wget --spider http://google.com 2>&1
 
 # 4. Is there an active WiFi connection?
-iwgetid -r
+# iwgetid -r
+echo "192.168.42.1 home.localhost" >> /etc/hosts
 
-if [ $? -eq 0 ]; then
-    printf 'Skipping WiFi Connect\n'
-else
-    printf 'Starting WiFi Connect\n'
-    ./wifi-connect
-fi
+# if [ $? -eq 0 ]; then
+    # printf 'Skipping WiFi Connect\n'
+# else
+# fi
+
+
+printf 'Starting WiFi Connect\n'
+./wifi-connect --portal-listening-port 8000
 
 # Start your application here.
 sleep infinity
