@@ -22,6 +22,7 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # 4. Is there an active WiFi connection?
 # iwgetid -r
 echo "192.168.42.1 home.localhost" >> /etc/hosts
+echo "192.168.42.1 home.local" >> /etc/hosts
 
 printf 'Starting WiFi Connect\n'
 ./wifi-connect --portal-listening-port 8000
