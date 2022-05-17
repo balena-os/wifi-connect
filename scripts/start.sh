@@ -23,12 +23,6 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # iwgetid -r
 echo "192.168.42.1 home.localhost" >> /etc/hosts
 
-# if [ $? -eq 0 ]; then
-    # printf 'Skipping WiFi Connect\n'
-# else
-# fi
-
-
 printf 'Starting WiFi Connect\n'
 ./wifi-connect --portal-listening-port 8000
 
