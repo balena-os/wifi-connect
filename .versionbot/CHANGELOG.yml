@@ -10,8 +10,8 @@
         change-type: minor
       author: Renovate Bot
   version: 4.6.0
-  title: "'Update Rust crate clap to 2.34.0'"
-  date: 2022-07-18T19:07:09.583Z
+  title: "'Bump async from 2.6.3 to 2.6.4 in /ui'"
+  date: 2022-07-18T19:50:57.926Z
 - commits:
     - subject: Update Rust crate nix to 0.24.2 [SECURITY]
       hash: 424b809ae8f16fbdf5fc9c9e1e325798c2e981c4
