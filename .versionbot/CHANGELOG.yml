@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update Rust crate iron-cors to 0.8.0
+      hash: 13a99d980a33d0059714cc6d45437f989f9f90d5
+      body: |
+        Update iron-cors to 0.8.0
+
+        Update iron-cors from 0.7.1 to 0.8.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+  version: 4.9.0
+  title: "'Update Rust crate iron-cors to 0.8.0'"
+  date: 2022-07-18T22:54:54.183Z
+- commits:
     - subject: Update Rust crate error-chain to 0.12.4
       hash: 5d639745d9a2fa58806d750c8fa831b00984333e
       body: |
