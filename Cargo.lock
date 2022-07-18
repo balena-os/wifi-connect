@@ -145,6 +145,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff511d5dc435d703f4971bc399647c9bc38e20cb41452e3b9feb4765419ed3f3"
 
 [[package]]
+name = "error-chain"
+version = "0.12.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d2f06b9cac1506ece98fe3231e3cc9c4410ec3d5b1f24ae1c8946f0742cdefc"
+dependencies = [
+ "version_check 0.9.4",
+]
+
+[[package]]
 name = "fuchsia-zircon"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -382,7 +391,7 @@ dependencies = [
  "ascii",
  "bitflags",
  "dbus",
- "error-chain",
+ "error-chain 0.11.0",
  "futures",
  "futures-cpupool",
  "log 0.3.9",
@@ -850,7 +859,7 @@ version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f4765f83163b74f957c797ad9253caf97f103fb064d3999aea9568d09fc8a33"
 dependencies = [
- "version_check",
+ "version_check 0.1.3",
 ]
 
 [[package]]
@@ -925,12 +934,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b772017e347561807c1aa192438c5fd74242a670a6cffacc40f2defd1dc069d"
 
 [[package]]
+name = "version_check"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
+
+[[package]]
 name = "wifi-connect"
 version = "4.7.0"
 dependencies = [
  "clap",
  "env_logger",
- "error-chain",
+ "error-chain 0.12.4",
  "iron",
  "iron-cors",
  "log 0.3.9",
