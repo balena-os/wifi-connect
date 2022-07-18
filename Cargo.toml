@@ -6,7 +6,7 @@ description = "Easy WiFi setup for Linux devices from your mobile phone or lapto
 
 [dependencies]
 network-manager = "0.11"
-clap = "2.24"
+clap = "2.34"
 iron = "0.6"
 iron-cors = "0.7"
 staticfile = "0.5"
