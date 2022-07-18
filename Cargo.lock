@@ -245,9 +245,9 @@ dependencies = [
 
 [[package]]
 name = "iron-cors"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2423002cee76f9d397bebc99a73396f320696cb7c1d34acda06a920a7eece233"
+checksum = "24b02b8856c7f14e443c483e802cf0ce693f3bec19f49d2c9a242b18f88c9b70"
 dependencies = [
  "iron",
  "log 0.4.17",
