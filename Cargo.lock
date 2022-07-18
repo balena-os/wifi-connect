@@ -926,7 +926,7 @@ checksum = "6b772017e347561807c1aa192438c5fd74242a670a6cffacc40f2defd1dc069d"
 
 [[package]]
 name = "wifi-connect"
-version = "4.6.0"
+version = "4.7.0"
 dependencies = [
  "clap",
  "env_logger",

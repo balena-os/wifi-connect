@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update Rust crate env_logger to 0.9.0
+      hash: 68ac9dcf875de934e1a8f69660e5d562e388fb78
+      body: |
+        Update env_logger to 0.9.0
+
+        Update env_logger from 0.4.3 to 0.9.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+  version: 4.7.0
+  title: "'Update Rust crate env_logger to 0.9.0'"
+  date: 2022-07-18T20:33:17.681Z
+- commits:
     - subject: Update Rust crate clap to 2.34.0
       hash: 2d46718d5150c0a2ddb71fbb750c9bf615a02747
       body: |
