@@ -1,7 +1,21 @@
 - commits:
+    - subject: Update Rust crate nix to 0.24.2 [SECURITY]
+      hash: 424b809ae8f16fbdf5fc9c9e1e325798c2e981c4
+      body: |
+        Update nix to 0.24.2
+
+        Update nix from 0.10.0 to 0.24.2
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+  version: 4.5.0
+  title: "'Update Rust crate nix to 0.24.2 [SECURITY]'"
+  date: 2022-07-18T18:01:19.005Z
+- commits:
     - subject: Remove CODEOWNERS file
       hash: b1a1d51d0bafec133ced017066710ab1a94fba45
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -29,7 +43,7 @@
 - commits:
     - subject: Terminate dnsmasq gracefully and wait for its exit
       hash: 382773d1d41010e3e620f8bd2ba3200999f04ad5
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -54,7 +68,7 @@
 - commits:
     - subject: Do not show hidden/empty SSID networks
       hash: a3a2867ff24909c563cbbb52325e43a3ac7f7f30
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -66,7 +80,7 @@
 - commits:
     - subject: target correctly the arch dockerfile template var
       hash: 2e3046fae7043f7cece17e6b53746f78280c3a6a
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -78,10 +92,10 @@
 - commits:
     - subject: Allow toggling "show password" on password input
       hash: 582dc761d92edc38d225dfe139a602ef0c06479d
-      body: ''
+      body: ""
       footer:
-        Connects-to: '#54'
-        connects-to: '#54'
+        Connects-to: "#54"
+        connects-to: "#54"
         Change-type: minor
         change-type: minor
         Signed-off-by: Stevche Radevski <stevche@balena.io>
@@ -92,10 +106,10 @@
 - commits:
     - subject: allow connections to open networks by providing a default arg
       hash: 3fc981583744dcbfd1e8b7ac14f9865af294bee0
-      body: ''
+      body: ""
       footer:
-        Connects-to: 'https://github.com/balena-io/wifi-connect/issues/343'
-        connects-to: 'https://github.com/balena-io/wifi-connect/issues/343'
+        Connects-to: https://github.com/balena-io/wifi-connect/issues/343
+        connects-to: https://github.com/balena-io/wifi-connect/issues/343
         Change-type: patch
         change-type: patch
         Signed-off-by: Matthew McGinn <matthew@balena.io>
@@ -123,7 +137,7 @@
 - commits:
     - subject: Replace UI with React and Rendition
       hash: dfe7802988f286e4bdc2d5d24590b8c06dc0a093
-      body: ''
+      body: ""
       footer:
         Change-type: minor
         change-type: minor
@@ -133,12 +147,12 @@
   version: 4.3.0
   date: 2020-04-21T09:47:17.676Z
 - commits:
-    - subject: 'readme: Add balenaOS multicontainer app example.'
+    - subject: "readme: Add balenaOS multicontainer app example."
       hash: 02f4f8f6817ad659036efeaade87e354efa33fb2
-      body: ''
+      body: ""
       footer:
-        Connects-to: '#239'
-        connects-to: '#239'
+        Connects-to: "#239"
+        connects-to: "#239"
         Change-type: patch
         change-type: patch
         Signed-off-by: Tomás Migone <tomas@balena.io>
@@ -177,7 +191,7 @@
 - commits:
     - subject: Delete only the right AP profile on start
       hash: 38770406eee93f5031c6de5b0413fce9279719da
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -189,7 +203,7 @@
 - commits:
     - subject: Add link to supported boards/dongles
       hash: 28f1e9ffa1cdf5df76eb5d81e61a5fc7bea28d9c
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -201,7 +215,7 @@
 - commits:
     - subject: Optional wait in the start.sh script
       hash: dfcc876df6c0b3deba7117057b48cb8e08f7817e
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -213,7 +227,7 @@
 - commits:
     - subject: Fix incorrect attribute name
       hash: e3144902b57f720ba44af83a6b326510927fdb6a
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -225,7 +239,7 @@
 - commits:
     - subject: Add machine-readable changelog
       hash: fe671647bd6612c9a8f44ad31682ec791a7b2b2d
-      body: ''
+      body: ""
       footer:
         Change-type: patch
         change-type: patch
@@ -236,7 +250,7 @@
   date: 2019-06-26T13:13:14.597Z
 - commits:
     - author: Zahari Petkov
-      body: 'Closes #278'
+      body: "Closes #278"
       footers:
         change-type: patch
         signed-off-by: Zahari Petkov <zahari@balena.io>
@@ -249,17 +263,17 @@
         signed-off-by: Zahari Petkov <zahari@balena.io>
       hash: aa42706fe3cbccdc01161fe8af79b2433a698f86
       subject: Do not manually define GitHub user and repo in the CI
-  date: '2019-04-02T15:04:00Z'
+  date: 2019-04-02T15:04:00Z
   version: 4.2.5
 - commits:
     - author: Horia Delicoti
-      body: '* install software packages using install_packages'
+      body: "* install software packages using install_packages"
       footers:
         change-type: patch
         signed-off-by: Horia Delicoti <horia@balena.io>
       hash: f43bab3075465c0a3b5ffae7f0fa8ea6f07d5eb5
       subject: Change the base image to balenalib
-  date: '2019-04-01T12:12:06Z'
+  date: 2019-04-01T12:12:06Z
   version: 4.2.4
 - commits:
     - author: Gergely Imreh
@@ -272,55 +286,53 @@
       hash: a0bb93c24a2919f7e3972e574d5f61d492f966ff
       subject: Add CODEOWNERS
     - author: Daniel Andrade
-      body: ''
+      body: ""
       hash: 20b66dd7344dba19ac347631843d7820e71ac768
       subject: Fix python example url
     - author: Daniel Andrade
-      body: ''
+      body: ""
       footers:
         change-type: patch
         signed-off-by: Daniel Andrade daniel@balena.io
       hash: 0cf30d42a5289fe6c3b62cc2a0e9336112512b03
       subject: Fix python example url
     - author: Daniel Andrade
-      body: ''
+      body: ""
       hash: e674a019d162b5db1aa2e75ffe2bfb2634c79907
-      subject: >-
-        Merge remote-tracking branch 'origin/balena-wifi-connect-link' into
+      subject: Merge remote-tracking branch 'origin/balena-wifi-connect-link' into
         balena-wifi-connect-link
-  date: '2019-03-29T15:44:05Z'
+  date: 2019-03-29T15:44:05Z
   version: 4.2.3
 - commits:
     - author: Zahari Petkov
-      body: ''
+      body: ""
       footers:
         change-type: patch
         signed-off-by: Zahari Petkov <zahari@balena.io>
       hash: f12a8df537a1ba15803568fbf748a3d4b320a7ac
       subject: Change company name
-  date: '2018-11-05T18:38:10Z'
+  date: 2018-11-05T18:38:10Z
   version: 4.2.2
 - commits:
     - author: Robert Vojta
       body: Just a cosmetic change.
       footers:
         change-type: patch
-        connects-to: '#228'
+        connects-to: "#228"
       hash: d178268d0ab3237ad7b8ac62849c54213d040166
-      subject: 'cli: Replace env! with clap crate! macros'
-  date: '2018-07-05T15:26:15Z'
+      subject: "cli: Replace env! with clap crate! macros"
+  date: 2018-07-05T15:26:15Z
   version: 4.2.1
 - commits:
     - author: majorz
-      body: >-
-        Lightweight support for WPA-Enterprise wireless security - EAP-PEAP
+      body: Lightweight support for WPA-Enterprise wireless security - EAP-PEAP
         (specifying CA and client certificates is WIP).
       footers:
         change-type: minor
-        connects-to: '#123'
+        connects-to: "#123"
       hash: 6547a4a77c76d0ec903033f44a177f312c2831fe
-      subject: 'auth: WPA-Enterprise support - EAP-PEAP'
-  date: '2018-06-28T10:46:49Z'
+      subject: "auth: WPA-Enterprise support - EAP-PEAP"
+  date: 2018-06-28T10:46:49Z
   version: 4.2.0
 - commits:
     - author: majorz
@@ -329,84 +341,83 @@
         D-Bus API. If systemd is not active on the system, the application exits
         with error.
 
-        Now it just prints an info message that the NetworkManager service
-        cannot be retrieved.
+        Now it just prints an info message that the NetworkManager service cannot be retrieved.
       footers:
         change-type: patch
-        connects-to: '#220'
+        connects-to: "#220"
       hash: 7c8514ea0a46a836e8fc96a8b128e29f6ebf7542
       subject: Do not fail on systems without systemd
-  date: '2018-06-11T15:50:12Z'
+  date: 2018-06-11T15:50:12Z
   version: 4.1.2
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#208'
+        connects-to: "#208"
       hash: 50f1fe4601564eec12773cced9e851f7d2c56aa0
       subject: Web server CORS middleware
-  date: '2018-04-20T05:17:56Z'
+  date: 2018-04-20T05:17:56Z
   version: 4.1.1
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: minor
-        connects-to: '#203'
+        connects-to: "#203"
       hash: 5e2b2fafe3f71d603030103e040291c17aa319df
       subject: Configurable listening port
-  date: '2018-04-09T10:16:00Z'
+  date: 2018-04-09T10:16:00Z
   version: 4.1.0
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#194'
+        connects-to: "#194"
       hash: 03f96a2f6c33ed3009edc868f695fa1eeb947d1c
       subject: Install WiFi Connect on Raspbian before activating NetworkManager
-  date: '2018-04-09T09:34:13Z'
+  date: 2018-04-09T09:34:13Z
   version: 4.0.9
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#122'
+        connects-to: "#122"
       hash: 2b69aa2890a3170599c51113b79b45b36eecef64
       subject: Require root privileges
-  date: '2018-03-20T09:21:00Z'
+  date: 2018-03-20T09:21:00Z
   version: 4.0.8
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#191'
+        connects-to: "#191"
       hash: 9fb6c76fdafd783f19830743ba5cf52241a65ab2
       subject: Fix Raspbian install script auto-canceling
-  date: '2018-03-14T21:11:37Z'
+  date: 2018-03-14T21:11:37Z
   version: 4.0.7
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#180'
+        connects-to: "#180"
       hash: d166767695935656bf1dee78371f15bb332dc239
       subject: Trap exit signals and exit gracefully
-  date: '2018-02-20T16:27:24Z'
+  date: 2018-02-20T16:27:24Z
   version: 4.0.6
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#181'
+        connects-to: "#181"
       hash: 613d8432d8e310d0a788f84809c71569d9a40718
       subject: Remove `clippy` as an optional dependency
-  date: '2018-02-20T15:09:30Z'
+  date: 2018-02-20T15:09:30Z
   version: 4.0.5
 - commits:
     - author: majorz
@@ -416,8 +427,7 @@
         error-chain error handling is introduced in WiFi Connect as well. This
         simplifies the error handling code and organizes it better.
 
-        But most importantly when an error occurs the underlying causes are
-        printed in a nicer way:
+        But most importantly when an error occurs the underlying causes are printed in a nicer way:
 
         ```
 
@@ -425,9 +435,7 @@
 
         Error: Cannot find network device with interface name 'notexisting'
 
-        caused by: D-Bus failure:
-        org.freedesktop.NetworkManager::GetDeviceByIpIface method call failed on
-        /org/freedesktop/NetworkManager
+        caused by: D-Bus failure: org.freedesktop.NetworkManager::GetDeviceByIpIface method call failed on /org/freedesktop/NetworkManager
 
         caused by: "No device found for the requested iface."
 
@@ -437,11 +445,7 @@
 
         ```
 
-        In the above case, the first error string is generated in WiFi Connect,
-        the second one in our network-manager bindings, and the last third one
-        in NetworkManager itself (sent using the D-Bus API). Additionally the
-        line starting with `Error:` is colored in red in the terminal for better
-        visibility.
+        In the above case, the first error string is generated in WiFi Connect, the second one in our network-manager bindings, and the last third one in NetworkManager itself (sent using the D-Bus API). Additionally the line starting with `Error:` is colored in red in the terminal for better visibility.
 
         In comparison the previous version produced:
 
@@ -449,10 +453,7 @@
 
         $ ./wifi-connect -i notexisting
 
-        [wifi_connect:ERROR] D-Bus
-        'org.freedesktop.NetworkManager'::'GetDeviceByIpIface' method call
-        failed on '/org/freedesktop/NetworkManager': No device found for the
-        requested iface.
+        [wifi_connect:ERROR] D-Bus 'org.freedesktop.NetworkManager'::'GetDeviceByIpIface' method call failed on '/org/freedesktop/NetworkManager': No device found for the requested iface.
 
         $ echo $?
 
@@ -460,49 +461,48 @@
 
         ```
 
-        We now support exit codes for each kind of error defined in WiFi Connect
-        as visible from the examples above.
+        We now support exit codes for each kind of error defined in WiFi Connect as visible from the examples above.
       footers:
         change-type: patch
-        connects-to: '#166'
+        connects-to: "#166"
       hash: 1f3eb9c8d574970ac62c08dddb894d743c9fd738
       subject: Exit codes and error-chain error handling
-  date: '2018-02-15T09:32:36Z'
+  date: 2018-02-15T09:32:36Z
   version: 4.0.4
 - commits:
     - author: majorz
       body: >-
         A regression happened in an older commit due to large amount of
-        replacements. The version before this one was using the proper 
-        `type="password"` field for the passphrase:
+        replacements. The version before this one was using the
+        proper  `type="password"` field for the passphrase:
 
         https://github.com/resin-io/resin-wifi-connect/commit/04a5de06a00603d017b773a21e15831f0c3e0be7#diff-528c3923d718a8860f5d8c05c3931c55
       footers:
         change-type: patch
-        connects-to: '#160'
+        connects-to: "#160"
       hash: 1ad1d9dd5f2485e960fbf9930cdf94a1b37e7c72
       subject: Revert passphrase to a proper password field
-  date: '2018-02-08T10:46:20Z'
+  date: 2018-02-08T10:46:20Z
   version: 4.0.3
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#168'
+        connects-to: "#168"
       hash: e872db894db8f34823dbd39928aff6fd205ba25b
       subject: Shorter Raspbian install script URL
-  date: '2018-02-08T10:13:46Z'
+  date: 2018-02-08T10:13:46Z
   version: 4.0.2
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#167'
+        connects-to: "#167"
       hash: 8a24ff2f445f695ed5ab84ff7fb75f846b197199
       subject: Load README logo from `master`
-  date: '2018-02-08T09:48:30Z'
+  date: 2018-02-08T09:48:30Z
   version: 4.0.1
 - commits:
     - author: majorz
@@ -512,290 +512,260 @@
         only a single connection profile through WiFi Connect, which limited
         moving the device between locations, etc.
 
-        To support multiple connection profiles the application flow is now
-        simplified and excludes unnecessary functionality:
+        To support multiple connection profiles the application flow is now simplified and excludes unnecessary functionality:
 
-        1. Trying to activate existing connections: this is handled by
-        NetworkManager automatically.
+        1. Trying to activate existing connections: this is handled by NetworkManager automatically.
 
-        2. Deleting all existing wireless connections: this is out of WiFi
-        Connect functionality scope and can be achieved in other ways if
-        necessary.
+        2. Deleting all existing wireless connections: this is out of WiFi Connect functionality scope and can be achieved in other ways if necessary.
 
-        3. Not exiting the application if Internet connectivity is not
-        established after connecting to the WiFi network. Now the application
-        exits even if no Internet connectivity is established after connecting
-        to the wireless network, as we should not make assumptions about the
-        connectivity state of the network a user wants to connect to. Displaying
-        the connectivity state on exit is kept though.
+        3. Not exiting the application if Internet connectivity is not established after connecting to the WiFi network. Now the application exits even if no Internet connectivity is established after connecting to the wireless network, as we should not make assumptions about the connectivity state of the network a user wants to connect to. Displaying the connectivity state on exit is kept though.
 
-        Since this is a major release not compatible with v3 there was room for
-        other improvements as well:
+        Since this is a major release not compatible with v3 there was room for other improvements as well:
 
-        1. Introducing `--activity-timeout` argument for exiting the application
-        in case a user has not connected to the captive portal for the specified
-        amount of time. The default is no activity timeout. This is needed in
-        use cases where WiFi Connect can block the start shell script when
-        Internet connectivity is temporary unavailable, e.g. Boombeastic does a
-        google ping to determine whether to execute WiFi Connect and without
-        this argument the main application will not start in case the device is
-        restarted and there is temporary connectivity issue.
+        1. Introducing `--activity-timeout` argument for exiting the application in case a user has not connected to the captive portal for the specified amount of time. The default is no activity timeout. This is needed in use cases where WiFi Connect can block the start shell script when Internet connectivity is temporary unavailable, e.g. Boombeastic does a google ping to determine whether to execute WiFi Connect and without this argument the main application will not start in case the device is restarted and there is temporary connectivity issue.
 
-        2. The old `--timeout` argument which was about specifying amount of
-        seconds to be waited for connection to be established is now removed.
-        This was introduced in v3, but there was not a single case where this
-        was really needed. In the future if such cases arise, we can introduce
-        something similar again and implement it better.
+        2. The old `--timeout` argument which was about specifying amount of seconds to be waited for connection to be established is now removed. This was introduced in v3, but there was not a single case where this was really needed. In the future if such cases arise, we can introduce something similar again and implement it better.
 
-        3. The directory containing the web UI assets of the application is
-        renamed from `public` to `ui`.
+        3. The directory containing the web UI assets of the application is renamed from `public` to `ui`.
 
-        4. The example start script is renamed from `start` to
-        `scripts/start.sh` and now it includes different example conditions for
-        executing WiFi Connect before the application. The default condition is
-        "Is there an active WiFi connection?" by checking the exit code of
-        `iwgetid -r`. For this reason `wireless-tools` is installed in the
-        Dockerfile.template.
+        4. The example start script is renamed from `start` to `scripts/start.sh` and now it includes different example conditions for executing WiFi Connect before the application. The default condition is "Is there an active WiFi connection?" by checking the exit code of `iwgetid -r`. For this reason `wireless-tools` is installed in the Dockerfile.template.
 
-        5. Installation instructions section in the README including installing
-        on Raspbian/Debian Stretch.
+        5. Installation instructions section in the README including installing on Raspbian/Debian Stretch.
 
         6. WiFi Connect logo and a new How It Works image.
 
-        7. The code in network.rs is refactored for reducing the cyclomatic
-        complexity.
+        7. The code in network.rs is refactored for reducing the cyclomatic complexity.
       footers:
         change-type: major
-        connects-to: '#145'
+        connects-to: "#145"
       hash: 7bae63d145eea80c6fd20d0af44c38bdd28653ea
       subject: Support for multiple connection profiles
-  date: '2018-01-23T17:23:42Z'
+  date: 2018-01-23T17:23:42Z
   version: 4.0.0
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#152'
+        connects-to: "#152"
       hash: c072a7afc6557545b744b550dec7ea689186c964
       subject: Use Rust NetworkManager bindings v0.8.6 to fix NM v1.10+ incompatibility
-  date: '2018-01-11T13:10:36Z'
+  date: 2018-01-11T13:10:36Z
   version: 3.0.7
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#154'
+        connects-to: "#154"
       hash: 611673f971d249d4d93306df186a2ed62a68da57
       subject: Rust cross-compilation toolchains update
-  date: '2018-01-10T19:02:11Z'
+  date: 2018-01-10T19:02:11Z
   version: 3.0.6
 - commits:
     - author: Tim Perry
-      body: ''
+      body: ""
       footers:
         change-type: patch
       hash: 6b2ef61b208ddee2cb188879994e9ee57feea514
       subject: Tweak CSS to line up correctly on more screen sizes
-  date: '2018-01-10T10:51:53Z'
+  date: 2018-01-10T10:51:53Z
   version: 3.0.5
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#116'
+        connects-to: "#116"
       hash: 89e4c8b6c42b4735f3d4d9f3983d7a6b72756dd1
       subject: Raspbian Stretch install script
-  date: '2017-11-08T15:21:15Z'
+  date: 2017-11-08T15:21:15Z
   version: 3.0.4
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#143'
+        connects-to: "#143"
       hash: 04a5de06a00603d017b773a21e15831f0c3e0be7
       subject: Improve consistency of new command line arguments
-  date: '2017-11-06T17:48:26Z'
+  date: 2017-11-06T17:48:26Z
   version: 3.0.3
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#141'
+        connects-to: "#141"
       hash: 6135eef368a9584c8f91147ffe199abb2cfabd35
       subject: Use install UI directory when running from install path
-  date: '2017-11-03T10:03:05Z'
+  date: 2017-11-03T10:03:05Z
   version: 3.0.2
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#136'
+        connects-to: "#136"
       hash: 3b3aa71cd6033459ccce8342df91a46f4867413c
       subject: resin-wifi-connect is now WiFi Connect
-  date: '2017-11-02T21:23:30Z'
+  date: 2017-11-02T21:23:30Z
   version: 3.0.1
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: major
-        connects-to: '#104'
+        connects-to: "#104"
       hash: d09d21ebc2f2741bcb6f7a10970e3152b9944daa
       subject: Rust language reimplementation
-  date: '2017-10-24T10:44:49Z'
+  date: 2017-10-24T10:44:49Z
   version: 3.0.0
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: minor
-        connects-to: '#118'
+        connects-to: "#118"
       hash: 152739c8cd898cc71c2a58b01fad97a2d068ca4b
       subject: README note for the coming-soon v3
-  date: '2017-10-06T10:45:02Z'
+  date: 2017-10-06T10:45:02Z
   version: 2.1.0
 - commits:
     - author: majorz
-      body: ''
+      body: ""
       footers:
         change-type: patch
-        connects-to: '#99'
+        connects-to: "#99"
       hash: 79adc34a04a8ffc3002340af6522678643b849b6
       subject: Configurable sleep in the start script
     - author: majorz
-      body: ''
+      body: ""
       hash: 9557d958c66c689ac39eab454d35159cc30350f8
       subject: Adding a FAQ entry for the START_SLEEP env var
-  date: '2017-06-14T09:10:57Z'
+  date: 2017-06-14T09:10:57Z
   version: 2.0.8
 - commits:
     - author: Joseph Roberts
-      body: ''
+      body: ""
       footers:
         signed-off-by: Joseph Roberts <joe@resin.io>
       hash: 94b7573577f78d49f2464126dfe31ccc794b4236
       subject: Integrate versionbot
     - author: Joseph Roberts
-      body: ''
+      body: ""
       footers:
         change-type: patch
         signed-off-by: Joseph Roberts <joe@resin.io>
       hash: 08a7be1cae4afa327f4fbaceba9db4a6288f0d8b
       subject: Fix NM_CONNECTIVITY constants
-  date: '2017-04-25T12:17:23Z'
+  date: 2017-04-25T12:17:23Z
   version: 2.0.6
 - commits:
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: cee23254ae45a6cef69b6c70bd3d1b034fe8a780
-      subject: >-
-        Removed magic timeout number and wait for service to start up before
+      subject: Removed magic timeout number and wait for service to start up before
         attempting to conect
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: a1ad3364eb416096a5152923d09b720ad459f3be
       subject: Fixed a bug
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: c7a45750252911c191f617e68f2dfab4a2d8bc46
       subject: Updated docker link
-  date: '2017-03-08T11:22:24Z'
+  date: 2017-03-08T11:22:24Z
   version: 2.0.5
 - commits:
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: a67d1738b61bc7a9c2ea310680bf4eb7e6cdc873
       subject: Fix escaping issues
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: ace9c5d2f96b4c8b8f1f9b3bd109e9893d107f5c
       subject: Removed duplicate access points from ssid list
-  date: '2016-12-12T14:55:36Z'
+  date: 2016-12-12T14:55:36Z
   version: 2.0.1
 - commits:
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: cd5826ca02abe66654a312f8294d387e3f84c3dd
       subject: Start and stop the passed in manager
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: de3af3af8b2fb9bf01fb9577ddaa280a5fb54e74
       subject: Implemented copy and exists functions
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: a3dd6f089fbaef3bad836a0f3163088914fc8ec4
       subject: Included fs-extra
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 5f38bb92af6245c8b722d2860eae67a8890c1eb3
       subject: Removed pre-start connman setup check
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 780f4e6710e11ba9ddfbad8a7525b395cb4c8d96
       subject: Refactored connman and added extra functionality
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 0365bab11c7287ee2644c8d5aa20f3ef9fa4dc91
       subject: Implemented check if a systemd unit exists function
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 352fcfe15a21530214f07bb8f9033085d5b17c0f
       subject: Ignore .resin-sync.yml
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 65ed2cb1be8822764db70b5c18d3628108157048
       subject: Refactored main control flow
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 0d6e889c077206b6a3319dd9f61b19136a5f88ef
       subject: Added retry parameter
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 2b3bca4bf178d4fe438b9c951c0dea7850109ad1
       subject: Started NM implementation
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 97f456638134d77f976049a5b0449af24e0e76c1
       subject: Checking whether NM has prior connections
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 3d200aa804003af7fe33411e2427385aa178a652
       subject: Ready for review
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: a2e8389c5d38577fbcc1f1bb5f2df5a9e23cfb02
       subject: PR changes
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: 06d015f2956d8074ed45b6a5044c7bacb8014385
       subject: Readme and testing procedure
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: bfcf8891d78c8e29d5592de2d18ed7879086e5a5
       subject: Backwards compatability
     - author: Joseph Roberts
-      body: ''
+      body: ""
       hash: eebae8c327d520da15d465c309d7fee0ca5803fa
       subject: PR comments
-  date: '2016-12-07T15:36:14Z'
+  date: 2016-12-07T15:36:14Z
   version: 2.0.0
 - commits:
     - author: Pagan Gazzard
-      body: ''
+      body: ""
       hash: 6e5d99b56f54fe3088048fb1e3c7ceb9e6d6eefa
       subject: Add linting
     - author: Petros Angelatos
-      body: ''
+      body: ""
       hash: 0601b2d8cfec117fabde08fe26266e8ac4b67ceb
       subject: Upgrade nodejs to v6
     - author: Pablo Carranza Vélez
-      body: ''
+      body: ""
       hash: a59cdcafa9bf82e9ada7bf7cd19bfb8efbe89898
       subject: Always use the /host_run dbus socket
     - author: Petros Angelatos
@@ -809,8 +779,8 @@
       hash: 19d6591e0f8548e6a2541f63637b6315b4132754
       subject: Use the more generic 0.10 tag on the Dockerfile
     - author: Pablo Carranza Velez
-      body: ''
+      body: ""
       hash: f074eee7d28663d89ab04dc7674eedc13e9f7a4e
       subject: Add Apache 2.0 license
-  date: '2016-10-13T20:37:05Z'
+  date: 2016-10-13T20:37:05Z
   version: 1.0.0
