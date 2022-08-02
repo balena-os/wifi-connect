@@ -21,11 +21,27 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
 # 4. Is there an active WiFi connection?
 # iwgetid -r
-echo "192.168.42.1 home.localhost" >> /etc/hosts
-echo "192.168.42.1 home.local" >> /etc/hosts
+echo "192.168.42.1 setup.localhost" >> /etc/hosts
+echo "192.168.42.1 setup.local" >> /etc/hosts
+ETH=$(ip a show eth0 up | grep inet)
+iwgetid -r
 
-printf 'Starting WiFi Connect\n'
-./wifi-connect --portal-listening-port 8000
+
+
+if [ $? -eq 0 ]; then
+    echo 'Have WiFi Connect\n'
+    if [ -z "$ETH" ]; then
+      echo "no ethernet, do nothing"
+    else
+      echo "have wifi + ethernet, enable hotspot"
+      printf 'Starting WiFi Connect\n'
+      ./wifi-connect --portal-listening-port 8000
+    fi
+else
+  echo "no wifi, start hotspot"
+  printf 'Starting WiFi Connect\n'
+  ./wifi-connect --portal-listening-port 8000
+fi
 
 # Start your application here.
 sleep infinity
