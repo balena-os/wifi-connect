@@ -1,12 +1,24 @@
-FROM balenalib/%%BALENA_MACHINE_NAME%%-debian
+FROM debian:bullseye-slim
 
-RUN install_packages dnsmasq wireless-tools
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  ca-certificates \
+  dnsmasq \
+  iw \
+  wget \
+  wireless-tools && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
-ARG VERSION="4.4.0"
-RUN curl -Ls "https://github.com/balena-io/wifi-connect/releases/download/v$VERSION/wifi-connect-v$VERSION-linux-%%BALENA_ARCH%%.tar.gz" \
-  | tar -xvz -C  /usr/src/app/
+ARG WIFI_CONNECT_VERSION="v4.4.6"
+
+RUN wget -q -O wifi-connect.tar.gz "https://github.com/balena-os/wifi-connect/releases/download/${WIFI_CONNECT_VERSION}/wifi-connect-${WIFI_CONNECT_VERSION}-linux-%%BALENA_ARCH%%.tar.gz" && \
+  tar -xf wifi-connect.tar.gz && \
+  rm wifi-connect.tar.gz
 
 COPY scripts/start.sh .
 
