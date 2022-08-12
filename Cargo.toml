@@ -1,14 +1,14 @@
 [package]
 name = "wifi-connect"
-version = "4.4.5"
+version = "4.9.0"
 authors = ["Zahari Petkov <zahari@balena.io>"]
 description = "Easy WiFi setup for Linux devices from your mobile phone or laptop"
 
 [dependencies]
 network-manager = "0.11"
-clap = "2.24"
+clap = "2.34"
 iron = "0.6"
-iron-cors = "0.7"
+iron-cors = "0.8"
 staticfile = "0.5"
 mount = "0.4"
 router = "0.6"
@@ -18,11 +18,11 @@ serde_derive = "1.0"
 persistent = "0.4"
 params = "0.8"
 log = "0.3"
-env_logger = "0.4"
-nix = "0.10"
+env_logger = "0.9"
+nix = "0.24"
 
 [dependencies.error-chain]
-version = "0.11"
+version = "0.12"
 default-features = false
 
 [profile.release]
