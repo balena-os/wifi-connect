@@ -1,4 +1,14 @@
 - commits:
+    - subject: Use IW to scan for networks before launch
+      hash: 7bcc4b8a96f14d8b3718b4b7190673263133e84e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: maggie0002
+  version: 4.9.1
+  date: 2022-08-12T17:23:09.727Z
+- commits:
     - subject: Update Rust crate iron-cors to 0.8.0
       hash: 13a99d980a33d0059714cc6d45437f989f9f90d5
       body: |
