@@ -21,8 +21,8 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 
 # 4. Is there an active WiFi connection?
 # iwgetid -r
-echo "192.168.42.1 setup.localhost" >> /etc/hosts
-echo "192.168.42.1 setup.local" >> /etc/hosts
+echo "192.168.42.1 samizdapp.localhost" >> /etc/hosts
+echo "192.168.42.1 samizdapp.local" >> /etc/hosts
 ETH=$(ip a show eth0 up | grep inet)
 iwgetid -r
 
