@@ -10,8 +10,8 @@
         change-type: minor
       author: Renovate Bot
   version: 4.10.0
-  title: "'Update Rust crate nix to 0.25.0'"
-  date: 2022-10-25T22:07:24.912Z
+  title: "'Bump follow-redirects from 1.10.0 to 1.15.2 in /ui'"
+  date: 2022-10-25T23:40:15.692Z
 - commits:
     - subject: Update Rust crate iron-cors to 0.8.0
       hash: 13a99d980a33d0059714cc6d45437f989f9f90d5
