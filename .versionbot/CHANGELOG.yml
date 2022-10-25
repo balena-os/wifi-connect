@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update Rust crate nix to 0.25.0
+      hash: ac933b530deb6fb30615de94bdb8d762e00f6a6e
+      body: |
+        Update nix to 0.25.0
+
+        Update nix from 0.24.2 to 0.25.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+  version: 4.10.0
+  title: "'Update Rust crate nix to 0.25.0'"
+  date: 2022-10-25T22:07:24.912Z
+- commits:
     - subject: Update Rust crate iron-cors to 0.8.0
       hash: 13a99d980a33d0059714cc6d45437f989f9f90d5
       body: |
