@@ -956,7 +956,7 @@ dependencies = [
  "error-chain 0.12.4",
  "iron",
  "iron-cors",
- "log 0.3.9",
+ "log 0.4.17",
  "mount",
  "network-manager",
  "nix",
