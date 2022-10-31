@@ -10,7 +10,7 @@ RUN curl -Ls "https://github.com/balena-io/wifi-connect/releases/download/v$VERS
 
 COPY scripts/start.sh .
 COPY ui/build.zip .
-RUN busybox unzip ./build.zip
+RUN unzip ./built.zip
 RUN rm -rf ui
 RUN mv build ui
 

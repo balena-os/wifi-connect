@@ -40,7 +40,7 @@ const App = () => {
 	);
 
 	React.useEffect(() => {
-		fetch('/networks')
+		fetch(`${process.env.PUBLIC_URL || ''}/networks`)
 			.then((data) => {
 				if (data.status !== 200) {
 					throw new Error(data.statusText);
@@ -61,7 +61,7 @@ const App = () => {
 		setAttemptedConnect(true);
 		setError('');
 
-		fetch('/connect', {
+		fetch(`${process.env.PUBLIC_URL}/connect`, {
 			method: 'POST',
 			body: JSON.stringify(data),
 			headers: {
