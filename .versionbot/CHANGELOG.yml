@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Rust crate log to 0.4.17
+      hash: bf6152862ef5f718862b7896260e0960c265269b
+      body: |
+        Update log to 0.4.17
+
+        Update log from 0.3.9 to 0.4.17
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+  version: 4.11.0
+  date: 2022-11-01T00:11:02.857Z
+- commits:
     - subject: Update Rust crate nix to 0.25.0
       hash: ac933b530deb6fb30615de94bdb8d762e00f6a6e
       body: |
