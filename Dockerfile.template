@@ -9,7 +9,7 @@ RUN curl -Ls "https://github.com/balena-io/wifi-connect/releases/download/v$VERS
   | tar -xvz -C  /usr/src/app/
 
 COPY scripts/start.sh .
-COPY ui/build.zip .
+COPY ui/built.zip .
 RUN unzip ./built.zip
 RUN rm -rf ui
 RUN mv build ui
