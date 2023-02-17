@@ -1,0 +1,22 @@
+name: Flowzone
+
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - 'main'
+      - 'master'
+
+jobs:
+  flowzone:
+    name: Flowzone
+    uses: product-os/flowzone/.github/workflows/flowzone.yml@master
+    secrets: inherit
+    with:
+      rust_binaries: false
+      rust_toolchain: 1.67.1
+      cargo_targets: |
+        aarch64-unknown-linux-gnu,
+        armv7-unknown-linux-gnueabihf,
+        x86_64-unknown-linux-gnu,
+        i686-unknown-linux-gnu
