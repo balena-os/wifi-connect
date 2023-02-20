@@ -1,4 +1,24 @@
 - commits:
+    - subject: Use Flowzone as a CI and upgrade network-manager crate
+      hash: c950ab476c3774b8b3a2af9bd62461d819d48f62
+      body: >
+        This fixes a failure at start due to missing AP security flags and device
+
+        type enumerations in the network-manager crate.
+
+
+        Also update to using Rust 1.67.1 and Flowzone as a CI.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+      nested: []
+  version: 4.11.0
+  title: ""
+  date: 2023-02-20T08:22:34.259Z
+- commits:
     - subject: Update Rust crate nix to 0.25.0
       hash: ac933b530deb6fb30615de94bdb8d762e00f6a6e
       body: |
@@ -234,8 +254,8 @@
     - subject: Ignore unmanaged devices
       hash: 131c3a6ed24b5589e916d8b10cf72bb7a8514600
       body: >
-        Unmanaged device could be wrongly picked when enumerating WiFi
-        interfaces. Those are now ignored.
+        Unmanaged device could be wrongly picked when enumerating WiFi interfaces.
+        Those are now ignored.
       footer:
         Change-type: patch
         change-type: patch
@@ -248,8 +268,7 @@
     - subject: Support Buster and future Raspbian versions in the installer
       hash: 285c339dc986f6f2aa029160d7cdfa165bfe8846
       body: >
-        Reverse installer logic to exclude Jessie only from allowing
-        installation.
+        Reverse installer logic to exclude Jessie only from allowing installation.
       footer:
         Change-type: patch
         change-type: patch
