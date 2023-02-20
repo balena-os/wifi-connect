@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove unused package-lock.json
+      hash: f595daf301d6ef0197a6853365ba43e5372e0346
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Zahari Petkov <zahari@balena.io>
+        signed-off-by: Zahari Petkov <zahari@balena.io>
+      author: Zahari Petkov
+      nested: []
+  version: 4.11.1
+  title: ""
+  date: 2023-02-20T09:10:41.432Z
+- commits:
     - subject: Use Flowzone as a CI and upgrade network-manager crate
       hash: c950ab476c3774b8b3a2af9bd62461d819d48f62
       body: >
