@@ -10,7 +10,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
-    "rendition": "^18.3.0",
+    "rendition": "^18.20.4",
     "styled-components": "^5.0.1",
     "typescript": "^3.8.3",
     "whatwg-fetch": "^3.0.0"
