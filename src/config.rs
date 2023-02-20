@@ -1,10 +1,10 @@
 use clap::{App, Arg};
 
 use std::env;
-use std::net::Ipv4Addr;
-use std::str::FromStr;
-use std::path::PathBuf;
 use std::ffi::OsStr;
+use std::net::Ipv4Addr;
+use std::path::PathBuf;
+use std::str::FromStr;
 
 const DEFAULT_GATEWAY: &str = "192.168.42.1";
 const DEFAULT_DHCP_RANGE: &str = "192.168.42.2,192.168.42.254";
@@ -129,7 +129,8 @@ pub fn get_config() -> Config {
     let gateway = Ipv4Addr::from_str(&matches.value_of("portal-gateway").map_or_else(
         || env::var("PORTAL_GATEWAY").unwrap_or_else(|_| DEFAULT_GATEWAY.to_string()),
         String::from,
-    )).expect("Cannot parse gateway address");
+    ))
+    .expect("Cannot parse gateway address");
 
     let dhcp_range = matches.value_of("portal-dhcp-range").map_or_else(
         || env::var("PORTAL_DHCP_RANGE").unwrap_or_else(|_| DEFAULT_DHCP_RANGE.to_string()),
@@ -151,19 +152,20 @@ pub fn get_config() -> Config {
     let activity_timeout = u64::from_str(&matches.value_of("activity-timeout").map_or_else(
         || env::var("ACTIVITY_TIMEOUT").unwrap_or_else(|_| DEFAULT_ACTIVITY_TIMEOUT.to_string()),
         String::from,
-    )).expect("Cannot parse activity timeout");
+    ))
+    .expect("Cannot parse activity timeout");
 
     let ui_directory = get_ui_directory(matches.value_of("ui-directory"));
 
     Config {
-        interface: interface,
-        ssid: ssid,
-        passphrase: passphrase,
-        gateway: gateway,
-        dhcp_range: dhcp_range,
-        listening_port: listening_port,
-        activity_timeout: activity_timeout,
-        ui_directory: ui_directory,
+        interface,
+        ssid,
+        passphrase,
+        gateway,
+        dhcp_range,
+        listening_port,
+        activity_timeout,
+        ui_directory,
     }
 }
 
@@ -197,7 +199,7 @@ fn get_install_ui_directory() -> Option<PathBuf> {
                         // not executing from `sbin` folder
                         return None;
                     }
-                },
+                }
                 None => return None,
             }
 

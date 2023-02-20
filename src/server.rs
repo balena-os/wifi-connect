@@ -1,24 +1,25 @@
-use std::sync::mpsc::{Receiver, Sender};
+use std::error::Error as StdError;
 use std::fmt;
 use std::net::Ipv4Addr;
-use std::error::Error as StdError;
+use std::sync::mpsc::{Receiver, Sender};
 
-use serde_json;
-use path::PathBuf;
-use iron::prelude::*;
-use iron::{headers, status, typemap, AfterMiddleware, Iron, IronError, IronResult, Request,
-           Response, Url};
 use iron::modifiers::Redirect;
+use iron::prelude::*;
+use iron::{
+    headers, status, typemap, AfterMiddleware, Iron, IronError, IronResult, Request, Response, Url,
+};
 use iron_cors::CorsMiddleware;
-use router::Router;
-use staticfile::Static;
 use mount::Mount;
-use persistent::Write;
 use params::{FromValue, Params};
+use path::PathBuf;
+use persistent::Write;
+use router::Router;
+use serde_json;
+use staticfile::Static;
 
 use errors::*;
-use network::{NetworkCommand, NetworkCommandResponse};
 use exit::{exit, ExitResult};
+use network::{NetworkCommand, NetworkCommandResponse};
 
 struct RequestSharedState {
     gateway: Ipv4Addr,
@@ -42,12 +43,12 @@ impl fmt::Display for StringError {
 
 impl StdError for StringError {
     fn description(&self) -> &str {
-        &*self.0
+        &self.0
     }
 }
 
 macro_rules! get_request_ref {
-    ($req:ident, $ty:ty, $err:expr) => (
+    ($req:ident, $ty:ty, $err:expr) => {
         match $req.get_ref::<$ty>() {
             Ok(val) => val,
             Err(err) => {
@@ -55,39 +56,46 @@ macro_rules! get_request_ref {
                 return Err(IronError::new(err, status::InternalServerError));
             }
         }
-    )
+    };
 }
 
 macro_rules! get_param {
-    ($params:ident, $param:expr, $ty:ty) => (
+    ($params:ident, $param:expr, $ty:ty) => {
         match $params.get($param) {
-            Some(value) => {
-                match <$ty as FromValue>::from_value(value) {
-                    Some(converted) => converted,
-                    None => {
-                        let err = format!("Unexpected type for '{}'", $param);
-                        error!("{}", err);
-                        return Err(IronError::new(StringError(err), status::InternalServerError));
-                    }
+            Some(value) => match <$ty as FromValue>::from_value(value) {
+                Some(converted) => converted,
+                None => {
+                    let err = format!("Unexpected type for '{}'", $param);
+                    error!("{}", err);
+                    return Err(IronError::new(
+                        StringError(err),
+                        status::InternalServerError,
+                    ));
                 }
             },
             None => {
                 let err = format!("'{}' not found in request params: {:?}", $param, $params);
                 error!("{}", err);
-                return Err(IronError::new(StringError(err), status::InternalServerError));
+                return Err(IronError::new(
+                    StringError(err),
+                    status::InternalServerError,
+                ));
             }
         }
-    )
+    };
 }
 
 macro_rules! get_request_state {
-    ($req:ident) => (
+    ($req:ident) => {
         get_request_ref!(
             $req,
             Write<RequestSharedState>,
             "Getting reference to request shared state failed"
-        ).as_ref().lock().unwrap()
-    )
+        )
+        .as_ref()
+        .lock()
+        .unwrap()
+    };
 }
 
 fn exit_with_error<E>(state: &RequestSharedState, e: E, e_kind: ErrorKind) -> IronResult<Response>
@@ -134,10 +142,10 @@ pub fn start_server(
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
     let request_state = RequestSharedState {
-        gateway: gateway,
-        server_rx: server_rx,
-        network_tx: network_tx,
-        exit_tx: exit_tx,
+        gateway,
+        server_rx,
+        network_tx,
+        exit_tx,
     };
 
     let mut router = Router::new();
@@ -147,10 +155,10 @@ pub fn start_server(
 
     let mut assets = Mount::new();
     assets.mount("/", router);
-    assets.mount("/static", Static::new(&ui_directory.join("static")));
-    assets.mount("/css", Static::new(&ui_directory.join("css")));
-    assets.mount("/img", Static::new(&ui_directory.join("img")));
-    assets.mount("/js", Static::new(&ui_directory.join("js")));
+    assets.mount("/static", Static::new(ui_directory.join("static")));
+    assets.mount("/css", Static::new(ui_directory.join("css")));
+    assets.mount("/img", Static::new(ui_directory.join("img")));
+    assets.mount("/js", Static::new(ui_directory.join("js")));
 
     let cors_middleware = CorsMiddleware::with_allow_any();
 
@@ -166,7 +174,7 @@ pub fn start_server(
     if let Err(e) = Iron::new(chain).http(&address) {
         exit(
             &exit_tx_clone,
-            ErrorKind::StartHTTPServer(address, e.description().into()).into(),
+            ErrorKind::StartHTTPServer(address, e.to_string()).into(),
         );
     }
 }
@@ -209,9 +217,9 @@ fn connect(req: &mut Request) -> IronResult<Response> {
     let request_state = get_request_state!(req);
 
     let command = NetworkCommand::Connect {
-        ssid: ssid,
-        identity: identity,
-        passphrase: passphrase,
+        ssid,
+        identity,
+        passphrase,
     };
 
     if let Err(e) = request_state.network_tx.send(command) {
