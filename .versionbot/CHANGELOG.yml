@@ -1,4 +1,16 @@
 - commits:
+    - subject: Pin Raspbian installer to v4.4.6
+      hash: 70a6634daccd07d2fcf27439d6c0b412ea9f6ade
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Zahari Petkov
+      nested: []
+  version: 4.11.2
+  title: ""
+  date: 2023-02-23T11:36:50.547Z
+- commits:
     - subject: Remove unused package-lock.json
       hash: f595daf301d6ef0197a6853365ba43e5372e0346
       body: ""
