@@ -38,7 +38,7 @@
     ]
   },
   "devDependencies": {
-    "@balena/lint": "^5.0.2",
+    "@balena/lint": "^6.0.0",
     "@types/json-schema": "^7.0.5",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.9"
