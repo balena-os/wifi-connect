@@ -20,13 +20,27 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # wget --spider http://google.com 2>&1
 
 # 4. Is there an active WiFi connection?
+# iwgetid -r
+echo "192.168.42.1 samizdapp.localhost" >> /etc/hosts
+echo "192.168.42.1 samizdapp.local" >> /etc/hosts
+ETH=$(ip a show eth0 up | grep inet)
 iwgetid -r
 
+
+
 if [ $? -eq 0 ]; then
-    printf 'Skipping WiFi Connect\n'
+    echo 'Have WiFi Connect\n'
+    if [ -z "$ETH" ]; then
+      echo "no ethernet, do nothing"
+    else
+      echo "have wifi + ethernet, enable hotspot"
+      printf 'Starting WiFi Connect\n'
+      ./wifi-connect --portal-listening-port 8000
+    fi
 else
-    printf 'Starting WiFi Connect\n'
-    ./wifi-connect
+  echo "no wifi, start hotspot"
+  printf 'Starting WiFi Connect\n'
+  ./wifi-connect --portal-listening-port 8000
 fi
 
 # Start your application here.
