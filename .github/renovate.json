@@ -1,0 +1,3 @@
+{
+  "extends": ["github>balena-io/renovate-config"]
+}
