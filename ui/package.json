@@ -9,7 +9,7 @@
     "promise-polyfill": "^8.1.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.1",
+    "react-scripts": "^5.0.1",
     "rendition": "^18.3.0",
     "styled-components": "^5.0.1",
     "typescript": "^3.8.3",
