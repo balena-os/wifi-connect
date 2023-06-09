@@ -205,7 +205,18 @@ impl NetworkCommandHandler {
     fn activate(&mut self) -> ExitResult {
         self.activated = true;
 
-        let networks = get_networks(&self.access_points);
+        // wifiscanner will use iw to scan which allows us to refresh access points _without_
+        // needing to stop the captive portal. We'll discard its results rather than converting to
+        // Network since it has not implemented parsing security.
+        let _ = wifiscanner::scan();
+        self.access_points = get_access_points(&self.device)?;
+
+        let networks = {
+            let mut networks = get_networks(&self.access_points);
+            // Drop our portal SSID from the list of returned networks
+            networks.retain(|network| network.ssid != self.config.ssid);
+            networks
+        };
 
         self.server_tx
             .send(NetworkCommandResponse::Networks(networks))
