@@ -1,4 +1,18 @@
 - commits:
+    - subject: Extend renovate config from balena-io/renovate-config
+      hash: 5e263213fa7f8a5dd698df529ea05dd9a4634e1f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Kyle Harding <kyle@balena.io>
+        signed-off-by: Kyle Harding <kyle@balena.io>
+      author: Kyle Harding
+      nested: []
+  version: 4.11.3
+  title: ""
+  date: 2023-05-29T20:09:32.021Z
+- commits:
     - subject: Pin Raspbian installer to v4.4.6
       hash: 70a6634daccd07d2fcf27439d6c0b412ea9f6ade
       body: ""
@@ -28,7 +42,8 @@
     - subject: Use Flowzone as a CI and upgrade network-manager crate
       hash: c950ab476c3774b8b3a2af9bd62461d819d48f62
       body: >
-        This fixes a failure at start due to missing AP security flags and device
+        This fixes a failure at start due to missing AP security flags and
+        device
 
         type enumerations in the network-manager crate.
 
@@ -280,8 +295,8 @@
     - subject: Ignore unmanaged devices
       hash: 131c3a6ed24b5589e916d8b10cf72bb7a8514600
       body: >
-        Unmanaged device could be wrongly picked when enumerating WiFi interfaces.
-        Those are now ignored.
+        Unmanaged device could be wrongly picked when enumerating WiFi
+        interfaces. Those are now ignored.
       footer:
         Change-type: patch
         change-type: patch
@@ -294,7 +309,8 @@
     - subject: Support Buster and future Raspbian versions in the installer
       hash: 285c339dc986f6f2aa029160d7cdfa165bfe8846
       body: >
-        Reverse installer logic to exclude Jessie only from allowing installation.
+        Reverse installer logic to exclude Jessie only from allowing
+        installation.
       footer:
         Change-type: patch
         change-type: patch
