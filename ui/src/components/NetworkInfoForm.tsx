@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Flex, Form, Heading, RenditionUiSchema } from 'rendition';
 import { Network, NetworkInfo } from './App';
 
+
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
 	properties: {
@@ -85,7 +86,9 @@ export const NetworkInfoForm = ({
 			mt={5}
 		>
 			<Heading.h3 align="center" mb={4}>
-				Hi! Please choose your WiFi from the list
+				Please choose your WiFi from the list to
+				<br />
+				continue with the setup of your observatory.
 			</Heading.h3>
 
 			<Form

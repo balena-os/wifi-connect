@@ -1,12 +1,15 @@
 import React from 'react';
-import logo from '../img/logo.svg';
+import logo from '../img/exclosure-blue.svg';
 import { Navbar, Provider, Container } from 'rendition';
 import { NetworkInfoForm } from './NetworkInfoForm';
 import { Notifications } from './Notifications';
 import { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
+
 
 const GlobalStyle = createGlobalStyle`
 	body {
+		background-color: #E8F0FF;
 		margin: 0;
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
 			'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -19,6 +22,10 @@ const GlobalStyle = createGlobalStyle`
 		font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 	}
 `;
+
+
+const StyledNavbar = styled(Navbar)`background-color: #0B1227;`;
+
 
 export interface NetworkInfo {
 	ssid?: string;
@@ -81,7 +88,7 @@ const App = () => {
 	return (
 		<Provider>
 			<GlobalStyle />
-			<Navbar brand={<img src={logo} style={{ height: 30 }} alt="logo" />} />
+			<StyledNavbar brand={<img src={logo} style={{ height: 128 }} alt="logo" />} />
 
 			<Container>
 				<Notifications

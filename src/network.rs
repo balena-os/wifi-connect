@@ -56,7 +56,7 @@ impl NetworkCommandHandler {
         Self::spawn_trap_exit_signals(exit_tx, network_tx.clone());
 
         let manager = NetworkManager::new();
-        debug!("NetworkManager connection initialized");
+        info!("NetworkManager connection initialized");
 
         let device = find_device(&manager, &config.interface)?;
 

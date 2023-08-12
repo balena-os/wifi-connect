@@ -118,10 +118,7 @@ impl BeforeMiddleware for RequestLogger {
     fn before(&self, req: &mut Request) -> IronResult<()> {
         let request_id = &req as *const _ as usize;
 
-        info!(
-            "Received request ({}): {} {}",
-            request_id, req.method, req.url
-        );
+        info!("REQ ({}): {} {}", request_id, req.method, req.url);
         Ok(())
     }
 }
@@ -131,7 +128,7 @@ impl AfterMiddleware for RequestLogger {
         let request_id = &req as *const _ as usize;
         let mut opt_code = res.status.map(|status| status.to_u16());
         let return_code = opt_code.get_or_insert(0);
-        info!("Responded ({}) with: {}", request_id, return_code);
+        info!("RES ({}) with: {}", request_id, return_code);
         Ok(res)
     }
 }
