@@ -19,7 +19,7 @@ pub fn start_dnsmasq(config: &Config, device: &Device) -> Result<Child> {
     ];
 
     Command::new("dnsmasq")
-        .args(args)
+        .args(&args)
         .spawn()
         .chain_err(|| ErrorKind::Dnsmasq)
 }
