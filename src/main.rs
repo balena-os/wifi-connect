@@ -61,6 +61,8 @@ fn main() {
 }
 
 fn run() -> Result<()> {
+    info!("wifi-config version: {}", env!("CARGO_PKG_VERSION"));
+
     block_exit_signals()?;
 
     logger::init();
