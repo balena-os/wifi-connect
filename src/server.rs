@@ -149,6 +149,11 @@ impl AfterMiddleware for RedirectMiddleware {
         if let Some(host) = req.headers.get::<headers::Host>() {
             if host.hostname != gateway {
                 info!(
+                    "host.hostname {:?} != gateway {:?}",
+                    host.hostname.as_bytes(),
+                    gateway.as_bytes()
+                );
+                info!(
                     "Redirecting Request to {} to gateway: {}",
                     req.url.host(),
                     gateway
@@ -199,7 +204,9 @@ pub fn start_server(
     chain.link_before(RequestLogger);
     chain.link_after(RequestLogger);
     chain.link(Write::<RequestSharedState>::both(request_state));
-    chain.link_after(RedirectMiddleware);
+    chain
+        .link_after(RedirectMiddleware)
+        .link_after(RequestLogger);
     chain.link_around(cors_middleware);
 
     let address = format!("{}:{}", gateway_clone, listening_port);

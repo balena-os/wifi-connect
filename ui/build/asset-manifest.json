@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/static/js/main.2b22a9e9.chunk.js",
+    "main.js": "/static/js/main.d13445d2.chunk.js",
     "runtime-main.js": "/static/js/runtime-main.2a78626f.js",
     "static/css/2.c38cd9da.chunk.css": "/static/css/2.c38cd9da.chunk.css",
-    "static/js/2.ef060f46.chunk.js": "/static/js/2.ef060f46.chunk.js",
+    "static/js/2.7cbc1bb7.chunk.js": "/static/js/2.7cbc1bb7.chunk.js",
     "index.html": "/index.html",
-    "precache-manifest.96ed21ec05e3b25e96ee640119b0334b.js": "/precache-manifest.96ed21ec05e3b25e96ee640119b0334b.js",
+    "precache-manifest.a0d05c25ec0360a2f78b5a729ed5d7d5.js": "/precache-manifest.a0d05c25ec0360a2f78b5a729ed5d7d5.js",
     "service-worker.js": "/service-worker.js",
-    "static/js/2.ef060f46.chunk.js.LICENSE.txt": "/static/js/2.ef060f46.chunk.js.LICENSE.txt",
-    "static/media/logo.svg": "/static/media/logo.34c0c94e.svg"
+    "static/js/2.7cbc1bb7.chunk.js.LICENSE.txt": "/static/js/2.7cbc1bb7.chunk.js.LICENSE.txt",
+    "static/media/exclosure-blue.svg": "/static/media/exclosure-blue.c0b1bde6.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.2a78626f.js",
     "static/css/2.c38cd9da.chunk.css",
-    "static/js/2.ef060f46.chunk.js",
-    "static/js/main.2b22a9e9.chunk.js"
+    "static/js/2.7cbc1bb7.chunk.js",
+    "static/js/main.d13445d2.chunk.js"
   ]
 }
