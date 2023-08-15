@@ -1,5 +1,5 @@
 use env_logger::LogBuilder;
-use log::{LogLevel, LogLevelFilter, LogRecord};
+use log::{LogLevelFilter, LogRecord};
 use std::env;
 
 pub fn init() {
@@ -9,21 +9,18 @@ pub fn init() {
         builder.parse(&env::var("RUST_LOG").unwrap());
     } else {
         let format = |record: &LogRecord| {
-            if record.level() == LogLevel::Info {
-                format!("{}", record.args())
-            } else {
-                format!(
-                    "[{}:{}] {}",
-                    record.location().module_path(),
-                    record.level(),
-                    record.args()
-                )
-            }
+            format!(
+                "[{}:{}:{}:{}] {}",
+                record.location().file(),
+                record.location().line(),
+                record.location().module_path(),
+                record.level(),
+                record.args()
+            )
         };
 
         builder.format(format).filter(None, LogLevelFilter::Info);
-
-        builder.parse("wifi-connect=info,iron::iron=off");
+        builder.parse("wifi-connect=info,iron::iron=info");
     }
 
     builder.init().unwrap();

@@ -116,10 +116,16 @@ pub fn get_config() -> Config {
         |v| Some(v.to_string()),
     );
 
-    let ssid: String = matches.value_of("portal-ssid").map_or_else(
+    let ssid_prefix: String = matches.value_of("portal-ssid").map_or_else(
         || env::var("PORTAL_SSID").unwrap_or_else(|_| DEFAULT_SSID.to_string()),
         String::from,
     );
+
+    let val = env::var("BALENA_DEVICE_UUID");
+    let ssid_suffix = val
+        .as_ref()
+        .map_or(String::new(), |v| format!("-{}", &v[0..7]));
+    let ssid = format!("{}{}", ssid_prefix, ssid_suffix);
 
     let passphrase: Option<String> = matches.value_of("portal-passphrase").map_or_else(
         || env::var("PORTAL_PASSPHRASE").ok(),
