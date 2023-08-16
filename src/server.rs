@@ -1,10 +1,7 @@
-use iron::headers::ContentType;
 use std::error::Error as StdError;
 use std::fmt;
 use std::net::Ipv4Addr;
 use std::sync::mpsc::{Receiver, Sender};
-
-use mime_guess::get_mime_type;
 
 use iron::modifiers::Redirect;
 use iron::prelude::*;
@@ -24,7 +21,6 @@ use staticfile::Static;
 use errors::*;
 use exit::{exit, ExitResult};
 use network::{NetworkCommand, NetworkCommandResponse};
-use std::path::Path;
 
 struct RequestSharedState {
     gateway: Ipv4Addr,
@@ -143,20 +139,6 @@ impl AfterMiddleware for RequestLogger {
     fn catch(&self, _: &mut Request, err: IronError) -> IronResult<Response> {
         error!("Error encountered: {:?}", err);
         Err(err)
-    }
-}
-
-struct ContentTypeMiddleware;
-
-impl AfterMiddleware for ContentTypeMiddleware {
-    fn after(&self, req: &mut Request, mut resp: Response) -> IronResult<Response> {
-        if let Some(file_path) = req.url.path().last() {
-            if let Some(ext) = Path::new(file_path).extension().and_then(|s| s.to_str()) {
-                let mime_type = get_mime_type(ext);
-                resp.headers.set(ContentType(mime_type));
-            }
-        }
-        Ok(resp)
     }
 }
 

@@ -12,9 +12,6 @@ extern crate serde_derive;
 #[macro_use]
 extern crate clap;
 
-#[macro_use]
-extern crate mime_guess;
-
 extern crate env_logger;
 extern crate iron;
 extern crate iron_cors;
