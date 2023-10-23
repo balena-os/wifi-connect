@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Lock file maintenance
+      hash: afb1984ca72630054d49bbf9f4f4c7ff98089648
+      body: |
+        Update
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 4.11.4
+  title: ""
+  date: 2023-10-23T00:38:06.843Z
+- commits:
     - subject: Extend renovate config from balena-io/renovate-config
       hash: 5e263213fa7f8a5dd698df529ea05dd9a4634e1f
       body: ""
