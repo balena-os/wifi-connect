@@ -1,5 +1,18 @@
 - commits:
     - subject: Update Lock file maintenance
+      hash: 16e226ac3497f53bfa2cf568847dea3b274ea2bd
+      body: |
+        Update
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 4.11.5
+  title: ""
+  date: 2023-10-30T00:37:19.278Z
+- commits:
+    - subject: Update Lock file maintenance
       hash: afb1984ca72630054d49bbf9f4f4c7ff98089648
       body: |
         Update
