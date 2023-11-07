@@ -8,6 +8,7 @@ export default defineConfig(({mode}) => {
             build: {
                 outDir: "build",
                 sourcemap: mode === "development",
+                assetsDir: 'static/assets',
             },
             plugins: [react()],
             target: browserslistToEsbuild(
