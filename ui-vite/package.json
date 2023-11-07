@@ -13,8 +13,6 @@
   "dependencies": {
     "@types/json-schema": "^7.0.14",
     "browserslist-to-esbuild": "^1.2.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.0.2",
     "promise-polyfill": "^8.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -33,6 +31,8 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.0.2",
     "util": "^0.12.5",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.9"
   }
 }
