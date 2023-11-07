@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Txt, Alert } from 'rendition';
 
 export const Notifications = ({
