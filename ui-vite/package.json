@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "rendition": "^35.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
