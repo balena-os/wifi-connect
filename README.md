@@ -70,7 +70,7 @@ Run the following in your terminal, then follow the onscreen instructions:
 
 ### balenaOS
 
-WiFi Connect can be integrated with a [balena.io](http://balena.io) application. (New to balena.io? Check out the [Getting Started Guide](https://balena.io/docs/#/pages/installing/gettingStarted.md).) This integration is accomplished through the use of two shared files:
+WiFi Connect can be integrated with a [balena.io](http://balena.io) application. (New to balena.io? Check out the [Getting Started Guide](https://www.balena.io/docs/learn/getting-started).) This integration is accomplished through the use of two shared files:
 - The [Dockerfile template](./Dockerfile.template) manages dependencies. The example included here has everything necessary for WiFi Connect. Application dependencies need to be added. For help with Dockerfiles, take a look at this [guide](https://balena.io/docs/deployment/dockerfile/).
 - The [start script](./scripts/start.sh) should contain the commands that run the application. Adding these commands at the end of the script will ensure that everything kicks off after WiFi is correctly configured. 
 An example of using WiFi Connect in a Python project can be found [here](https://github.com/balena-io-projects/balena-wifi-connect-example).
