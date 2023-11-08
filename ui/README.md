@@ -2,7 +2,7 @@
 
 ## Setting up the development environment
 
-The UI for **WiFi Connect** is built using **React**, bootstrapped by **create-react-app**. In order to develop for the UI you need to do the following:
+The UI for **WiFi Connect** is built using **React**, bootstrapped by **Vite**. In order to develop for the UI you need to do the following:
 
 1. Run `npm install` in the UI folder.
 2. Run `npm start` to start the development server. This will serve the UI on `localhost:3000` by default.
