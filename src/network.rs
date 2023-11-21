@@ -41,6 +41,7 @@ struct NetworkCommandHandler {
     manager: NetworkManager,
     device: Device,
     access_points: Vec<AccessPoint>,
+    iw_access_points: Vec<wifiscanner::Wifi>,
     portal_connection: Option<Connection>,
     config: Config,
     dnsmasq: process::Child,
@@ -79,6 +80,7 @@ impl NetworkCommandHandler {
             manager,
             device,
             access_points,
+            iw_access_points: vec![],
             portal_connection,
             config,
             dnsmasq,
@@ -205,14 +207,10 @@ impl NetworkCommandHandler {
     fn activate(&mut self) -> ExitResult {
         self.activated = true;
 
-        // wifiscanner will use iw to scan which allows us to refresh access points _without_
-        // needing to stop the captive portal. We'll discard its results rather than converting to
-        // Network since it has not implemented parsing security.
-        let _ = wifiscanner::scan();
-        self.access_points = get_access_points(&self.device)?;
+        self.iw_access_points = get_iw_access_points()?;
 
         let networks = {
-            let mut networks = get_networks(&self.access_points);
+            let mut networks = get_iw_networks(&self.iw_access_points);
             // Drop our portal SSID from the list of returned networks
             networks.retain(|network| network.ssid != self.config.ssid);
             networks
@@ -365,6 +363,57 @@ fn find_wifi_managed_device(devices: Vec<Device>) -> Result<Option<Device>> {
     Ok(None)
 }
 
+fn get_iw_access_points() -> Result<Vec<wifiscanner::Wifi>> {
+    get_iw_access_points_impl()
+}
+
+fn get_iw_access_points_impl() -> Result<Vec<wifiscanner::Wifi>> {
+    let mut access_points = wifiscanner::scan().unwrap_or_else(|e| {
+        warn!("Scanning for access points failed: {:#?}", e);
+        vec![]
+    });
+
+    // Purge access points with duplicate SSIDs
+    let mut inserted = HashSet::new();
+    access_points.retain(|ap| inserted.insert(ap.ssid.clone()));
+
+    // Remove access points without SSID (hidden)
+    access_points.retain(|ap| !ap.ssid.is_empty());
+
+    if !access_points.is_empty() {
+        info!(
+            "Access points: {:?}",
+            access_points
+                .iter()
+                .map(|ap| &ap.ssid)
+                .collect::<Vec<_>>()
+        );
+        return Ok(access_points);
+    }
+
+    warn!("No access points found - giving up...");
+    Ok(vec![])
+}
+
+fn get_iw_networks(access_points: &[wifiscanner::Wifi]) -> Vec<Network> {
+    access_points.iter().map(get_iw_network_info).collect()
+}
+
+fn get_iw_network_info(access_point: &wifiscanner::Wifi) -> Network {
+    Network {
+        ssid: access_point.ssid.clone(),
+        security: get_iw_network_security(access_point).to_string(),
+    }
+}
+
+fn get_iw_network_security(access_point: &wifiscanner::Wifi) -> &str {
+    match access_point.security.as_str() {
+        "802.1X" => "enterprise",
+        "" => "none",
+        _ => "wpa",
+    }
+}
+
 fn get_access_points(device: &Device) -> Result<Vec<AccessPoint>> {
     get_access_points_impl(device).chain_err(|| ErrorKind::NoAccessPoints)
 }
@@ -410,31 +459,6 @@ fn get_access_points_ssids(access_points: &[AccessPoint]) -> Vec<&str> {
         .iter()
         .map(|ap| ap.ssid().as_str().unwrap())
         .collect()
-}
-
-fn get_networks(access_points: &[AccessPoint]) -> Vec<Network> {
-    access_points.iter().map(get_network_info).collect()
-}
-
-fn get_network_info(access_point: &AccessPoint) -> Network {
-    Network {
-        ssid: access_point.ssid().as_str().unwrap().to_string(),
-        security: get_network_security(access_point).to_string(),
-    }
-}
-
-fn get_network_security(access_point: &AccessPoint) -> &str {
-    if access_point.security.contains(Security::ENTERPRISE) {
-        "enterprise"
-    } else if access_point.security.contains(Security::WPA2)
-        || access_point.security.contains(Security::WPA)
-    {
-        "wpa"
-    } else if access_point.security.contains(Security::WEP) {
-        "wep"
-    } else {
-        "none"
-    }
 }
 
 fn find_access_point<'a>(access_points: &'a [AccessPoint], ssid: &str) -> Option<&'a AccessPoint> {
