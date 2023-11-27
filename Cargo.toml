@@ -20,7 +20,7 @@ params = "0.8"
 log = "0.3"
 env_logger = "0.4"
 nix = "0.25"
-wifiscanner = "0.5.1"
+wifiscanner = { git = "https://github.com/HuMoran/wifiscanner.git", rev = "9d9a8d1" }
 
 [dependencies.error-chain]
 version = "0.12"

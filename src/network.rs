@@ -385,7 +385,7 @@ fn get_iw_access_points_impl() -> Result<Vec<wifiscanner::Wifi>> {
             "Access points: {:?}",
             access_points
                 .iter()
-                .map(|ap| &ap.ssid)
+                .map(|ap| (&ap.ssid, &ap.security))
                 .collect::<Vec<_>>()
         );
         return Ok(access_points);
