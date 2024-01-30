@@ -407,7 +407,7 @@ dependencies = [
 [[package]]
 name = "network-manager"
 version = "0.13.3"
-source = "git+https://github.com/balena-io-modules/network-manager.git#4da2e6a57de16b6ae911f74321f929d78af8b1ba"
+source = "git+https://github.com/hupster/network-manager.git#46e6c38034b4933ec73c5cb5d53220cb2de909b2"
 dependencies = [
  "ascii",
  "bitflags",

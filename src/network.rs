@@ -280,6 +280,10 @@ fn init_access_point_credentials(
             identity: identity.to_string(),
             passphrase: passphrase.to_string(),
         }
+    } else if access_point.security.contains(Security::WPA3) {
+        AccessPointCredentials::Sae {
+            passphrase: passphrase.to_string(),
+        }
     } else if access_point.security.contains(Security::WPA2)
         || access_point.security.contains(Security::WPA)
     {
@@ -415,6 +419,8 @@ fn get_network_info(access_point: &AccessPoint) -> Network {
 fn get_network_security(access_point: &AccessPoint) -> &str {
     if access_point.security.contains(Security::ENTERPRISE) {
         "enterprise"
+    } else if access_point.security.contains(Security::WPA3) {
+        "wpa3"
     } else if access_point.security.contains(Security::WPA2)
         || access_point.security.contains(Security::WPA)
     {
