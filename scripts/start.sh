@@ -25,6 +25,13 @@ iwgetid -r
 if [ $? -eq 0 ]; then
     printf 'Skipping WiFi Connect\n'
 else
+    # Fetch the name of the current WiFi interface, as they can be variable
+    wifi_interface_name=$(iw dev | awk '$1=="Interface"{print $2}')
+
+    # Update the list of available WiFi networks before launch
+    iw dev "$wifi_interface_name" scan &> /dev/null || printf 'Error updating WiFi network list with IW\n'
+
+    # Launch WiFi Connect
     printf 'Starting WiFi Connect\n'
     ./wifi-connect
 fi
