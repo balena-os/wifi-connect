@@ -1,5 +1,18 @@
 - commits:
     - subject: Update Lock file maintenance
+      hash: f31daad837df1a1b0b28a3449ad1524141178303
+      body: |
+        Update
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 4.11.29
+  title: ""
+  date: 2024-03-11T00:34:10.732Z
+- commits:
+    - subject: Update Lock file maintenance
       hash: 01de8aecac6c077894987597cf0a7f6eeb5076cc
       body: |
         Update
@@ -797,7 +810,8 @@
         D-Bus API. If systemd is not active on the system, the application exits
         with error.
 
-        Now it just prints an info message that the NetworkManager service cannot be retrieved.
+        Now it just prints an info message that the NetworkManager service
+        cannot be retrieved.
       footers:
         change-type: patch
         connects-to: "#220"
@@ -883,7 +897,8 @@
         error-chain error handling is introduced in WiFi Connect as well. This
         simplifies the error handling code and organizes it better.
 
-        But most importantly when an error occurs the underlying causes are printed in a nicer way:
+        But most importantly when an error occurs the underlying causes are
+        printed in a nicer way:
 
         ```
 
@@ -891,7 +906,9 @@
 
         Error: Cannot find network device with interface name 'notexisting'
 
-        caused by: D-Bus failure: org.freedesktop.NetworkManager::GetDeviceByIpIface method call failed on /org/freedesktop/NetworkManager
+        caused by: D-Bus failure:
+        org.freedesktop.NetworkManager::GetDeviceByIpIface method call failed on
+        /org/freedesktop/NetworkManager
 
         caused by: "No device found for the requested iface."
 
@@ -901,7 +918,11 @@
 
         ```
 
-        In the above case, the first error string is generated in WiFi Connect, the second one in our network-manager bindings, and the last third one in NetworkManager itself (sent using the D-Bus API). Additionally the line starting with `Error:` is colored in red in the terminal for better visibility.
+        In the above case, the first error string is generated in WiFi Connect,
+        the second one in our network-manager bindings, and the last third one
+        in NetworkManager itself (sent using the D-Bus API). Additionally the
+        line starting with `Error:` is colored in red in the terminal for better
+        visibility.
 
         In comparison the previous version produced:
 
@@ -909,7 +930,10 @@
 
         $ ./wifi-connect -i notexisting
 
-        [wifi_connect:ERROR] D-Bus 'org.freedesktop.NetworkManager'::'GetDeviceByIpIface' method call failed on '/org/freedesktop/NetworkManager': No device found for the requested iface.
+        [wifi_connect:ERROR] D-Bus
+        'org.freedesktop.NetworkManager'::'GetDeviceByIpIface' method call
+        failed on '/org/freedesktop/NetworkManager': No device found for the
+        requested iface.
 
         $ echo $?
 
@@ -917,7 +941,8 @@
 
         ```
 
-        We now support exit codes for each kind of error defined in WiFi Connect as visible from the examples above.
+        We now support exit codes for each kind of error defined in WiFi Connect
+        as visible from the examples above.
       footers:
         change-type: patch
         connects-to: "#166"
@@ -968,29 +993,58 @@
         only a single connection profile through WiFi Connect, which limited
         moving the device between locations, etc.
 
-        To support multiple connection profiles the application flow is now simplified and excludes unnecessary functionality:
+        To support multiple connection profiles the application flow is now
+        simplified and excludes unnecessary functionality:
 
-        1. Trying to activate existing connections: this is handled by NetworkManager automatically.
+        1. Trying to activate existing connections: this is handled by
+        NetworkManager automatically.
 
-        2. Deleting all existing wireless connections: this is out of WiFi Connect functionality scope and can be achieved in other ways if necessary.
+        2. Deleting all existing wireless connections: this is out of WiFi
+        Connect functionality scope and can be achieved in other ways if
+        necessary.
 
-        3. Not exiting the application if Internet connectivity is not established after connecting to the WiFi network. Now the application exits even if no Internet connectivity is established after connecting to the wireless network, as we should not make assumptions about the connectivity state of the network a user wants to connect to. Displaying the connectivity state on exit is kept though.
+        3. Not exiting the application if Internet connectivity is not
+        established after connecting to the WiFi network. Now the application
+        exits even if no Internet connectivity is established after connecting
+        to the wireless network, as we should not make assumptions about the
+        connectivity state of the network a user wants to connect to. Displaying
+        the connectivity state on exit is kept though.
 
-        Since this is a major release not compatible with v3 there was room for other improvements as well:
+        Since this is a major release not compatible with v3 there was room for
+        other improvements as well:
 
-        1. Introducing `--activity-timeout` argument for exiting the application in case a user has not connected to the captive portal for the specified amount of time. The default is no activity timeout. This is needed in use cases where WiFi Connect can block the start shell script when Internet connectivity is temporary unavailable, e.g. Boombeastic does a google ping to determine whether to execute WiFi Connect and without this argument the main application will not start in case the device is restarted and there is temporary connectivity issue.
+        1. Introducing `--activity-timeout` argument for exiting the application
+        in case a user has not connected to the captive portal for the specified
+        amount of time. The default is no activity timeout. This is needed in
+        use cases where WiFi Connect can block the start shell script when
+        Internet connectivity is temporary unavailable, e.g. Boombeastic does a
+        google ping to determine whether to execute WiFi Connect and without
+        this argument the main application will not start in case the device is
+        restarted and there is temporary connectivity issue.
 
-        2. The old `--timeout` argument which was about specifying amount of seconds to be waited for connection to be established is now removed. This was introduced in v3, but there was not a single case where this was really needed. In the future if such cases arise, we can introduce something similar again and implement it better.
+        2. The old `--timeout` argument which was about specifying amount of
+        seconds to be waited for connection to be established is now removed.
+        This was introduced in v3, but there was not a single case where this
+        was really needed. In the future if such cases arise, we can introduce
+        something similar again and implement it better.
 
-        3. The directory containing the web UI assets of the application is renamed from `public` to `ui`.
+        3. The directory containing the web UI assets of the application is
+        renamed from `public` to `ui`.
 
-        4. The example start script is renamed from `start` to `scripts/start.sh` and now it includes different example conditions for executing WiFi Connect before the application. The default condition is "Is there an active WiFi connection?" by checking the exit code of `iwgetid -r`. For this reason `wireless-tools` is installed in the Dockerfile.template.
+        4. The example start script is renamed from `start` to
+        `scripts/start.sh` and now it includes different example conditions for
+        executing WiFi Connect before the application. The default condition is
+        "Is there an active WiFi connection?" by checking the exit code of
+        `iwgetid -r`. For this reason `wireless-tools` is installed in the
+        Dockerfile.template.
 
-        5. Installation instructions section in the README including installing on Raspbian/Debian Stretch.
+        5. Installation instructions section in the README including installing
+        on Raspbian/Debian Stretch.
 
         6. WiFi Connect logo and a new How It Works image.
 
-        7. The code in network.rs is refactored for reducing the cyclomatic complexity.
+        7. The code in network.rs is refactored for reducing the cyclomatic
+        complexity.
       footers:
         change-type: major
         connects-to: "#145"
