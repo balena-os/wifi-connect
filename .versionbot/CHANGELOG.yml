@@ -1,4 +1,18 @@
 - commits:
+    - subject: Enable building and publishing of binaries via flowzone
+      hash: 74f4557092a343151100e76d8e634b686f5d4b46
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+  version: 4.11.36
+  title: ""
+  date: 2024-04-16T17:43:50.537Z
+- commits:
     - subject: Update Lock file maintenance
       hash: 0d595c7a9cfd5ededbea50bd80432edae9b0bdd2
       body: |
