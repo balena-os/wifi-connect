@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Lock file maintenance
+      hash: f7884ba7f9ea6c81a2a42ffac6156e664f8ad453
+      body: |
+        Update
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 4.11.37
+  title: ""
+  date: 2024-04-22T00:34:30.424Z
+- commits:
     - subject: Enable building and publishing of binaries via flowzone
       hash: 74f4557092a343151100e76d8e634b686f5d4b46
       body: ""
