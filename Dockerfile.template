@@ -1,12 +1,14 @@
 FROM balenalib/%%BALENA_MACHINE_NAME%%-debian
 
-RUN install_packages dnsmasq wireless-tools
+RUN install_packages dnsmasq wireless-tools unzip
 
 WORKDIR /usr/src/app
 
-ARG VERSION="4.4.0"
-RUN curl -Ls "https://github.com/balena-io/wifi-connect/releases/download/v$VERSION/wifi-connect-v$VERSION-linux-%%BALENA_ARCH%%.tar.gz" \
-  | tar -xvz -C  /usr/src/app/
+ARG VERSION="4.11.1"
+RUN curl -Ls -o /tmp/wifi-connect.zip \
+  "https://github.com/balena-io/wifi-connect/releases/download/v$VERSION/wifi-connect-v$VERSION-linux-%%BALENA_ARCH%%.zip" && \
+  unzip -o /tmp/wifi-connect.zip -d /usr/src/app && \
+  rm /tmp/wifi-connect.zip
 
 COPY scripts/start.sh .
 
