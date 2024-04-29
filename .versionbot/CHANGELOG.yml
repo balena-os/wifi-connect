@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Lock file maintenance
+      hash: 70701e36d78f0cced6a6ed66c6ceb006df1b3eab
+      body: |
+        Update
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Self-hosted Renovate Bot
+      nested: []
+  version: 4.11.39
+  title: ""
+  date: 2024-04-29T00:34:11.088Z
+- commits:
     - subject: Use latest version and fix release file name in Dockerfile.template
       hash: 1cd73066f4ff2e23810b0587ed5fd603753e7df4
       body: ""
