@@ -41,9 +41,10 @@ runs:
       run: |
         cd ./ui
         npm run build
+        tar --auto-compress -cvf wifi-connect-ui.tar.gz  -C build .
 
     - name: Upload artifacts
       uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
       with:
         name: gh-release-wifi-connect-ui-${{ github.event.pull_request.head.sha || github.event.head_commit.id }}-${{ strategy.job-index }}
-        path: ./ui/build
+        path: ./ui/wifi-connect-ui.tar.gz
