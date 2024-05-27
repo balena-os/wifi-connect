@@ -9,6 +9,9 @@ RUN install_packages dnsmasq wireless-tools
 # use latest version. If specific version is required, it should be provided as vX.Y.Z, e.g v4.11.37
 ARG VERSION="latest"
 
+# create /usr/src/app/ui directory where we will extract pre-built UI 
+WORKDIR /usr/src/app/ui
+
 WORKDIR /usr/src/app
 
 RUN \
@@ -29,7 +32,9 @@ RUN \
         export URL_PARTIAL="download/${VERSION}" ; \
     fi; \
     curl -Ls "$BASE_URL/$URL_PARTIAL/wifi-connect-$BINARY_ARCH_NAME.tar.gz" \
-    | tar -xvz -C  /usr/src/app/
+    | tar -xvz -C  /usr/src/app/ &&\
+    curl -Ls "$BASE_URL/$URL_PARTIAL/wifi-connect-ui.tar.gz" \
+    | tar -xvz -C  /usr/src/app/ui 
 
 COPY scripts/start.sh .
 
