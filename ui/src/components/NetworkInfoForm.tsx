@@ -1,7 +1,8 @@
-import { JSONSchema7 as JSONSchema } from 'json-schema';
+import type { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
-import { Flex, Form, Heading, RenditionUiSchema } from 'rendition';
-import { Network, NetworkInfo } from './App';
+import type { RenditionUiSchema } from 'rendition';
+import { Flex, Form, Heading } from 'rendition';
+import type { Network, NetworkInfo } from './App';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
