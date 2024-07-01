@@ -269,7 +269,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24b02b8856c7f14e443c483e802cf0ce693f3bec19f49d2c9a242b18f88c9b70"
 dependencies = [
  "iron",
- "log 0.4.21",
+ "log 0.4.22",
 ]
 
 [[package]]
@@ -311,14 +311,14 @@ version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e19e8d5c34a3e0e2223db8e060f9e8264aeeb5c5fc64a4ee9965c062211c024b"
 dependencies = [
- "log 0.4.21",
+ "log 0.4.22",
 ]
 
 [[package]]
 name = "log"
-version = "0.4.21"
+version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
+checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
 name = "matches"
@@ -415,7 +415,7 @@ dependencies = [
  "error-chain",
  "futures",
  "futures-cpupool",
- "log 0.4.21",
+ "log 0.4.22",
  "tokio-timer",
 ]
 
@@ -868,9 +868,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.117"
+version = "1.0.119"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "455182ea6142b14f93f4bc5320a2b31c1f266b66a4a5c858b013302a5d8cbfc3"
+checksum = "e8eddb61f0697cc3989c5d64b452f5488e2b8a60fd7d5076a3045076ffef8cb0"
 dependencies = [
  "itoa",
  "ryu",
@@ -962,9 +962,9 @@ dependencies = [
 
 [[package]]
 name = "tinyvec"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87cc5ceb3875bb20c2890005a4e226a4651264a5c75edb2421b52861a0a0cb50"
+checksum = "c55115c6fbe2d2bef26eb09ad74bde02d8255476fc0c7b515ef09fbb35742d82"
 dependencies = [
  "tinyvec_macros",
 ]
