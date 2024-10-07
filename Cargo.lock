@@ -43,14 +43,14 @@ version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0dde43e75fd43e8a1bf86103336bc699aa8d17ad1be60c76c0bdfd4828e19b78"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
 ]
 
 [[package]]
 name = "autocfg"
-version = "1.3.0"
+version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
+checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
 name = "base64"
@@ -139,7 +139,7 @@ version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3c7c73a2d1e9fc0886a08b93e98eb643461230d5f1925e4036204d5f2e261a8"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
  "cfg-if 0.1.10",
  "lazy_static",
 ]
@@ -212,9 +212,9 @@ checksum = "d231dfb89cfffdbc30e7fc41579ed6066ad03abda9e567ccafae602b97ec5024"
 
 [[package]]
 name = "httparse"
-version = "1.9.4"
+version = "1.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fcc0b4a115bf80b728eb8ea024ad5bd707b615bfed49e0665b6e0f86fd082d9"
+checksum = "7d71d3574edd2771538b901e6549113b4006ece66150fb69c0fb6d9a2adae946"
 
 [[package]]
 name = "hyper"
@@ -292,9 +292,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
-version = "0.2.158"
+version = "0.2.159"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8adc4bb1803a324070e64a98ae98f38934d91957a99cfb3a43dcbc01bc56439"
+checksum = "561d97a539a36e26a9a5fad1ea11a3039a67714694aaa379433e580854bc3dc5"
 
 [[package]]
 name = "libdbus-sys"
@@ -347,7 +347,7 @@ version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5aa361d4faea93603064a027415f07bd8e1d5c88c9fbf68bf56a285428fd79ce"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
 ]
 
 [[package]]
@@ -425,7 +425,7 @@ version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f346ff70e7dbfd675fe90590b92d59ef2de15a8779ae305ebcbfd3f0caf59be4"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
  "bitflags",
  "cfg-if 1.0.0",
  "libc",
@@ -484,7 +484,7 @@ version = "0.1.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1429034a0490724d0075ebb2bc9e875d6503c3cf69e235a8941aa757d83ef5bf"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
  "num-integer",
  "num-traits",
 ]
@@ -507,7 +507,7 @@ version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
 ]
 
 [[package]]
@@ -599,9 +599,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pkg-config"
-version = "0.3.30"
+version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d231b230927b5e4ad203db57bbcbee2802f6bce620b1e4a9024a07d94e2907ec"
+checksum = "953ec861398dccce10c670dfeaf3ec4911ca479e9c02154b3a215178c5f566f2"
 
 [[package]]
 name = "plugin"
@@ -890,7 +890,7 @@ version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f92a496fb766b417c996b9c5e57daf2f7ad3b0bebe1ccfca4856390e3d3bb67"
 dependencies = [
- "autocfg 1.3.0",
+ "autocfg 1.4.0",
 ]
 
 [[package]]
@@ -913,9 +913,9 @@ checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
 
 [[package]]
 name = "syn"
-version = "2.0.77"
+version = "2.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f35bcdf61fd8e7be6caf75f429fdca8beb3ed76584befb503b1569faee373ed"
+checksum = "89132cd0bf050864e1d38dc3bbc07a0eb8e7530af26344d3d2bbbef83499f590"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1045,9 +1045,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-bidi"
-version = "0.3.15"
+version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08f95100a766bf4f8f28f90d77e0a5461bbdb219042e7679bebe79004fed8d75"
+checksum = "5ab17db44d7388991a428b2ee655ce0c212e862eff1768a455c58f9aad6e7893"
 
 [[package]]
 name = "unicode-ident"
