@@ -4,6 +4,8 @@ import { Navbar, Provider, Container } from 'rendition';
 import { NetworkInfoForm } from './NetworkInfoForm';
 import { Notifications } from './Notifications';
 import { createGlobalStyle } from 'styled-components';
+import { NAVBAR_BACKGROUND_COLOR } from '../config';
+import { T } from './Localize';
 
 const GlobalStyle = createGlobalStyle`
 	body {
@@ -50,7 +52,7 @@ const App = () => {
 			})
 			.then(setAvailableNetworks)
 			.catch((e: Error) => {
-				setError(`Failed to fetch available networks. ${e.message || e}`);
+				setError(`${T('failed_to_fetch_wifi_networks')}. ${e.message || e}`);
 			})
 			.finally(() => {
 				setIsFetchingNetworks(false);
@@ -74,14 +76,19 @@ const App = () => {
 				}
 			})
 			.catch((e: Error) => {
-				setError(`Failed to connect to the network. ${e.message || e}`);
+				setError(
+					`${T('failed_to_connect_to_wifi_networks')} ${e.message || e}`,
+				);
 			});
 	};
 
 	return (
 		<Provider>
 			<GlobalStyle />
-			<Navbar brand={<img src={logo} style={{ height: 30 }} alt="logo" />} />
+			<Navbar
+				style={{ backgroundColor: NAVBAR_BACKGROUND_COLOR }}
+				brand={<img src={logo} style={{ height: 30 }} alt="logo" />}
+			/>
 
 			<Container>
 				<Notifications
