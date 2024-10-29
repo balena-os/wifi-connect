@@ -1,4 +1,17 @@
 - commits:
+    - subject: Do not publish the repo to crates.io
+      hash: b187fbc65acb49e64255b79ee714939bb50d28c3
+      body: |
+        The default is true. This prevents accidental publishing of the project
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Felipe Lalanne
+      nested: []
+  version: 4.11.68
+  title: ""
+  date: 2024-10-29T15:29:45.807Z
+- commits:
     - subject: Update Lock file maintenance
       hash: d01c16d7cce29da0b5c42e97b1910f32e39dcd29
       body: |
