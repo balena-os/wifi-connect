@@ -2,12 +2,13 @@ import { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
 import { Flex, Form, Heading, RenditionUiSchema } from 'rendition';
 import { Network, NetworkInfo } from './App';
+import { T } from './Localize';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
 	properties: {
 		ssid: {
-			title: 'SSID',
+			title: T('ssid'),
 			type: 'string',
 			default: availableNetworks[0]?.ssid,
 			oneOf: availableNetworks.map((network) => ({
@@ -21,7 +22,7 @@ const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 			default: '',
 		},
 		passphrase: {
-			title: 'Passphrase',
+			title: T('passphrase'),
 			type: 'string',
 			default: '',
 		},
@@ -31,7 +32,7 @@ const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 
 const getUiSchema = (isEnterprise: boolean): RenditionUiSchema => ({
 	ssid: {
-		'ui:placeholder': 'Select SSID',
+		'ui:placeholder': T('select_ssid'),
 		'ui:options': {
 			emphasized: true,
 		},
@@ -85,7 +86,7 @@ export const NetworkInfoForm = ({
 			mt={5}
 		>
 			<Heading.h3 align="center" mb={4}>
-				Hi! Please choose your WiFi from the list
+				{T('welcome_message')}
 			</Heading.h3>
 
 			<Form
@@ -103,7 +104,7 @@ export const NetworkInfoForm = ({
 					mt: 3,
 					disabled: availableNetworks.length <= 0,
 				}}
-				submitButtonText={'Connect'}
+				submitButtonText={T('connect_wifi')}
 			/>
 		</Flex>
 	);
