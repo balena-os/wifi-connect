@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Lock file maintenance
+      hash: 77a464edd452954cb566529316c4528d06117279
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.69
+  title: ""
+  date: 2024-11-04T00:30:32.671Z
+- commits:
     - subject: Do not publish the repo to crates.io
       hash: b187fbc65acb49e64255b79ee714939bb50d28c3
       body: |
