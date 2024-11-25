@@ -1,5 +1,18 @@
 - commits:
     - subject: Update Lock file maintenance
+      hash: 3bb153a177d9a5e38bc6f5e6ab2e7fa078ac798c
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.72
+  title: ""
+  date: 2024-11-25T00:31:51.295Z
+- commits:
+    - subject: Update Lock file maintenance
       hash: 5d20a6a8167bddb2459706ee8f9d333fa48b8566
       body: |
         Update 
@@ -1502,11 +1515,8 @@
   version: 4.0.4
 - commits:
     - author: majorz
-      body: >-
-        A regression happened in an older commit due to large amount of
-        replacements. The version before this one was using the
-        proper  `type="password"` field for the passphrase:
-
+      body: |-
+        A regression happened in an older commit due to large amount of replacements. The version before this one was using the proper  `type="password"` field for the passphrase:
         https://github.com/resin-io/resin-wifi-connect/commit/04a5de06a00603d017b773a21e15831f0c3e0be7#diff-528c3923d718a8860f5d8c05c3931c55
       footers:
         change-type: patch
