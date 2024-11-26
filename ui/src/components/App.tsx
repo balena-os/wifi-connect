@@ -39,7 +39,8 @@ const App = () => {
 		[],
 	);
 
-	React.useEffect(() => {
+	const fetchNetworks = () => {
+		setIsFetchingNetworks(true);
 		fetch('/networks')
 			.then((data) => {
 				if (data.status !== 200) {
@@ -55,6 +56,10 @@ const App = () => {
 			.finally(() => {
 				setIsFetchingNetworks(false);
 			});
+	};
+
+	React.useEffect(() => {
+		fetchNetworks();
 	}, []);
 
 	const onConnect = (data: NetworkInfo) => {
@@ -92,6 +97,7 @@ const App = () => {
 					error={error}
 				/>
 				<NetworkInfoForm
+					fetchNetworks={fetchNetworks}
 					availableNetworks={availableNetworks}
 					onSubmit={onConnect}
 				/>
