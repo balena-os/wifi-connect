@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Txt, Alert } from 'rendition';
+import { T } from './Localize';
 
 export const Notifications = ({
 	hasAvailableNetworks,
@@ -14,20 +15,14 @@ export const Notifications = ({
 		<>
 			{attemptedConnect && (
 				<Alert m={2} info>
-					<Txt.span>Applying changes... </Txt.span>
-					<Txt.span>
-						Your device will soon be online. If connection is unsuccessful, the
-						Access Point will be back up in a few minutes, and reloading this
-						page will allow you to try again.
-					</Txt.span>
+					<Txt.span>{T('applying_changes')}</Txt.span>
+					<Txt.span>{T('device_will_soon_be_online')}</Txt.span>
 				</Alert>
 			)}
 			{!hasAvailableNetworks && (
 				<Alert m={2} warning>
-					<Txt.span>No wifi networks available.&nbsp;</Txt.span>
-					<Txt.span>
-						Please ensure there is a network within range and reboot the device.
-					</Txt.span>
+					<Txt.span>{T('no_wifi_network_available')}&nbsp;</Txt.span>
+					<Txt.span>{T('ensure_wifi_in_range')}</Txt.span>
 				</Alert>
 			)}
 			{!!error && (
