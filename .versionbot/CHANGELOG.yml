@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/setup-node action to v4
+      hash: 42fc2e37b63bc08f4b9d44e1364c205149ab493c
+      body: |
+        Update actions/setup-node from 3 to 4
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.79
+  title: ""
+  date: 2025-02-07T22:14:54.650Z
+- commits:
     - subject: Update actions/upload-artifact digest to 65c4c4a
       hash: dc16c318806bec3b1cc7229348a3749dd75e4523
       body: |
