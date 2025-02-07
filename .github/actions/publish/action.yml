@@ -22,7 +22,7 @@ runs:
   using: "composite"
   steps:    
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # v3
       with:
         node-version: ${{ inputs.NODE_VERSION }}
 
