@@ -1,4 +1,86 @@
 - commits:
+    - subject: Download pre-built UI in Dockerfile.template
+      hash: ede837e870d130ec5c7dbddcc6c09d9b14867883
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: Update npm dependencies
+      hash: 79c572220d2d7f840fb0fc2964f5b72708f2baee
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: Archive build output and upload to github releases
+      hash: 6e785419156a1bdedf7397b5db03f9027c7e4bcb
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: remove build folder
+      hash: 25024787f19cc908107bea96b587043292bf705e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: myarmolinsky
+      nested: []
+    - subject: minimum node and move @types to devdep
+      hash: 327f426c58f57ea9b12efd39197ef3bf4b3c465f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: myarmolinsky
+      nested: []
+    - subject: gitignore build, bump balena/lint and lint-staged
+      hash: e7a134b39f581e056602060bb055439d1b4d177e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: myarmolinsky
+      nested: []
+    - subject: "[UI] update react-scripts to v5.x"
+      hash: 1fdbb0898b2f0b71680228c38cf5c5d3c028ce34
+      body: >
+        - react-scripts v3.x fails with `Error: error:0308010c:digital envelope
+        routines::unsupported [Node Error Solved]`
+          on Node v20.x
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: Build and Publish wifi-connect-ui
+      hash: 475325ada5b2acca8910bf9e8f44b56d0d56ba6f
+      body: |
+        - use custom publish action for building and publishing the ui
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+  version: 4.11.76
+  title: ""
+  date: 2025-02-07T17:31:26.263Z
+- commits:
     - subject: Update Lock file maintenance
       hash: a3eb7227add65223fa769d2384e3dab58ac0be51
       body: |
