@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update Pin actions/setup-node action to 1a4442c
+      hash: e2ba13990aee3a97670b21b476f2cf51a2cb3ed0
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.77
+  title: ""
+  date: 2025-02-07T18:17:17.317Z
+- commits:
     - subject: Download pre-built UI in Dockerfile.template
       hash: ede837e870d130ec5c7dbddcc6c09d9b14867883
       body: ""
