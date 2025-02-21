@@ -44,7 +44,7 @@ runs:
         tar --auto-compress -cvf wifi-connect-ui.tar.gz  -C build .
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+      uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
       with:
         name: gh-release-wifi-connect-ui-${{ github.event.pull_request.head.sha || github.event.head_commit.id }}-${{ strategy.job-index }}
         path: ./ui/wifi-connect-ui.tar.gz
