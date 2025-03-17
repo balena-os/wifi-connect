@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/setup-node digest to cdca736
+      hash: 2693976d4527beb8907fca75a0f1dc8b31ab35d7
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.81
+  title: ""
+  date: 2025-03-17T04:18:13.553Z
+- commits:
     - subject: Update actions/upload-artifact digest to 4cec3d8
       hash: f842110c508ced49557fcb4deab76355f12cd1a0
       body: |
