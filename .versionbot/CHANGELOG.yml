@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/setup-node digest to 49933ea
+      hash: b9fea5e98717169b7eac5b2eab0b1e89531b6ac2
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.83
+  title: ""
+  date: 2025-04-14T04:20:09.005Z
+- commits:
     - subject: Update actions/upload-artifact digest to ea165f8
       hash: 8b9954db93e3d3d2406b8c98a62d9e9fc668ae03
       body: |
