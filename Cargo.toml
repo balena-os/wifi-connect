@@ -28,3 +28,4 @@ default-features = false
 
 [profile.release]
 lto = true
+
