@@ -20,6 +20,8 @@ RUN \
             BINARY_ARCH_NAME="x86_64-unknown-linux-gnu" ;;\
         "armv7l") \
             BINARY_ARCH_NAME="armv7-unknown-linux-gnueabihf" ;;\
+        "armv6") \
+            BINARY_ARCH_NAME="arm-unknown-linux-gnueabihf" ;;\
         *) \
             echo >&2 "error: unsupported architecture ($DETECTED_ARCH)"; exit 1 ;; \ 
     esac;\
