@@ -1,4 +1,16 @@
 - commits:
+    - subject: "patch: Replace balenalib with Docker Official image"
+      hash: dd25ac50cf1170f06fe6745cb8bcbd8e9eb9648a
+      body: ""
+      footer:
+        Signed-off-by: Vipul Gupta (@vipulgupta2048) <vipulgupta2048@gmail.com>
+        signed-off-by: Vipul Gupta (@vipulgupta2048) <vipulgupta2048@gmail.com>
+      author: Vipul Gupta (@vipulgupta2048)
+      nested: []
+  version: 4.11.84
+  title: ""
+  date: 2025-07-22T15:34:26.428Z
+- commits:
     - subject: Update actions/setup-node digest to 49933ea
       hash: b9fea5e98717169b7eac5b2eab0b1e89531b6ac2
       body: |

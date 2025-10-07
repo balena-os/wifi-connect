@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -u
+set -o pipefail  # Make pipelines return failure if any command fails
 
 trap "exit 1" TERM
 export TOP_PID=$$
@@ -14,13 +15,13 @@ NAME='WiFi Connect Raspbian Installer'
 INSTALL_BIN_DIR="$WFC_INSTALL_ROOT/sbin"
 INSTALL_UI_DIR="$WFC_INSTALL_ROOT/share/wifi-connect/ui"
 
-RELEASE_URL="https://api.github.com/repos/$WFC_REPO/releases/45509064"
+RELEASE_URL="https://api.github.com/repos/$WFC_REPO/releases/latest"
 
 CONFIRMATION=true
 
 usage() {
     cat 1>&2 <<EOF
-$NAME 1.0.1 (2018-21-03)
+$NAME 2.0.0 (2025-10-07)
 
 USAGE:
     $SCRIPT [FLAGS]
@@ -52,6 +53,7 @@ main() {
     need_cmd apt-get
     need_cmd grep
     need_cmd mktemp
+    need_cmd uname
 
     check_os_version
 
@@ -72,6 +74,29 @@ check_os_version() {
     if [ "$_version" == "8 (jessie)" ]; then
         err "Distributions based on Debian 8 (jessie) are not supported"
     fi
+}
+
+detect_architecture() {
+    local _arch
+    _arch=$(uname -m)
+
+    case "$_arch" in
+        aarch64|arm64)
+            echo "aarch64-unknown-linux-gnu"
+            ;;
+        armv7l|armv6l)
+            echo "armv7-unknown-linux-gnueabihf"
+            ;;
+        x86_64|amd64)
+            echo "x86_64-unknown-linux-gnu"
+            ;;
+        i686|i386)
+            echo "i686-unknown-linux-gnu"
+            ;;
+        *)
+            err "Unsupported architecture: $_arch"
+            ;;
+    esac
 }
 
 activate_network_manager() {
@@ -159,30 +184,83 @@ confirm_installation() {
 }
 
 install_wfc() {
-    local _regex='browser_download_url": "\K.*rpi\.tar\.gz'
-    local _arch_url
+    local _arch
+    local _binary_regex
+    local _ui_regex='browser_download_url": "\K.*wifi-connect-ui\.tar\.gz'
+    local _binary_url
+    local _ui_url
     local _wfc_version
     local _download_dir
+    local _ui_download_dir
+
+    say "Detecting architecture..."
+    
+    _arch=$(detect_architecture)
+    
+    say "Detected architecture: $_arch"
+    
+    _binary_regex="browser_download_url\": \"\\K.*${_arch}\\.tar\\.gz"
 
     say "Retrieving latest release from $RELEASE_URL..."
 
-    _arch_url=$(ensure curl "$RELEASE_URL" -s | grep -hoP "$_regex")
+    local _release_data
+    _release_data=$(ensure curl -s "$RELEASE_URL")
 
-    say "Downloading and extracting $_arch_url..."
+    _binary_url=$(echo "$_release_data" | grep -oP "$_binary_regex" | head -n 1)
+    _ui_url=$(echo "$_release_data" | grep -oP "$_ui_regex" | head -n 1)
+
+    if [ -z "$_binary_url" ]; then
+        err "Could not find binary download URL for architecture: $_arch"
+    fi
+
+    if [ -z "$_ui_url" ]; then
+        err "Could not find UI download URL"
+    fi
+
+    say "Downloading and extracting binary from $_binary_url..."
 
     _download_dir=$(ensure mktemp -d)
 
-    ensure curl -Ls "$_arch_url" | tar -xz -C "$_download_dir"
+    # Download binary and extract
+    if ! curl -Ls "$_binary_url" | tar -xz -C "$_download_dir"; then
+        err "Failed to download or extract binary"
+    fi
 
-    ensure sudo mv "$_download_dir/wifi-connect" $INSTALL_BIN_DIR
+    if [ ! -f "$_download_dir/wifi-connect" ]; then
+        err "wifi-connect binary not found in downloaded archive"
+    fi
 
-    ensure sudo mkdir -p $INSTALL_UI_DIR
+    ensure sudo mv "$_download_dir/wifi-connect" "$INSTALL_BIN_DIR"
 
-    ensure sudo rm -rdf $INSTALL_UI_DIR
+    say "Downloading and extracting UI from $_ui_url..."
 
-    ensure sudo mv "$_download_dir/ui" $INSTALL_UI_DIR
+    # Create separate directory for UI download
+    _ui_download_dir=$(ensure mktemp -d)
 
-    ensure rm -rdf "$_download_dir"
+    # Download UI and extract
+    if ! curl -Ls "$_ui_url" | tar -xz -C "$_ui_download_dir"; then
+        err "Failed to download or extract UI"
+    fi
+
+    # Check what was actually extracted
+    if [ -d "$_ui_download_dir/ui" ]; then
+        # UI is in a subdirectory
+        ensure sudo mkdir -p "$(dirname "$INSTALL_UI_DIR")"
+        ensure sudo rm -rf "$INSTALL_UI_DIR"
+        ensure sudo mv "$_ui_download_dir/ui" "$INSTALL_UI_DIR"
+    elif [ -f "$_ui_download_dir/index.html" ]; then
+        # UI files are in the root of the archive
+        ensure sudo mkdir -p "$INSTALL_UI_DIR"
+        ensure sudo rm -rf "$INSTALL_UI_DIR"
+        ensure sudo mkdir -p "$INSTALL_UI_DIR"
+        ensure sudo cp -r "$_ui_download_dir"/* "$INSTALL_UI_DIR/"
+    else
+        err "Could not find UI files in downloaded archive. Contents: $(ls -la "$_ui_download_dir")"
+    fi
+
+    # Cleanup both temp directories
+    ensure rm -rf "$_download_dir"
+    ensure rm -rf "$_ui_download_dir"
 
     _wfc_version=$(ensure wifi-connect --version)
 
