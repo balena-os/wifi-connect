@@ -1,4 +1,462 @@
 - commits:
+    - subject: "patch: Replace balenalib with Docker Official image"
+      hash: dd25ac50cf1170f06fe6745cb8bcbd8e9eb9648a
+      body: ""
+      footer:
+        Signed-off-by: Vipul Gupta (@vipulgupta2048) <vipulgupta2048@gmail.com>
+        signed-off-by: Vipul Gupta (@vipulgupta2048) <vipulgupta2048@gmail.com>
+      author: Vipul Gupta (@vipulgupta2048)
+      nested: []
+  version: 4.11.84
+  title: ""
+  date: 2025-07-22T15:34:26.428Z
+- commits:
+    - subject: Update actions/setup-node digest to 49933ea
+      hash: b9fea5e98717169b7eac5b2eab0b1e89531b6ac2
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.83
+  title: ""
+  date: 2025-04-14T04:20:09.005Z
+- commits:
+    - subject: Update actions/upload-artifact digest to ea165f8
+      hash: 8b9954db93e3d3d2406b8c98a62d9e9fc668ae03
+      body: |
+        Update actions/upload-artifact
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.82
+  title: ""
+  date: 2025-03-19T18:18:19.868Z
+- commits:
+    - subject: Update actions/setup-node digest to cdca736
+      hash: 2693976d4527beb8907fca75a0f1dc8b31ab35d7
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.81
+  title: ""
+  date: 2025-03-17T04:18:13.553Z
+- commits:
+    - subject: Update actions/upload-artifact digest to 4cec3d8
+      hash: f842110c508ced49557fcb4deab76355f12cd1a0
+      body: |
+        Update actions/upload-artifact
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.80
+  title: ""
+  date: 2025-02-21T20:16:49.750Z
+- commits:
+    - subject: Update actions/setup-node action to v4
+      hash: 42fc2e37b63bc08f4b9d44e1364c205149ab493c
+      body: |
+        Update actions/setup-node from 3 to 4
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.79
+  title: ""
+  date: 2025-02-07T22:14:54.650Z
+- commits:
+    - subject: Update actions/upload-artifact digest to 65c4c4a
+      hash: dc16c318806bec3b1cc7229348a3749dd75e4523
+      body: |
+        Update actions/upload-artifact
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.78
+  title: ""
+  date: 2025-02-07T20:15:45.710Z
+- commits:
+    - subject: Update Pin actions/setup-node action to 1a4442c
+      hash: e2ba13990aee3a97670b21b476f2cf51a2cb3ed0
+      body: |
+        Update actions/setup-node
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.77
+  title: ""
+  date: 2025-02-07T18:17:17.317Z
+- commits:
+    - subject: Download pre-built UI in Dockerfile.template
+      hash: ede837e870d130ec5c7dbddcc6c09d9b14867883
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: Update npm dependencies
+      hash: 79c572220d2d7f840fb0fc2964f5b72708f2baee
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: Archive build output and upload to github releases
+      hash: 6e785419156a1bdedf7397b5db03f9027c7e4bcb
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: remove build folder
+      hash: 25024787f19cc908107bea96b587043292bf705e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: myarmolinsky
+      nested: []
+    - subject: minimum node and move @types to devdep
+      hash: 327f426c58f57ea9b12efd39197ef3bf4b3c465f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: myarmolinsky
+      nested: []
+    - subject: gitignore build, bump balena/lint and lint-staged
+      hash: e7a134b39f581e056602060bb055439d1b4d177e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: myarmolinsky
+      nested: []
+    - subject: "[UI] update react-scripts to v5.x"
+      hash: 1fdbb0898b2f0b71680228c38cf5c5d3c028ce34
+      body: >
+        - react-scripts v3.x fails with `Error: error:0308010c:digital envelope
+        routines::unsupported [Node Error Solved]`
+          on Node v20.x
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+    - subject: Build and Publish wifi-connect-ui
+      hash: 475325ada5b2acca8910bf9e8f44b56d0d56ba6f
+      body: |
+        - use custom publish action for building and publishing the ui
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Rahul Thakoor <rahul@balena.io>
+        signed-off-by: Rahul Thakoor <rahul@balena.io>
+      author: Rahul Thakoor
+      nested: []
+  version: 4.11.76
+  title: ""
+  date: 2025-02-07T17:31:26.263Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: a3eb7227add65223fa769d2384e3dab58ac0be51
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.75
+  title: ""
+  date: 2024-12-09T00:53:00.243Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 93153567edcecc583b28ae74415086b0203627d2
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.74
+  title: ""
+  date: 2024-12-02T02:45:18.193Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 1d8991a7822749376e6069148077b167cd0a0d54
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.73
+  title: ""
+  date: 2024-12-02T00:44:46.012Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 3bb153a177d9a5e38bc6f5e6ab2e7fa078ac798c
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.72
+  title: ""
+  date: 2024-11-25T00:31:51.295Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 5d20a6a8167bddb2459706ee8f9d333fa48b8566
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.71
+  title: ""
+  date: 2024-11-18T00:31:23.325Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 4467496b26cd1858c4d95916d28b1fc13017d732
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.70
+  title: ""
+  date: 2024-11-11T00:30:21.410Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 77a464edd452954cb566529316c4528d06117279
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.69
+  title: ""
+  date: 2024-11-04T00:30:32.671Z
+- commits:
+    - subject: Do not publish the repo to crates.io
+      hash: b187fbc65acb49e64255b79ee714939bb50d28c3
+      body: |
+        The default is true. This prevents accidental publishing of the project
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Felipe Lalanne
+      nested: []
+  version: 4.11.68
+  title: ""
+  date: 2024-10-29T15:29:45.807Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: d01c16d7cce29da0b5c42e97b1910f32e39dcd29
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.67
+  title: ""
+  date: 2024-10-28T00:31:49.575Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 08b65a0e12910779f5b4a0ad4fec81cf3ae63e03
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.66
+  title: ""
+  date: 2024-10-21T00:29:56.315Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 8d4b73473524ccdaaf559a1aa6b1885d10924b6c
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.65
+  title: ""
+  date: 2024-10-14T00:29:55.575Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 28aac8f17867b05b9e8d5f6f18f7fcfc8702e47d
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.64
+  title: ""
+  date: 2024-10-07T00:30:07.113Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: d83a73cb6f981c299134fc43ad0193f32a37760d
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.63
+  title: ""
+  date: 2024-09-23T00:39:52.848Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 69df251b2cac7669bd673e7efc09d2bc83c9c858
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.62
+  title: ""
+  date: 2024-09-16T00:42:39.091Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 9750519acd8d850dbd90d07ec6e1832f4ac69d4c
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.61
+  title: ""
+  date: 2024-09-09T03:18:51.645Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 6b40bcd60014981725e4cfd51eb35fcf731eb69e
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.60
+  title: ""
+  date: 2024-09-09T00:40:33.996Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 88c35c61dc0aadb9ee9bf5b251534cd8670fa7d6
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.59
+  title: ""
+  date: 2024-09-02T00:40:19.497Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 54a0b1e46aa20408a75b93d9dacced49e78d9988
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.58
+  title: ""
+  date: 2024-08-26T00:37:48.183Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 99dde699ac4859c570d5e1eef25259c90b7ce05e
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.57
+  title: ""
+  date: 2024-08-19T00:36:44.109Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 62fd21eb15dac71ea6f5aff64feb296801170c85
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.56
+  title: ""
+  date: 2024-08-12T00:38:06.752Z
+- commits:
+    - subject: Update Lock file maintenance
+      hash: 836bf403663cdd06b6c96aa16a0d7845ddabd696
+      body: |
+        Update 
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.55
+  title: ""
+  date: 2024-08-05T00:37:48.399Z
+- commits:
     - subject: Update Lock file maintenance
       hash: 5cdd866f72976aba1109b52ece1b8ca971b366d7
       body: |
@@ -1281,11 +1739,8 @@
   version: 4.0.4
 - commits:
     - author: majorz
-      body: >-
-        A regression happened in an older commit due to large amount of
-        replacements. The version before this one was using the
-        proper  `type="password"` field for the passphrase:
-
+      body: |-
+        A regression happened in an older commit due to large amount of replacements. The version before this one was using the proper  `type="password"` field for the passphrase:
         https://github.com/resin-io/resin-wifi-connect/commit/04a5de06a00603d017b773a21e15831f0c3e0be7#diff-528c3923d718a8860f5d8c05c3931c55
       footers:
         change-type: patch

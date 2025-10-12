@@ -1,0 +1,50 @@
+---
+name: package and draft GitHub release
+# https://github.com/product-os/flowzone/tree/master/.github/actions
+inputs:
+  json:
+    description: "JSON stringified object containing all the inputs from the calling workflow"
+    required: true
+  secrets:
+    description: "JSON stringified object containing all the secrets from the calling workflow"
+    required: true
+  variables:
+    description: "JSON stringified object containing all the variables from the calling workflow"
+    required: true
+
+  # --- custom environment
+  NODE_VERSION:
+    type: string
+    default: "20.x"
+
+runs:
+  # https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+  using: "composite"
+  steps:    
+    - name: Setup Node.js
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: ${{ inputs.NODE_VERSION }}
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        cd ./ui
+        if [ -e package-lock.json ]; then
+          npm ci
+        else
+          npm i
+        fi
+
+    - name: Build wifi-connect-ui
+      shell: bash
+      run: |
+        cd ./ui
+        npm run build
+        tar --auto-compress -cvf wifi-connect-ui.tar.gz  -C build .
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: gh-release-wifi-connect-ui-${{ github.event.pull_request.head.sha || github.event.head_commit.id }}-${{ strategy.job-index }}
+        path: ./ui/wifi-connect-ui.tar.gz
