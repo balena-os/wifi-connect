@@ -53,11 +53,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Download build artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: wifi-connect-linux-aarch64
-      #     path: dist
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wifi-connect-linux-aarch64
+          path: dist
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
