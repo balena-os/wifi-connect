@@ -1,0 +1,14 @@
+{
+  "branches": ["master", "fix/semantic-release"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/changelog", {
+      "changelogFile": "CHANGELOG-AMAZON.md"
+    }],
+    ["@semantic-release/git", {
+      "assets": ["CHANGELOG-AMAZON.md"],
+      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    }]
+  ]
+}
