@@ -3,6 +3,7 @@ name: Build wifi-connect (Linux aarch64)
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -44,7 +45,7 @@ jobs:
 
   release:
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/fix/semantic-release') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -61,12 +62,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24'
 
-      - name: Install semantic-release
-        run: npm install --global semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/exec
+      # - name: Install semantic-release
+      #   run: |
+      #     npm install -g semantic-release @semantic-release/changelog @semantic-release/exec
 
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release --no-ci
+        run: npx --package @semantic-release/changelog --package @semantic-release/exec semantic-release --no-ci --plugins "@semantic-release/changelog,@semantic-release/exec"
