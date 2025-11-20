@@ -6,8 +6,11 @@
     ["@semantic-release/changelog", {
       "changelogFile": "CHANGELOG-AMAZON.md"
     }],
+    ["@semantic-release/exec", {
+      "prepareCmd": "sed -i 's@version = .*@version = ${nextRelease.version}@' Cargo.toml"
+    }],
     ["@semantic-release/git", {
-      "assets": ["CHANGELOG-AMAZON.md"],
+      "assets": ["CHANGELOG-AMAZON.md", "Cargo.toml"],
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }]
   ]
