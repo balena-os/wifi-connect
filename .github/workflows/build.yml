@@ -45,7 +45,7 @@ jobs:
 
   release:
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/fix/semantic-release') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
