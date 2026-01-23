@@ -1,17 +1,17 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y --no-install-recommends dnsmasq wireless-tools
+RUN apt-get update && apt-get install -y --no-install-recommends dnsmasq wireless-tools curl ca-certificates
 
 # use latest version. If specific version is required, it should be provided as vX.Y.Z, e.g v4.11.37
 ARG VERSION="latest"
 
-# create /usr/src/app/ui directory where we will extract pre-built UI 
+# create /usr/src/app/ui directory where we will extract pre-built UI
 WORKDIR /usr/src/app/ui
 
 WORKDIR /usr/src/app
 
 RUN \
-    export BASE_URL="https://github.com/balena-os/wifi-connect/releases" &&\    
+    export BASE_URL="https://github.com/balena-os/wifi-connect/releases" &&\
     DETECTED_ARCH=$(uname -m) &&\
     case $DETECTED_ARCH in \
         "aarch64") \
@@ -21,7 +21,7 @@ RUN \
         "armv7l") \
             BINARY_ARCH_NAME="armv7-unknown-linux-gnueabihf" ;;\
         *) \
-            echo >&2 "error: unsupported architecture ($DETECTED_ARCH)"; exit 1 ;; \ 
+            echo >&2 "error: unsupported architecture ($DETECTED_ARCH)"; exit 1 ;; \
     esac;\
     if [ ${VERSION} = "latest" ]; then \
         export URL_PARTIAL="latest/download" ; \
@@ -31,7 +31,7 @@ RUN \
     curl -Ls "$BASE_URL/$URL_PARTIAL/wifi-connect-$BINARY_ARCH_NAME.tar.gz" \
     | tar -xvz -C  /usr/src/app/ &&\
     curl -Ls "$BASE_URL/$URL_PARTIAL/wifi-connect-ui.tar.gz" \
-    | tar -xvz -C  /usr/src/app/ui 
+    | tar -xvz -C  /usr/src/app/ui
 
 COPY scripts/start.sh .
 
