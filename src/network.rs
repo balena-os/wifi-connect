@@ -43,7 +43,7 @@ struct NetworkCommandHandler {
     access_points: Vec<AccessPoint>,
     portal_connection: Option<Connection>,
     config: Config,
-    dnsmasq: process::Child,
+    dnsmasq: Option<process::Child>,
     server_tx: Sender<NetworkCommandResponse>,
     network_rx: Receiver<NetworkCommand>,
     activated: bool,
@@ -62,9 +62,19 @@ impl NetworkCommandHandler {
 
         let access_points = get_access_points(&device)?;
 
-        let portal_connection = Some(create_portal(&device, config)?);
+        let portal_connection = if !config.no_ap {
+            Some(create_portal(&device, config)?)
+        } else {
+            info!("No-AP mode: skipping access point creation");
+            None
+        };
 
-        let dnsmasq = start_dnsmasq(config, &device)?;
+        let dnsmasq = if !config.no_ap {
+            Some(start_dnsmasq(config, &device)?)
+        } else {
+            info!("No-AP mode: skipping dnsmasq");
+            None
+        };
 
         let (server_tx, server_rx) = channel();
 
@@ -98,6 +108,7 @@ impl NetworkCommandHandler {
         let listening_port = config.listening_port;
         let exit_tx_server = exit_tx.clone();
         let ui_directory = config.ui_directory.clone();
+        let no_ap = config.no_ap;
 
         thread::spawn(move || {
             start_server(
@@ -107,6 +118,7 @@ impl NetworkCommandHandler {
                 network_tx,
                 exit_tx_server,
                 &ui_directory,
+                no_ap,
             );
         });
     }
@@ -193,7 +205,9 @@ impl NetworkCommandHandler {
     }
 
     fn stop(&mut self, exit_tx: &Sender<ExitResult>, result: ExitResult) {
-        let _ = stop_dnsmasq(&mut self.dnsmasq);
+        if let Some(ref mut dnsmasq) = self.dnsmasq {
+            let _ = stop_dnsmasq(dnsmasq);
+        }
 
         if let Some(ref connection) = self.portal_connection {
             let _ = stop_portal_impl(connection, &self.config);
@@ -264,7 +278,9 @@ impl NetworkCommandHandler {
 
         self.access_points = get_access_points(&self.device)?;
 
-        self.portal_connection = Some(create_portal(&self.device, &self.config)?);
+        if !self.config.no_ap {
+            self.portal_connection = Some(create_portal(&self.device, &self.config)?);
+        }
 
         Ok(false)
     }

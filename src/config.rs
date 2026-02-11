@@ -23,6 +23,7 @@ pub struct Config {
     pub listening_port: u16,
     pub activity_timeout: u64,
     pub ui_directory: PathBuf,
+    pub no_ap: bool,
 }
 
 pub fn get_config() -> Config {
@@ -109,6 +110,12 @@ pub fn get_config() -> Config {
                 ))
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("no-ap")
+                .long("no-ap")
+                .help("Serve the UI without creating an access point (station mode)")
+                .takes_value(false),
+        )
         .get_matches();
 
     let interface: Option<String> = matches.value_of("portal-interface").map_or_else(
@@ -157,6 +164,9 @@ pub fn get_config() -> Config {
 
     let ui_directory = get_ui_directory(matches.value_of("ui-directory"));
 
+    let no_ap: bool = matches.is_present("no-ap")
+        || env::var("NO_AP").map_or(false, |v| v == "1" || v.to_lowercase() == "true");
+
     Config {
         interface,
         ssid,
@@ -166,6 +176,7 @@ pub fn get_config() -> Config {
         listening_port,
         activity_timeout,
         ui_directory,
+        no_ap,
     }
 }
 

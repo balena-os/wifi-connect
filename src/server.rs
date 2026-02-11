@@ -138,6 +138,7 @@ pub fn start_server(
     network_tx: Sender<NetworkCommand>,
     exit_tx: Sender<ExitResult>,
     ui_directory: &PathBuf,
+    no_ap: bool,
 ) {
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
@@ -164,10 +165,16 @@ pub fn start_server(
 
     let mut chain = Chain::new(assets);
     chain.link(Write::<RequestSharedState>::both(request_state));
-    chain.link_after(RedirectMiddleware);
+    if !no_ap {
+        chain.link_after(RedirectMiddleware);
+    }
     chain.link_around(cors_middleware);
 
-    let address = format!("{}:{}", gateway_clone, listening_port);
+    let address = if no_ap {
+        format!("0.0.0.0:{}", listening_port)
+    } else {
+        format!("{}:{}", gateway_clone, listening_port)
+    };
 
     info!("Starting HTTP server on {}", &address);
 
