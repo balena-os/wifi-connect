@@ -25,10 +25,10 @@ iwgetid -r
 
 # Query the network manager list of networks to cache the available access points
 printf '\nAvailable acscess points:'
-nmcli -t -f SSID dev wifi list
+nmcli -t -f SSID dev wifi list > /usr/src/app/access-points.txt
 
 if [ $? -eq 0 ]; then
-    if [ ${LAUNCH_WIFI_CONNECT_IF_CONNECTED:-1} -eq 1 ]; then
+    if [ ${LAUNCH_IF_CONNECTED:-1} -eq 1 ]; then
         ./wifi-connect --no-ap
     else
         printf 'Skipping WiFi Connect\n'
