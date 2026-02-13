@@ -1,7 +1,7 @@
 import type { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
 import type { RenditionUiSchema } from 'rendition';
-import { Flex, Form, Heading } from 'rendition';
+import { Button, Flex, Form, Heading, Spinner } from 'rendition';
 import type { Network, NetworkInfo } from './App';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
@@ -64,11 +64,15 @@ const isEnterpriseNetwork = (
 interface NetworkInfoFormProps {
 	availableNetworks: Network[];
 	onSubmit: (data: NetworkInfo) => void;
+	onRescan: () => void;
+	isRescanning: boolean;
 }
 
 export const NetworkInfoForm = ({
 	availableNetworks,
 	onSubmit,
+	onRescan,
+	isRescanning,
 }: NetworkInfoFormProps) => {
 	const [data, setData] = React.useState<NetworkInfo>({});
 
@@ -106,6 +110,24 @@ export const NetworkInfoForm = ({
 				}}
 				submitButtonText={'Connect'}
 			/>
+
+			<Flex mt={3} justifyContent="center" alignItems="center">
+				<Button
+					primary
+					onClick={onRescan}
+					disabled={isRescanning}
+					label={
+						isRescanning ? (
+							<Flex alignItems="center" style={{ gap: '8px' }}>
+								<Spinner />
+								<span>Scanning...</span>
+							</Flex>
+						) : (
+							'Rescan networks'
+						)
+					}
+				/>
+			</Flex>
 		</Flex>
 	);
 };

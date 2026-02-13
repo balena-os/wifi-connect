@@ -20,10 +20,19 @@ sleep 25
 # wget --spider http://google.com 2>&1
 
 # 4. Is there an active WiFi connection?
+echo "Active WiFi connection:"
 iwgetid -r
 
+# Query the network manager list of networks to cache the available access points
+printf '\nAvailable acscess points:'
+nmcli -t -f SSID dev wifi list
+
 if [ $? -eq 0 ]; then
-    printf 'Skipping WiFi Connect\n'
+    if [ ${LAUNCH_WIFI_CONNECT_IF_CONNECTED:-1} -eq 1 ]; then
+        ./wifi-connect --no-ap
+    else
+        printf 'Skipping WiFi Connect\n'
+    fi
 else
     printf 'Starting WiFi Connect\n'
     ./wifi-connect

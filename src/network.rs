@@ -18,6 +18,7 @@ use server::start_server;
 
 pub enum NetworkCommand {
     Activate,
+    Rescan,
     Timeout,
     Exit,
     Connect {
@@ -170,6 +171,9 @@ impl NetworkCommandHandler {
                 NetworkCommand::Activate => {
                     self.activate()?;
                 }
+                NetworkCommand::Rescan => {
+                    self.rescan()?;
+                }
                 NetworkCommand::Timeout => {
                     if !self.activated {
                         info!("Timeout reached. Exiting...");
@@ -219,6 +223,24 @@ impl NetworkCommandHandler {
     fn activate(&mut self) -> ExitResult {
         self.activated = true;
 
+        let networks = get_networks(&self.access_points);
+
+        self.server_tx
+            .send(NetworkCommandResponse::Networks(networks))
+            .chain_err(|| ErrorKind::SendAccessPointSSIDs)
+    }
+
+    fn rescan(&mut self) -> ExitResult {
+        if let Some(wifi_device) = self.device.as_wifi_device() {
+            if let Err(e) = wifi_device.request_scan() {
+                debug!("Requesting WiFi scan failed: {}", e);
+            } else {
+                thread::sleep(Duration::from_secs(4));
+            }
+        }
+        if let Ok(aps) = get_access_points(&self.device) {
+            self.access_points = aps;
+        }
         let networks = get_networks(&self.access_points);
 
         self.server_tx

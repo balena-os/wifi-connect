@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     dnsmasq \
     wireless-tools \
+    network-manager \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app

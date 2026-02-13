@@ -152,6 +152,7 @@ pub fn start_server(
     let mut router = Router::new();
     router.get("/", Static::new(ui_directory), "index");
     router.get("/networks", networks, "networks");
+    router.get("/rescan", rescan, "rescan");
     router.post("/connect", connect, "connect");
 
     let mut assets = Mount::new();
@@ -192,6 +193,30 @@ fn networks(req: &mut Request) -> IronResult<Response> {
     let request_state = get_request_state!(req);
 
     if let Err(e) = request_state.network_tx.send(NetworkCommand::Activate) {
+        return exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandActivate);
+    }
+
+    let networks = match request_state.server_rx.recv() {
+        Ok(result) => match result {
+            NetworkCommandResponse::Networks(networks) => networks,
+        },
+        Err(e) => return exit_with_error(&request_state, e, ErrorKind::RecvAccessPointSSIDs),
+    };
+
+    let access_points_json = match serde_json::to_string(&networks) {
+        Ok(json) => json,
+        Err(e) => return exit_with_error(&request_state, e, ErrorKind::SerializeAccessPointSSIDs),
+    };
+
+    Ok(Response::with((status::Ok, access_points_json)))
+}
+
+fn rescan(req: &mut Request) -> IronResult<Response> {
+    info!("User requested network rescan");
+
+    let request_state = get_request_state!(req);
+
+    if let Err(e) = request_state.network_tx.send(NetworkCommand::Rescan) {
         return exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandActivate);
     }
 
