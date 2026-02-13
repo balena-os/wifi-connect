@@ -24,7 +24,6 @@ echo "Active WiFi connection:"
 iwgetid -r
 
 # Query the network manager list of networks to cache the available access points
-printf '\nAvailable acscess points:'
 nmcli -t -f SSID dev wifi list > /usr/src/app/access-points.txt
 
 if [ $? -eq 0 ]; then
