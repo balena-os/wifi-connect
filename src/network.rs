@@ -110,6 +110,8 @@ impl NetworkCommandHandler {
         let exit_tx_server = exit_tx.clone();
         let ui_directory = config.ui_directory.clone();
         let no_ap = config.no_ap;
+        let auth_user = config.auth_user.clone();
+        let auth_password = config.auth_password.clone();
 
         thread::spawn(move || {
             start_server(
@@ -120,6 +122,8 @@ impl NetworkCommandHandler {
                 exit_tx_server,
                 &ui_directory,
                 no_ap,
+                auth_user,
+                auth_password,
             );
         });
     }

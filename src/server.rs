@@ -3,10 +3,12 @@ use std::fmt;
 use std::net::Ipv4Addr;
 use std::sync::mpsc::{Receiver, Sender};
 
+use iron::modifier::Modifier;
 use iron::modifiers::Redirect;
 use iron::prelude::*;
 use iron::{
-    headers, status, typemap, AfterMiddleware, Iron, IronError, IronResult, Request, Response, Url,
+    headers, status, typemap, AfterMiddleware, BeforeMiddleware, Iron, IronError, IronResult,
+    Request, Response, Url,
 };
 use iron_cors::CorsMiddleware;
 use mount::Mount;
@@ -111,6 +113,59 @@ where
     ))
 }
 
+/// Modifier to set WWW-Authenticate header for Basic auth challenge.
+struct WwwAuthenticateHeader(String);
+
+impl Modifier<Response> for WwwAuthenticateHeader {
+    fn modify(self, response: &mut Response) {
+        response
+            .headers
+            .set_raw("WWW-Authenticate", vec![self.0.into_bytes()]);
+    }
+}
+
+/// HTTP Basic Auth middleware - used only in no-ap mode when credentials are configured.
+struct BasicAuthMiddleware {
+    username: String,
+    password: String,
+}
+
+impl BasicAuthMiddleware {
+    fn new(username: String, password: String) -> Self {
+        Self { username, password }
+    }
+
+    fn check_auth(&self, req: &Request) -> bool {
+        let auth_header = match req.headers.get::<headers::Authorization<headers::Basic>>() {
+            Some(auth) => auth,
+            None => return false,
+        };
+        let pass_match = auth_header
+            .0
+            .password
+            .as_ref()
+            .map_or(false, |p| p == &self.password);
+        auth_header.0.username == self.username && pass_match
+    }
+}
+
+impl BeforeMiddleware for BasicAuthMiddleware {
+    fn before(&self, req: &mut Request) -> IronResult<()> {
+        if self.check_auth(req) {
+            Ok(())
+        } else {
+            Err(IronError::new(
+                StringError("Unauthorized".to_string()),
+                (
+                    status::Unauthorized,
+                    "Authentication required",
+                    WwwAuthenticateHeader("Basic realm=\"WiFi Connect\"".to_string()),
+                ),
+            ))
+        }
+    }
+}
+
 struct RedirectMiddleware;
 
 impl AfterMiddleware for RedirectMiddleware {
@@ -139,6 +194,8 @@ pub fn start_server(
     exit_tx: Sender<ExitResult>,
     ui_directory: &PathBuf,
     no_ap: bool,
+    auth_user: Option<String>,
+    auth_password: Option<String>,
 ) {
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
@@ -166,6 +223,12 @@ pub fn start_server(
 
     let mut chain = Chain::new(assets);
     chain.link(Write::<RequestSharedState>::both(request_state));
+    if no_ap {
+        if let (Some(user), Some(pass)) = (auth_user, auth_password) {
+            info!("Basic Auth enabled for no-ap mode (user: {})", user);
+            chain.link_before(BasicAuthMiddleware::new(user, pass));
+        }
+    }
     if !no_ap {
         chain.link_after(RedirectMiddleware);
     }

@@ -59,3 +59,17 @@ Command line options have environment variable counterpart. If both a command li
     Web UI directory location
 
     Default: _ui_
+
+*   **--no-ap**
+
+    Serve the UI without creating an access point (station mode). The web interface listens on all interfaces (0.0.0.0) instead of only the captive portal gateway. Useful when the device is already connected to a network and you want to configure WiFi from another device on the same network.
+
+    Environment variable: **$NO_AP** (set to `1` or `true` to enable)
+
+*   **--auth-user** user, **$AUTH_USER**
+
+    HTTP Basic Auth username for protecting the web UI. Only used when `--no-ap` is enabled. Requires `--auth-password` to be set as well. When both are configured, all requests to the UI require authentication.
+
+*   **--auth-password** password, **$AUTH_PASSWORD**
+
+    HTTP Basic Auth password for protecting the web UI. Only used when `--no-ap` is enabled. Requires `--auth-user` to be set as well.
