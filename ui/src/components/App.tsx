@@ -34,6 +34,7 @@ export interface Network {
 const App = () => {
 	const [attemptedConnect, setAttemptedConnect] = React.useState(false);
 	const [isFetchingNetworks, setIsFetchingNetworks] = React.useState(true);
+	const [isRescanning, setIsRescanning] = React.useState(false);
 	const [error, setError] = React.useState('');
 	const [availableNetworks, setAvailableNetworks] = React.useState<Network[]>(
 		[],
@@ -56,6 +57,27 @@ const App = () => {
 				setIsFetchingNetworks(false);
 			});
 	}, []);
+
+	const onRescan = () => {
+		setIsRescanning(true);
+		setError('');
+
+		fetch('/rescan')
+			.then((data) => {
+				if (data.status !== 200) {
+					throw new Error(data.statusText);
+				}
+
+				return data.json();
+			})
+			.then(setAvailableNetworks)
+			.catch((e: Error) => {
+				setError(`Failed to rescan networks. ${e.message || e}`);
+			})
+			.finally(() => {
+				setIsRescanning(false);
+			});
+	};
 
 	const onConnect = (data: NetworkInfo) => {
 		setAttemptedConnect(true);
@@ -94,6 +116,8 @@ const App = () => {
 				<NetworkInfoForm
 					availableNetworks={availableNetworks}
 					onSubmit={onConnect}
+					onRescan={onRescan}
+					isRescanning={isRescanning}
 				/>
 			</Container>
 		</Provider>

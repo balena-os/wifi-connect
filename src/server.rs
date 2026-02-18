@@ -3,10 +3,12 @@ use std::fmt;
 use std::net::Ipv4Addr;
 use std::sync::mpsc::{Receiver, Sender};
 
+use iron::modifier::Modifier;
 use iron::modifiers::Redirect;
 use iron::prelude::*;
 use iron::{
-    headers, status, typemap, AfterMiddleware, Iron, IronError, IronResult, Request, Response, Url,
+    headers, status, typemap, AfterMiddleware, BeforeMiddleware, Iron, IronError, IronResult,
+    Request, Response, Url,
 };
 use iron_cors::CorsMiddleware;
 use mount::Mount;
@@ -111,6 +113,59 @@ where
     ))
 }
 
+/// Modifier to set WWW-Authenticate header for Basic auth challenge.
+struct WwwAuthenticateHeader(String);
+
+impl Modifier<Response> for WwwAuthenticateHeader {
+    fn modify(self, response: &mut Response) {
+        response
+            .headers
+            .set_raw("WWW-Authenticate", vec![self.0.into_bytes()]);
+    }
+}
+
+/// HTTP Basic Auth middleware - used only in no-ap mode when credentials are configured.
+struct BasicAuthMiddleware {
+    username: String,
+    password: String,
+}
+
+impl BasicAuthMiddleware {
+    fn new(username: String, password: String) -> Self {
+        Self { username, password }
+    }
+
+    fn check_auth(&self, req: &Request) -> bool {
+        let auth_header = match req.headers.get::<headers::Authorization<headers::Basic>>() {
+            Some(auth) => auth,
+            None => return false,
+        };
+        let pass_match = auth_header
+            .0
+            .password
+            .as_ref()
+            .map_or(false, |p| p == &self.password);
+        auth_header.0.username == self.username && pass_match
+    }
+}
+
+impl BeforeMiddleware for BasicAuthMiddleware {
+    fn before(&self, req: &mut Request) -> IronResult<()> {
+        if self.check_auth(req) {
+            Ok(())
+        } else {
+            Err(IronError::new(
+                StringError("Unauthorized".to_string()),
+                (
+                    status::Unauthorized,
+                    "Authentication required",
+                    WwwAuthenticateHeader("Basic realm=\"WiFi Connect\"".to_string()),
+                ),
+            ))
+        }
+    }
+}
+
 struct RedirectMiddleware;
 
 impl AfterMiddleware for RedirectMiddleware {
@@ -138,6 +193,9 @@ pub fn start_server(
     network_tx: Sender<NetworkCommand>,
     exit_tx: Sender<ExitResult>,
     ui_directory: &PathBuf,
+    no_ap: bool,
+    auth_user: Option<String>,
+    auth_password: Option<String>,
 ) {
     let exit_tx_clone = exit_tx.clone();
     let gateway_clone = gateway;
@@ -151,6 +209,7 @@ pub fn start_server(
     let mut router = Router::new();
     router.get("/", Static::new(ui_directory), "index");
     router.get("/networks", networks, "networks");
+    router.get("/rescan", rescan, "rescan");
     router.post("/connect", connect, "connect");
 
     let mut assets = Mount::new();
@@ -164,10 +223,22 @@ pub fn start_server(
 
     let mut chain = Chain::new(assets);
     chain.link(Write::<RequestSharedState>::both(request_state));
-    chain.link_after(RedirectMiddleware);
+    if no_ap {
+        if let (Some(user), Some(pass)) = (auth_user, auth_password) {
+            info!("Basic Auth enabled for no-ap mode (user: {})", user);
+            chain.link_before(BasicAuthMiddleware::new(user, pass));
+        }
+    }
+    if !no_ap {
+        chain.link_after(RedirectMiddleware);
+    }
     chain.link_around(cors_middleware);
 
-    let address = format!("{}:{}", gateway_clone, listening_port);
+    let address = if no_ap {
+        format!("0.0.0.0:{}", listening_port)
+    } else {
+        format!("{}:{}", gateway_clone, listening_port)
+    };
 
     info!("Starting HTTP server on {}", &address);
 
@@ -185,6 +256,30 @@ fn networks(req: &mut Request) -> IronResult<Response> {
     let request_state = get_request_state!(req);
 
     if let Err(e) = request_state.network_tx.send(NetworkCommand::Activate) {
+        return exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandActivate);
+    }
+
+    let networks = match request_state.server_rx.recv() {
+        Ok(result) => match result {
+            NetworkCommandResponse::Networks(networks) => networks,
+        },
+        Err(e) => return exit_with_error(&request_state, e, ErrorKind::RecvAccessPointSSIDs),
+    };
+
+    let access_points_json = match serde_json::to_string(&networks) {
+        Ok(json) => json,
+        Err(e) => return exit_with_error(&request_state, e, ErrorKind::SerializeAccessPointSSIDs),
+    };
+
+    Ok(Response::with((status::Ok, access_points_json)))
+}
+
+fn rescan(req: &mut Request) -> IronResult<Response> {
+    info!("User requested network rescan");
+
+    let request_state = get_request_state!(req);
+
+    if let Err(e) = request_state.network_tx.send(NetworkCommand::Rescan) {
         return exit_with_error(&request_state, e, ErrorKind::SendNetworkCommandActivate);
     }
 

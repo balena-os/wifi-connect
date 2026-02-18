@@ -18,6 +18,7 @@ use server::start_server;
 
 pub enum NetworkCommand {
     Activate,
+    Rescan,
     Timeout,
     Exit,
     Connect {
@@ -43,7 +44,7 @@ struct NetworkCommandHandler {
     access_points: Vec<AccessPoint>,
     portal_connection: Option<Connection>,
     config: Config,
-    dnsmasq: process::Child,
+    dnsmasq: Option<process::Child>,
     server_tx: Sender<NetworkCommandResponse>,
     network_rx: Receiver<NetworkCommand>,
     activated: bool,
@@ -62,9 +63,19 @@ impl NetworkCommandHandler {
 
         let access_points = get_access_points(&device)?;
 
-        let portal_connection = Some(create_portal(&device, config)?);
+        let portal_connection = if !config.no_ap {
+            Some(create_portal(&device, config)?)
+        } else {
+            info!("No-AP mode: skipping access point creation");
+            None
+        };
 
-        let dnsmasq = start_dnsmasq(config, &device)?;
+        let dnsmasq = if !config.no_ap {
+            Some(start_dnsmasq(config, &device)?)
+        } else {
+            info!("No-AP mode: skipping dnsmasq");
+            None
+        };
 
         let (server_tx, server_rx) = channel();
 
@@ -98,6 +109,9 @@ impl NetworkCommandHandler {
         let listening_port = config.listening_port;
         let exit_tx_server = exit_tx.clone();
         let ui_directory = config.ui_directory.clone();
+        let no_ap = config.no_ap;
+        let auth_user = config.auth_user.clone();
+        let auth_password = config.auth_password.clone();
 
         thread::spawn(move || {
             start_server(
@@ -107,6 +121,9 @@ impl NetworkCommandHandler {
                 network_tx,
                 exit_tx_server,
                 &ui_directory,
+                no_ap,
+                auth_user,
+                auth_password,
             );
         });
     }
@@ -158,6 +175,9 @@ impl NetworkCommandHandler {
                 NetworkCommand::Activate => {
                     self.activate()?;
                 }
+                NetworkCommand::Rescan => {
+                    self.rescan()?;
+                }
                 NetworkCommand::Timeout => {
                     if !self.activated {
                         info!("Timeout reached. Exiting...");
@@ -193,7 +213,9 @@ impl NetworkCommandHandler {
     }
 
     fn stop(&mut self, exit_tx: &Sender<ExitResult>, result: ExitResult) {
-        let _ = stop_dnsmasq(&mut self.dnsmasq);
+        if let Some(ref mut dnsmasq) = self.dnsmasq {
+            let _ = stop_dnsmasq(dnsmasq);
+        }
 
         if let Some(ref connection) = self.portal_connection {
             let _ = stop_portal_impl(connection, &self.config);
@@ -205,6 +227,24 @@ impl NetworkCommandHandler {
     fn activate(&mut self) -> ExitResult {
         self.activated = true;
 
+        let networks = get_networks(&self.access_points);
+
+        self.server_tx
+            .send(NetworkCommandResponse::Networks(networks))
+            .chain_err(|| ErrorKind::SendAccessPointSSIDs)
+    }
+
+    fn rescan(&mut self) -> ExitResult {
+        if let Some(wifi_device) = self.device.as_wifi_device() {
+            if let Err(e) = wifi_device.request_scan() {
+                debug!("Requesting WiFi scan failed: {}", e);
+            } else {
+                thread::sleep(Duration::from_secs(4));
+            }
+        }
+        if let Ok(aps) = get_access_points(&self.device) {
+            self.access_points = aps;
+        }
         let networks = get_networks(&self.access_points);
 
         self.server_tx
@@ -264,7 +304,9 @@ impl NetworkCommandHandler {
 
         self.access_points = get_access_points(&self.device)?;
 
-        self.portal_connection = Some(create_portal(&self.device, &self.config)?);
+        if !self.config.no_ap {
+            self.portal_connection = Some(create_portal(&self.device, &self.config)?);
+        }
 
         Ok(false)
     }

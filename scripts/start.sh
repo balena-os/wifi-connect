@@ -19,13 +19,27 @@ sleep 25
 # 3. Is there Internet connectivity via a google ping?
 # wget --spider http://google.com 2>&1
 
+# Query the network manager list of networks to cache the available access points
+nmcli -t -f SSID dev wifi list > /usr/src/app/access-points.txt
+
 # 4. Is there an active WiFi connection?
+echo "Active WiFi connection:"
 iwgetid -r
 
+# Check if there is an active WiFi connection
 if [ $? -eq 0 ]; then
-    printf 'Skipping WiFi Connect\n'
+    if [ ${LAUNCH_IF_CONNECTED:-1} -eq 1 ]; then
+        # check if NO_AP_MODE_PASSWORD is set
+        if [ -z "$NO_AP_MODE_PASSWORD" ]; then
+            echo "NO_AP_MODE_PASSWORD is not set, not running wifi-connect in no-ap mode"
+        else
+            ./wifi-connect --no-ap --auth-user robot --auth-password $NO_AP_MODE_PASSWORD
+        fi
+    else
+        printf 'Skipping WiFi Connect\n'
+    fi
 else
-    printf 'Starting WiFi Connect\n'
+    printf 'Starting WiFi Connect\n' # AP mode by default
     ./wifi-connect
 fi
 

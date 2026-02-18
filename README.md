@@ -51,6 +51,12 @@ When the network credentials have been entered, WiFi Connect will disable the ac
 
 For a complete list of command line arguments and environment variables check out our [command line arguments](./docs/command-line-arguments.md) guide.
 
+### No-AP mode (station mode)
+
+When `--no-ap` is used, WiFi Connect serves the UI without creating an access point. This is useful when the device is already on a network (e.g. via Ethernet) and you want to configure WiFi from another device. The web interface listens on all interfaces and can be accessed at `http://<device-ip>:80` (or the configured port).
+
+In this mode, you can optionally enable HTTP Basic Auth with `--auth-user` and `--auth-password` to protect the UI from unauthorized access on the network.
+
 The full application flow is illustrated in the [state flow diagram](./docs/state-flow-diagram.md).
 
 ***
