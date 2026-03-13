@@ -6,7 +6,8 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # sometimes. In this case, following checks will fail and wifi-connect
 # will be launched even if the device will be able to connect to a WiFi network.
 # If this is your case, you can wait for a while and then check for the connection.
-sleep 25
+# Configurable via START_SLEEP env var (default: 25 seconds).
+sleep ${START_SLEEP:-25}
 
 # Choose a condition for running WiFi Connect according to your use case:
 
@@ -40,7 +41,12 @@ if [ $? -eq 0 ]; then
     fi
 else
     printf 'Starting WiFi Connect\n' # AP mode by default
-    ./wifi-connect
+    # Build portal SSID: if BOT_ID exists, prepend to PORTAL_SSID; else use PORTAL_SSID if set
+    portal_ssid=""
+    if [ -n "$PORTAL_SSID" ]; then
+        portal_ssid="${BOT_ID:+"${BOT_ID}-"}${PORTAL_SSID}"
+    fi
+    ./wifi-connect ${portal_ssid:+--portal-ssid "$portal_ssid"}
 fi
 
 # Start your application here.
