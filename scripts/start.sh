@@ -44,13 +44,13 @@ try_saved_networks() {
     while [ "$attempts" -gt 0 ]; do
         for conn in $(get_saved_wifi_visible); do
             printf 'Trying saved network: %s\n' "$conn"
-            # if nmcli connection up "$conn" 2>/dev/null; then
-            #     sleep "$delay"
-            #     if has_internet; then
-            #         printf 'Connected to %s with internet\n' "$conn"
-            #         return 0
-            #     fi
-            # fi
+            if nmcli connection up "$conn" 2>/dev/null; then
+                sleep "$delay"
+                if has_internet; then
+                    printf 'Connected to %s with internet\n' "$conn"
+                    return 0
+                fi
+            fi
         done
         attempts=$((attempts - 1))
         [ "$attempts" -gt 0 ] && sleep "$delay"
