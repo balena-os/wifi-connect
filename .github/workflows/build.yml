@@ -71,4 +71,8 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx --package @semantic-release/changelog --package @semantic-release/exec semantic-release --no-ci --plugins "@semantic-release/changelog,@semantic-release/exec"
+        run: |
+          npx --package @semantic-release/changelog \
+              --package @semantic-release/exec \
+              --package @semantic-release/git \
+              semantic-release --no-ci
