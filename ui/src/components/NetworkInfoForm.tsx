@@ -1,7 +1,7 @@
 import type { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
 import type { RenditionUiSchema } from 'rendition';
-import { Flex, Form, Heading } from 'rendition';
+import { Button, Flex, Form, Heading } from 'rendition';
 import type { Network, NetworkInfo } from './App';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
@@ -64,11 +64,15 @@ const isEnterpriseNetwork = (
 interface NetworkInfoFormProps {
 	availableNetworks: Network[];
 	onSubmit: (data: NetworkInfo) => void;
+	onRefreshNetworks: () => void;
+	isRefreshingNetworks: boolean;
 }
 
 export const NetworkInfoForm = ({
 	availableNetworks,
 	onSubmit,
+	onRefreshNetworks,
+	isRefreshingNetworks,
 }: NetworkInfoFormProps) => {
 	const [data, setData] = React.useState<NetworkInfo>({});
 
@@ -114,6 +118,17 @@ export const NetworkInfoForm = ({
 				}}
 				submitButtonText={'Connect'}
 			/>
+			<Button
+				type="button"
+				width={['60%', '48%', '36%', '24%']}
+				mt={2}
+				secondary
+				outline
+				disabled={isRefreshingNetworks}
+				onClick={onRefreshNetworks}
+			>
+				{isRefreshingNetworks ? 'Refreshing...' : 'Refresh WiFi list'}
+			</Button>
 		</Flex>
 	);
 };

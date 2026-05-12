@@ -96,13 +96,14 @@ export interface Network {
 const App = () => {
 	const [attemptedConnect, setAttemptedConnect] = React.useState(false);
 	const [isFetchingNetworks, setIsFetchingNetworks] = React.useState(true);
+	const [isRefreshingNetworks, setIsRefreshingNetworks] = React.useState(false);
 	const [error, setError] = React.useState('');
 	const [availableNetworks, setAvailableNetworks] = React.useState<Network[]>(
 		[],
 	);
 
 	React.useEffect(() => {
-		fetch('/networks')
+		fetch('/networks', { cache: 'no-store' })
 			.then((data) => {
 				if (data.status !== 200) {
 					throw new Error(data.statusText);
@@ -137,6 +138,24 @@ const App = () => {
 			})
 			.catch((e: Error) => {
 				setError(`Failed to connect to the network. ${e.message || e}`);
+			});
+	};
+
+	const onRefreshNetworks = () => {
+		setIsRefreshingNetworks(true);
+		setError('');
+
+		fetch('/networks/refresh', {
+			method: 'POST',
+		})
+			.then((resp) => {
+				if (resp.status !== 202 && resp.status !== 200) {
+					throw new Error(resp.statusText);
+				}
+			})
+			.catch((e: Error) => {
+				setIsRefreshingNetworks(false);
+				setError(`Failed to refresh available networks. ${e.message || e}`);
 			});
 	};
 
@@ -199,6 +218,7 @@ const App = () => {
 			<Container>
 				<Notifications
 					attemptedConnect={attemptedConnect}
+					isRefreshingNetworks={isRefreshingNetworks}
 					hasAvailableNetworks={
 						isFetchingNetworks || availableNetworks.length > 0
 					}
@@ -213,6 +233,8 @@ const App = () => {
 					// 	{ ssid: 'Enterprise Net', security: 'enterprise' },
 					// ]}
 					onSubmit={onConnect}
+					onRefreshNetworks={onRefreshNetworks}
+					isRefreshingNetworks={isRefreshingNetworks}
 				/>
 			</Container>
 		</Provider>
