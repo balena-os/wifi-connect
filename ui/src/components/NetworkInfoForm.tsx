@@ -85,7 +85,13 @@ export const NetworkInfoForm = ({
 			m={4}
 			mt={5}
 		>
-			<Heading.h3 align="center" mb={4}>
+			<Heading.h3
+				align="center"
+				mb={4}
+				color={'white'}
+				style={{ fontWeight: 700 }}
+				fontSize={'23px'}
+			>
 				Hi! Please choose your WiFi from the list
 			</Heading.h3>
 
@@ -94,7 +100,9 @@ export const NetworkInfoForm = ({
 				onFormChange={({ formData }) => {
 					setData(formData);
 				}}
-				onFormSubmit={({ formData }) => onSubmit(formData)}
+				onFormSubmit={({ formData }) => {
+					onSubmit(formData);
+				}}
 				value={data}
 				schema={getSchema(availableNetworks)}
 				uiSchema={getUiSchema(isSelectedNetworkEnterprise)}

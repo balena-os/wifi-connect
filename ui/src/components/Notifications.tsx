@@ -13,7 +13,7 @@ export const Notifications = ({
 	return (
 		<>
 			{attemptedConnect && (
-				<Alert m={2} info>
+				<Alert m={2} bg="var(--darker)" info>
 					<Txt.span>Applying changes... </Txt.span>
 					<Txt.span>
 						Your device will soon be online. If connection is unsuccessful, the
@@ -23,7 +23,7 @@ export const Notifications = ({
 				</Alert>
 			)}
 			{!hasAvailableNetworks && (
-				<Alert m={2} warning>
+				<Alert m={2} bg="var(--darker)" warning>
 					<Txt.span>No wifi networks available.&nbsp;</Txt.span>
 					<Txt.span>
 						Please ensure there is a network within range and reboot the device.
@@ -31,7 +31,7 @@ export const Notifications = ({
 				</Alert>
 			)}
 			{!!error && (
-				<Alert m={2} danger>
+				<Alert m={2} bg="var(--darker)" danger>
 					<Txt.span>{error}</Txt.span>
 				</Alert>
 			)}

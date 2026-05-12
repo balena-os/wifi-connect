@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from '../img/logo.svg';
 import { Navbar, Provider, Container } from 'rendition';
 import { NetworkInfoForm } from './NetworkInfoForm';
 import { Notifications } from './Notifications';
@@ -15,6 +14,8 @@ const GlobalStyle = createGlobalStyle`
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
 			'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
 			sans-serif;
+		background: var(--main);
+		color: var(--txt);
 		overscroll-behavior-y: none;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
@@ -24,7 +25,39 @@ const GlobalStyle = createGlobalStyle`
 		font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 	}
 
+	form label {
+		font-weight: 700;
+	}
+
+	#root_ssid {
+		border: solid var(--lighter) !important;
+	}
+
+	form input {
+		border: solid var(--lighter) !important;
+	}
+
+	#root_ssid__input {
+		border: none !important;
+	}
+
+	form input:focus,
+	form select:focus,
+	form textarea:focus {
+		box-shadow: none !important;
+	}
+
+	#root_ssid__input {
+		color: var(--txt) !important;
+	}
+
+	.StyledIcon-sc-ofa7kd-0 path {
+		stroke: var(--txt) !important;
+	}
+
 	#root_ssid__select-drop {
+		background-color:  var(--darker) !important;
+		color: white !important;
 		max-height: 60vh !important;
 		overflow-y: auto !important;
 		overscroll-behavior-y: contain;
@@ -36,6 +69,16 @@ const GlobalStyle = createGlobalStyle`
 	#root_ssid__select-drop [role="listbox"] {
 		overscroll-behavior-y: contain;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	#root_ssid__select-drop [role="option"][aria-selected="true"] {
+		background-color: var(--darker) !important;
+		color: var(--primary) !important;
+	}
+
+	#root_ssid__select-drop [role="option"]:hover {
+		background-color: var(--primary) !important;
+		color: white !important;
 	}
 `;
 
@@ -97,10 +140,61 @@ const App = () => {
 			});
 	};
 
+	const customTheme = {
+		colors: {
+			primary: {
+				main: '#FF8D28',
+				light: '#FFA352',
+				dark: '#E67610',
+			},
+			secondary: {
+				main: '#FFFFFF',
+				light: '#FFFFFF',
+				dark: '#FFFFFF',
+			},
+			tertiary: {
+				main: '#FF8D28',
+				light: '#FF8D28',
+				dark: '#FF8D28',
+			},
+			// quartenary: {
+			// 	main: '#FF8D28',
+			// 	light: '#FF8D28',
+			// 	dark: '#FF8D28',
+			// },
+			text: {
+				main: '#FFFFFF',
+				light: '#FFFFFF',
+				dark: '#FFFFFF',
+			},
+			neutral: {
+				main: '#FFFFFF',
+				light: '#FFFFFF',
+				dark: '#FFFFFF',
+			},
+			aaaaaaaa: {
+				main: '#FF8D28',
+				light: '#FF8D28',
+				dark: '#FF8D28',
+			},
+		},
+	};
 	return (
-		<Provider>
+		<Provider theme={customTheme}>
 			<GlobalStyle />
-			<Navbar brand={<img src={logo} style={{ height: 30 }} alt="logo" />} />
+			{/* <Navbar brand={<img src={logo} style={{ height: 30 }} alt="logo" />} /> */}
+			<Navbar
+				brand={
+					<div
+						style={{ fontWeight: '700', fontSize: '24px', fontFamily: 'K2D' }}
+					>
+						PlayControl
+					</div>
+				}
+				style={{
+					background: 'var(--header)',
+				}}
+			></Navbar>
 
 			<Container>
 				<Notifications
@@ -112,6 +206,12 @@ const App = () => {
 				/>
 				<NetworkInfoForm
 					availableNetworks={availableNetworks}
+					// availableNetworks={[
+					// 	{ ssid: 'Home WiFi', security: 'wpa2' },
+					// 	{ ssid: 'Office Network', security: 'wpa2' },
+					// 	{ ssid: 'Guest', security: 'open' },
+					// 	{ ssid: 'Enterprise Net', security: 'enterprise' },
+					// ]}
 					onSubmit={onConnect}
 				/>
 			</Container>
