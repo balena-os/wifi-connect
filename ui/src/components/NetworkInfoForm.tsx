@@ -1,8 +1,9 @@
 import type { JSONSchema7 as JSONSchema } from 'json-schema';
 import * as React from 'react';
 import type { RenditionUiSchema } from 'rendition';
-import { Flex, Form, Heading } from 'rendition';
+import { Button, Flex, Form, Heading } from 'rendition';
 import type { Network, NetworkInfo } from './App';
+import { RefreshIcon } from './RefreshIcon';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
@@ -64,11 +65,15 @@ const isEnterpriseNetwork = (
 interface NetworkInfoFormProps {
 	availableNetworks: Network[];
 	onSubmit: (data: NetworkInfo) => void;
+	onRefreshNetworks: () => void;
+	isRefreshingNetworks: boolean;
 }
 
 export const NetworkInfoForm = ({
 	availableNetworks,
 	onSubmit,
+	onRefreshNetworks,
+	isRefreshingNetworks,
 }: NetworkInfoFormProps) => {
 	const [data, setData] = React.useState<NetworkInfo>({});
 
@@ -85,8 +90,33 @@ export const NetworkInfoForm = ({
 			m={4}
 			mt={5}
 		>
-			<Heading.h3 align="center" mb={4}>
-				Hi! Please choose your WiFi from the list
+			<Heading.h3
+				align="center"
+				mb={4}
+				color={'white'}
+				style={{ fontWeight: 700 }}
+				fontSize={'23px'}
+			>
+				<Flex
+					alignItems="center"
+					flexDirection={['column', 'row']}
+					flexWrap="wrap"
+					justifyContent="center"
+				>
+					Hi! Please choose your WiFi
+					<Button
+						type="button"
+						ml={[0, 3]}
+						mt={[2, 0]}
+						tertiary
+						plain
+						icon={<RefreshIcon />}
+						disabled={isRefreshingNetworks}
+						onClick={onRefreshNetworks}
+					>
+						{isRefreshingNetworks ? 'Refreshing...' : 'Rescan'}
+					</Button>
+				</Flex>
 			</Heading.h3>
 
 			<Form
@@ -94,7 +124,9 @@ export const NetworkInfoForm = ({
 				onFormChange={({ formData }) => {
 					setData(formData);
 				}}
-				onFormSubmit={({ formData }) => onSubmit(formData)}
+				onFormSubmit={({ formData }) => {
+					onSubmit(formData);
+				}}
 				value={data}
 				schema={getSchema(availableNetworks)}
 				uiSchema={getUiSchema(isSelectedNetworkEnterprise)}

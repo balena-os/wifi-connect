@@ -18,6 +18,7 @@ use server::start_server;
 
 pub enum NetworkCommand {
     Activate,
+    Refresh,
     Timeout,
     Exit,
     Connect {
@@ -158,6 +159,9 @@ impl NetworkCommandHandler {
                 NetworkCommand::Activate => {
                     self.activate()?;
                 }
+                NetworkCommand::Refresh => {
+                    self.refresh()?;
+                }
                 NetworkCommand::Timeout => {
                     if !self.activated {
                         info!("Timeout reached. Exiting...");
@@ -210,6 +214,29 @@ impl NetworkCommandHandler {
         self.server_tx
             .send(NetworkCommandResponse::Networks(networks))
             .chain_err(|| ErrorKind::SendAccessPointSSIDs)
+    }
+
+    fn refresh(&mut self) -> ExitResult {
+        self.activated = true;
+
+        info!("Refreshing available WiFi networks...");
+
+        // Give the HTTP 202 response a chance to reach the phone before the AP drops.
+        thread::sleep(Duration::from_secs(1));
+
+        if let Some(ref connection) = self.portal_connection {
+            stop_portal(connection, &self.config)?;
+        }
+
+        self.portal_connection = None;
+
+        let access_points = get_access_points(&self.device);
+
+        self.portal_connection = Some(create_portal(&self.device, &self.config)?);
+
+        self.access_points = access_points?;
+
+        Ok(())
     }
 
     fn connect(&mut self, ssid: &str, identity: &str, passphrase: &str) -> Result<bool> {
