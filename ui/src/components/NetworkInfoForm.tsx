@@ -3,6 +3,7 @@ import * as React from 'react';
 import type { RenditionUiSchema } from 'rendition';
 import { Button, Flex, Form, Heading } from 'rendition';
 import type { Network, NetworkInfo } from './App';
+import { RefreshIcon } from './RefreshIcon';
 
 const getSchema = (availableNetworks: Network[]): JSONSchema => ({
 	type: 'object',
@@ -96,7 +97,26 @@ export const NetworkInfoForm = ({
 				style={{ fontWeight: 700 }}
 				fontSize={'23px'}
 			>
-				Hi! Please choose your WiFi from the list
+				<Flex
+					alignItems="center"
+					flexDirection={['column', 'row']}
+					flexWrap="wrap"
+					justifyContent="center"
+				>
+					Hi! Please choose your WiFi
+					<Button
+						type="button"
+						ml={[0, 3]}
+						mt={[2, 0]}
+						tertiary
+						plain
+						icon={<RefreshIcon />}
+						disabled={isRefreshingNetworks}
+						onClick={onRefreshNetworks}
+					>
+						{isRefreshingNetworks ? 'Refreshing...' : 'Rescan'}
+					</Button>
+				</Flex>
 			</Heading.h3>
 
 			<Form
@@ -118,17 +138,6 @@ export const NetworkInfoForm = ({
 				}}
 				submitButtonText={'Connect'}
 			/>
-			<Button
-				type="button"
-				width={['60%', '48%', '36%', '24%']}
-				mt={2}
-				secondary
-				outline
-				disabled={isRefreshingNetworks}
-				onClick={onRefreshNetworks}
-			>
-				{isRefreshingNetworks ? 'Refreshing...' : 'Refresh WiFi list'}
-			</Button>
 		</Flex>
 	);
 };

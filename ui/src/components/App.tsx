@@ -5,10 +5,6 @@ import { Notifications } from './Notifications';
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
-	html {
-		overscroll-behavior-y: none;
-	}
-
 	body {
 		margin: 0;
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -16,7 +12,6 @@ const GlobalStyle = createGlobalStyle`
 			sans-serif;
 		background: var(--main);
 		color: var(--txt);
-		overscroll-behavior-y: none;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
@@ -58,17 +53,6 @@ const GlobalStyle = createGlobalStyle`
 	#root_ssid__select-drop {
 		background-color:  var(--darker) !important;
 		color: white !important;
-		max-height: 60vh !important;
-		overflow-y: auto !important;
-		overscroll-behavior-y: contain;
-		-webkit-overflow-scrolling: touch;
-		touch-action: pan-y;
-	}
-
-	#root_ssid__select-drop > div,
-	#root_ssid__select-drop [role="listbox"] {
-		overscroll-behavior-y: contain;
-		-webkit-overflow-scrolling: touch;
 	}
 
 	#root_ssid__select-drop [role="option"][aria-selected="true"] {
