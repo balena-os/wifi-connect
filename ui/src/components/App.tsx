@@ -6,17 +6,36 @@ import { Notifications } from './Notifications';
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
+	html {
+		overscroll-behavior-y: none;
+	}
+
 	body {
 		margin: 0;
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
 			'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
 			sans-serif;
+		overscroll-behavior-y: none;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
 
 	code {
 		font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+	}
+
+	#root_ssid__select-drop {
+		max-height: 60vh !important;
+		overflow-y: auto !important;
+		overscroll-behavior-y: contain;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-y;
+	}
+
+	#root_ssid__select-drop > div,
+	#root_ssid__select-drop [role="listbox"] {
+		overscroll-behavior-y: contain;
+		-webkit-overflow-scrolling: touch;
 	}
 `;
 
