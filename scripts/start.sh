@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+# Path to the host's system D-Bus socket (NetworkManager lives on the host).
+# Defaults to Balena's bind location; override via env for other hosts
+# (e.g. a plain Portainer/Docker host — see docs/PORTAINER.md).
+export DBUS_SYSTEM_BUS_ADDRESS="${DBUS_SYSTEM_BUS_ADDRESS:-unix:path=/host/run/dbus/system_bus_socket}"
 
 # ------------------------------------------------------------------------------
 # Helper: check if we have internet connectivity

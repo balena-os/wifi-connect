@@ -1,0 +1,63 @@
+# WiFi Connect — Portainer / plain-Docker deployment (non-Balena hosts).
+#
+# Runs the captive-portal WiFi setup on a host where NetworkManager runs on the
+# HOST (e.g. the rnoid Jetson robots deployed via Portainer). See
+# docs/PORTAINER.md for the full rationale, env vars, and caveats.
+#
+# Deploy as its OWN stack (not bundled with the app stack) with restart: always
+# so it comes up with the Docker daemon and stays available even if the main
+# application stack is down — which is exactly when an operator needs to fix
+# the network.
+#
+#   docker compose -f docker-compose.portainer.yml up -d --build
+#
+services:
+  wifi-connect:
+    build:
+      context: .
+      dockerfile: Dockerfile.template
+    image: robot-com/wifi-connect:latest
+    container_name: wifi-connect
+    restart: always
+
+    # The captive-portal AP and web server live on the host's wireless
+    # interface, so the container shares the host network namespace.
+    network_mode: host
+
+    # NetworkManager (on the host) does the privileged radio work; the container
+    # only drives it over D-Bus and manages the AP + its dnsmasq. NET_ADMIN is
+    # usually enough; some hosts require privileged for dnsmasq/AP setup —
+    # uncomment `privileged` below if the AP fails to come up.
+    cap_add:
+      - NET_ADMIN
+    # privileged: true
+
+    volumes:
+      # Host system D-Bus socket → reach NetworkManager. Mounted at the path
+      # start.sh expects (see DBUS_SYSTEM_BUS_ADDRESS below).
+      - /run/dbus:/host/run/dbus:ro
+
+    environment:
+      # Where start.sh looks for the host D-Bus socket (matches the mount above).
+      DBUS_SYSTEM_BUS_ADDRESS: "unix:path=/host/run/dbus/system_bus_socket"
+
+      # Seconds to wait at startup for NetworkManager to auto-connect before
+      # deciding the robot is offline (avoids raising the AP on every boot).
+      START_SLEEP: "25"
+
+      # Per-robot captive-portal SSID. Final SSID is "${BOT_ID}-${PORTAL_SSID}"
+      # when BOT_ID is set, else just "${PORTAL_SSID}". Keep BOT_ID unique per
+      # robot so multiple robots don't broadcast the same setup network.
+      PORTAL_SSID: "setup"
+      BOT_ID: "${BOT_ID:-}"
+
+      # Retry tuning for auto-joining saved networks before raising the AP.
+      RECONNECT_ATTEMPTS: "2"
+      RECONNECT_DELAY: "5"
+
+      # Optional: serve the UI in station mode (no AP) with basic auth when the
+      # robot is already online. Leave unset to skip.
+      # NO_AP_MODE_PASSWORD: "change-me"
+
+      # Set LAUNCH_APP=0 to disable raising the AP entirely (debugging).
+      LAUNCH_APP: "1"
