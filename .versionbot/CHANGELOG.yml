@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update flowzonify to v0.4.13
+      hash: 5abbe1ed866642fcb5762f96be4e8f94c2d5a4d3
+      body: |
+        Update flowzonify from 0.0.0 to 0.4.13
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.86
+  title: ""
+  date: 2026-09-30T18:38:32.176Z
+- commits:
     - subject: Move Rust toolchain pin from Flowzone input to Cargo.toml
       hash: 8bcb2b53b450a01d4653e7457fc874c9806c137e
       body: |
