@@ -1,4 +1,21 @@
 - commits:
+    - subject: Move Rust toolchain pin from Flowzone input to Cargo.toml
+      hash: 8bcb2b53b450a01d4653e7457fc874c9806c137e
+      body: |
+        Flowzone removed the rust_toolchain input and now reads the toolchain
+        from rust-version in Cargo.toml. Passing the old input made GitHub
+        reject the workflow before any job ran.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+  version: 4.11.85
+  title: ""
+  date: 2026-09-30T16:34:58.943Z
+- commits:
     - subject: "patch: Replace balenalib with Docker Official image"
       hash: dd25ac50cf1170f06fe6745cb8bcbd8e9eb9648a
       body: ""
