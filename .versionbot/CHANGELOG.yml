@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/setup-node action to v6
+      hash: 013fd1f4f26252cd0a72c8efc1c8e470da21c4ea
+      body: |
+        Update actions/setup-node from 4.4.0 to 6.5.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.87
+  title: ""
+  date: 2026-09-30T20:36:11.738Z
+- commits:
     - subject: Update flowzonify to v0.4.13
       hash: 5abbe1ed866642fcb5762f96be4e8f94c2d5a4d3
       body: |
