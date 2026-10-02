@@ -1,6 +1,6 @@
-FROM debian:bullseye
+FROM debian:trixie
 
-RUN apt-get update && apt-get install -y --no-install-recommends dnsmasq wireless-tools
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates dnsmasq wireless-tools curl
 
 # use latest version. If specific version is required, it should be provided as vX.Y.Z, e.g v4.11.37
 ARG VERSION="latest"
@@ -28,9 +28,9 @@ RUN \
     else \
         export URL_PARTIAL="download/${VERSION}" ; \
     fi; \
-    curl -Ls "$BASE_URL/$URL_PARTIAL/wifi-connect-$BINARY_ARCH_NAME.tar.gz" \
+    curl -fLs "$BASE_URL/$URL_PARTIAL/wifi-connect-$BINARY_ARCH_NAME.tar.gz" \
     | tar -xvz -C  /usr/src/app/ &&\
-    curl -Ls "$BASE_URL/$URL_PARTIAL/wifi-connect-ui.tar.gz" \
+    curl -fLs "$BASE_URL/$URL_PARTIAL/wifi-connect-ui.tar.gz" \
     | tar -xvz -C  /usr/src/app/ui 
 
 COPY scripts/start.sh .
