@@ -14,7 +14,7 @@ NAME='WiFi Connect Raspbian Installer'
 INSTALL_BIN_DIR="$WFC_INSTALL_ROOT/sbin"
 INSTALL_UI_DIR="$WFC_INSTALL_ROOT/share/wifi-connect/ui"
 
-RELEASE_URL="https://api.github.com/repos/$WFC_REPO/releases/45509064"
+RELEASE_URL="https://api.github.com/repos/$WFC_REPO/releases/latest"
 
 CONFIRMATION=true
 
@@ -159,21 +159,24 @@ confirm_installation() {
 }
 
 install_wfc() {
-    local _regex='browser_download_url": "\K.*rpi\.tar\.gz'
+    local _regex='browser_download_url": "\K.*aarch64.*\.tar\.gz'
+    local _uiregex='browser_download_url": "\K.*wifi-connect-ui\.tar\.gz'
     local _arch_url
+    local _ui_url
     local _wfc_version
     local _download_dir
 
     say "Retrieving latest release from $RELEASE_URL..."
 
     _arch_url=$(ensure curl "$RELEASE_URL" -s | grep -hoP "$_regex")
+    _ui_url=$(ensure curl "$RELEASE_URL" -s | grep -hoP "$_uiregex")
 
     say "Downloading and extracting $_arch_url..."
 
     _download_dir=$(ensure mktemp -d)
-
+    ensure mkdir -p "$_download_dir/ui"
     ensure curl -Ls "$_arch_url" | tar -xz -C "$_download_dir"
-
+    ensure curl -Ls "$_ui_url" | tar -xz -C "$_download_dir/ui"
     ensure sudo mv "$_download_dir/wifi-connect" $INSTALL_BIN_DIR
 
     ensure sudo mkdir -p $INSTALL_UI_DIR
