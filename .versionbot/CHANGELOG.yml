@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/upload-artifact action to v7
+      hash: 97f452713328b099775a6f5c4a4c05dd4248f779
+      body: |
+        Update actions/upload-artifact from 4.6.2 to 7.0.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.90
+  title: ""
+  date: 2026-10-02T16:37:45.369Z
+- commits:
     - subject: Update actions/setup-node action to v7
       hash: 0683f4f54e0c8b0edc882f718f8ce564aeed8431
       body: |
