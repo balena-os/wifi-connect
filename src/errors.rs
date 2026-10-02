@@ -35,6 +35,10 @@ error_chain! {
             description("Sending NetworkCommand::Activate failed")
         }
 
+        SendNetworkCommandRefresh {
+            description("Sending NetworkCommand::Refresh failed")
+        }
+
         SendNetworkCommandConnect {
             description("Sending NetworkCommand::Connect failed")
         }
@@ -115,6 +119,7 @@ pub fn exit_code(e: &Error) -> i32 {
         ErrorKind::RecvNetworkCommand => 7,
         ErrorKind::SendNetworkCommandActivate => 8,
         ErrorKind::SendNetworkCommandConnect => 9,
+        ErrorKind::SendNetworkCommandRefresh => 25,
         ErrorKind::DeviceByInterface(_) => 10,
         ErrorKind::NotAWiFiDevice(_) => 11,
         ErrorKind::NoWiFiDevice => 12,
