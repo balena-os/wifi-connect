@@ -1,4 +1,27 @@
 - commits:
+    - subject: Update Dockerfile base image to Debian trixie
+      hash: 41aaa01ab79a91e599c8d4735ffef24e47c9b069
+      body: |
+        Bullseye LTS ended on 2026-08-31.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+    - subject: Fix dockerfile build
+      hash: 009eea9338e09375ef92db69fdf7aa83d7c6b591
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Carlos Alvarez
+      nested: []
+  version: 4.11.88
+  title: ""
+  date: 2026-10-02T12:53:09.235Z
+- commits:
     - subject: Update actions/setup-node action to v6
       hash: 013fd1f4f26252cd0a72c8efc1c8e470da21c4ea
       body: |
