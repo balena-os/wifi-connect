@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update actions/setup-node action to v7
+      hash: 0683f4f54e0c8b0edc882f718f8ce564aeed8431
+      body: |
+        Update actions/setup-node from 6.5.0 to 7.0.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: balena-renovate[bot]
+      nested: []
+  version: 4.11.89
+  title: ""
+  date: 2026-10-02T14:37:09.782Z
+- commits:
     - subject: Update Dockerfile base image to Debian trixie
       hash: 41aaa01ab79a91e599c8d4735ffef24e47c9b069
       body: |
