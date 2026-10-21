@@ -1,6 +1,8 @@
 FROM debian:trixie
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates dnsmasq wireless-tools curl
+# Fail on a cached layer or stale mirror: older CA bundles trust since-distrusted roots
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates dnsmasq wireless-tools curl && \
+    dpkg --compare-versions "$(dpkg-query -W -f='${Version}' ca-certificates)" ge 20250419+deb13u1
 
 # use latest version. If specific version is required, it should be provided as vX.Y.Z, e.g v4.11.37
 ARG VERSION="latest"
