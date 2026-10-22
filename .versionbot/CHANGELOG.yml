@@ -1,4 +1,23 @@
 - commits:
+    - subject: Require ca-certificates 20250419+deb13u1 or later
+      hash: f56dd5ea59ed64cd9b2eb6daed56cbed8d23b3ff
+      body: |
+        trixie-security ships an updated CA bundle that distrusts roots older
+        bundles still trust. A fresh build already installs it, but a cached
+        layer keeps the old bundle, and the build then downloads the release
+        with curl against it. Check the installed version, so the build fails
+        instead of shipping the old bundle.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+        signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+      author: Shaun Mulligan
+      nested: []
+  version: 4.11.91
+  title: ""
+  date: 2026-10-22T02:54:13.005Z
+- commits:
     - subject: Update actions/upload-artifact action to v7
       hash: 97f452713328b099775a6f5c4a4c05dd4248f779
       body: |
