@@ -112,7 +112,13 @@ Dongle                                     | Chip
 [ModMyPi](http://bit.ly/1gY3IHF)           | Ralink RT3070
 [ThePiHut](http://bit.ly/1LfkCgZ)          | Ralink RT5370
 
-It has also been successfully tested with the onboard WiFi on a Raspberry Pi 3.
+It has also been successfully tested with the following onboard WiFi SBC's and NUCs:
+
+* Raspberry Pi 3
+* Intel Compute Stick STK1AW32SC (Intel Wireless-AC 7265)
+* ASUS VivoStick TS10
+* ASUS Mini PC/NUC (PN41) and (PN41-S)
+* ASUS Mini PC/NUC (PN51)
 
 Given these results, it is probable that most dongles with *Atheros* or *Ralink* chipsets will work.
 
