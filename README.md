@@ -140,3 +140,12 @@ License
 
 WiFi Connect is free software, and may be redistributed under the terms specified in
 the [license](https://github.com/balena-io/wifi-connect/blob/master/LICENSE).
+
+***
+
+Related Projects
+----------------
+
+The [Open Agriculture Foundation](https://github.com/OpenAgricultureFoundation) re-wrote WiFi Connect in Python 3.6 language. Their version comes with additional features like connecting to hidden networks and deleting all stored connections. The repository can be found [here](https://github.com/OpenAgricultureFoundation/python-wifi-connect).
+
+If you're looking for a simple reset button that deletes all stored WiFi connections, you can use the service [balena-reset](https://github.com/frederikheld/balena-reset) by [Frederik Held](https://github.com/frederikheld).
